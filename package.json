@@ -1,0 +1,8 @@
+{
+  "name": "itools",
+  "private": true,
+  "workspaces": [
+    "packages/*/backend",
+    "packages/*/frontend"
+  ]
+}
