@@ -9,5 +9,8 @@
   "author": "Alphien",
   "dependencies": {
     "fastify": "^4.7.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3"
   }
 }
