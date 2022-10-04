@@ -5,8 +5,8 @@
     "node": ">=16.16.0"
   },
   "workspaces": [
-    "packages/*/backend",
-    "packages/*/frontend"
+    "apps/*/backend",
+    "apps/*/frontend"
   ],
   "devDependencies": {
     "@types/node": "^18.8.1",
