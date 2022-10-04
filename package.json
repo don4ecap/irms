@@ -8,6 +8,10 @@
     "apps/*/backend",
     "apps/*/frontend"
   ],
+  "scripts": {
+    "build": "npm run --workspaces build",
+    "test": "npm run --workspaces test"
+  },
   "devDependencies": {
     "@types/node": "^18.8.1",
     "eslint": "^8.24.0",
