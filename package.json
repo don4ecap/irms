@@ -1,6 +1,9 @@
 {
   "name": "itools",
   "private": true,
+  "engines": {
+    "node": ">=16.16.0"
+  },
   "workspaces": [
     "packages/*/backend",
     "packages/*/frontend"
