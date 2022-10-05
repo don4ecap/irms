@@ -12,6 +12,7 @@
   "scripts": {
     "build": "npm run --workspaces build",
     "lint": "eslint apps/**/backend/src/*.ts apps/**/frontend/src/*.ts  apps/**/frontend/src/*.vue",
+    "lint:fix": "eslint --fix apps/**/backend/src/*.ts apps/**/frontend/src/*.ts  apps/**/frontend/src/*.vue",
     "test": "npm run --workspaces test",
     "clean": "npm run --workspaces clean"
   },
