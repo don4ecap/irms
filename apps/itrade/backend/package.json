@@ -8,7 +8,8 @@
     "js:watch": "nodemon -e 'js' build/index.js",
     "start": "npm run build && node build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ts:watch": "tsc --watch"
+    "ts:watch": "tsc --watch",
+    "clean": "rm -rf build"
   },
   "author": "Alphien",
   "dependencies": {

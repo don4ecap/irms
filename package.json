@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "build": "npm run --workspaces build",
-    "test": "npm run --workspaces test"
+    "test": "npm run --workspaces test",
+    "clean": "npm run --workspaces clean"
   },
   "devDependencies": {
     "@types/node": "^18.8.1",
