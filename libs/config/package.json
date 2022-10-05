@@ -4,6 +4,7 @@
   "description": "iTools Configuration Library",
   "main": "index.js",
   "scripts": {
+    "build": "echo \"I don't have build script 😅\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Alphien"

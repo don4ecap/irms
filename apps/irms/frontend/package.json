@@ -4,6 +4,7 @@
   "description": "iRMS frontend",
   "main": "index.js",
   "scripts": {
+    "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist"
   },
