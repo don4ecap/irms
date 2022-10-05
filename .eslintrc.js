@@ -13,7 +13,13 @@ module.exports = {
     'prettier',
     'plugin:prettier/recommended',
   ],
-  overrides: [],
+  overrides: [
+    // For vue
+    {
+      files: ['*.vue'],
+      parser: 'vue-eslint-parser',
+    },
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
