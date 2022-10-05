@@ -1,5 +1,3 @@
 {
-  "compilerOptions": {
-    // Left this blank can make vite work :D
-  }
+  "extends": "../../../frontend.tsconfig.json"
 }
