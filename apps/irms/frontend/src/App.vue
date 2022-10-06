@@ -1,23 +1,60 @@
+<template>
+  <jqxTabs
+    ref="tabs"
+    class="main-tab"
+    width="100%"
+    height="100%"
+    position="top"
+    theme="office"
+    @tabclick="onTabClick()"
+  >
+    <ul>
+      <li>EE02</li>
+      <li>EE04</li>
+      <li>FIXUAT</li>
+      <li>JCMA</li>
+      <li>KRIBMA</li>
+      <li>KRMA</li>
+    </ul>
+    <div>
+      <main-panel />
+    </div>
+    <div>
+      <main-panel />
+    </div>
+    <div>
+      <main-panel />
+    </div>
+    <div>
+      <main-panel />
+    </div>
+    <div>
+      <main-panel />
+    </div>
+    <div>
+      <main-panel />
+    </div>
+  </jqxTabs>
+</template>
+
 <script lang="ts">
+import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
+import MainPanel from './components/MainPanel.vue'
+
 export default {
-  data() {
-    return {
-      h1: 'Hey there...',
-      text: 'Hello world',
-    }
+  components: {
+    JqxTabs,
+    MainPanel,
+  },
+
+  // data() {
+  //   return {}
+  // },
+
+  methods: {
+    onTabClick() {
+      this.$refs.tabs.focus()
+    },
   },
 }
 </script>
-
-<template>
-  <div>
-    <h1>{{ h1 }}</h1>
-    <p>{{ text }}</p>
-  </div>
-</template>
-
-<style scoped>
-h1 {
-  color: blueviolet;
-}
-</style>
