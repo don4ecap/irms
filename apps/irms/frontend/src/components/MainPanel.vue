@@ -169,7 +169,7 @@ export default {
     return {
       panels: [
         { size: 150, min: 150, max: 150, collapsible: true },
-        { size: '50%', min: '5%', collapsible: false },
+        { size: '50%', min: '50%', collapsible: false },
       ],
     }
   },
