@@ -69,6 +69,55 @@
           </tbody>
         </table>
       </div>
+      <div class="col-5 flex flex-column flex-grow">
+        <table>
+          <tbody>
+            <tr width="200px">
+              <td style="table-layout: fixed">Risk Ratio:</td>
+              <td class="text-left">
+                <span class="text-large">0.00 %</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Live NAV:</td>
+              <td class="text-left">
+                <span
+                  class="text-large"
+                  style="
+                    background-color: #7cb342;
+                    color: #fff;
+                    padding: 0.2rem;
+                    padding-inline: 0.4rem;
+                    border-radius: 0.2rem;
+                  "
+                >
+                  $31,356.91(+0.21 %)
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Last Calculated:</td>
+              <td class="text-left">
+                <span>October 7 2022 3:31 PM</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-5 flex flex-column flex-grow" style="gap: 0.3rem">
+        <div class="flex" style="gap: 0.3rem">
+          <JqxButton class="inline-block" theme="office">Generate</JqxButton>
+          <JqxButton class="inline-block" theme="office">Preview</JqxButton>
+          <JqxButton class="inline-block" theme="office">Delete</JqxButton>
+          <JqxButton class="inline-block" theme="office">Gen ID</JqxButton>
+        </div>
+        <div class="flex" style="gap: 0.3rem">
+          <JqxButton class="inline-block" theme="office">Gen MORN</JqxButton>
+          <JqxButton class="inline-block" theme="office">Gen TOCOM</JqxButton>
+          <JqxButton class="inline-block" theme="office">Gen EVENING</JqxButton>
+          <JqxButton class="inline-block" theme="office">Gen END</JqxButton>
+        </div>
+      </div>
     </div>
     <div>Panel Two</div>
   </JqxSplitter>
