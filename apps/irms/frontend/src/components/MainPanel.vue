@@ -150,5 +150,10 @@ export default {
       ],
     }
   },
+  mounted() {
+    document
+      .querySelectorAll('.main-panel')
+      .forEach((mainPanel) => (mainPanel.style.width = null))
+  },
 }
 </script>
