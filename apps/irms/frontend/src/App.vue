@@ -1,7 +1,7 @@
 <template>
   <jqxTabs
-    ref="tabs"
-    class="main-tab"
+    ref="mainTabs"
+    class="main-tabs"
     width="100%"
     height="100%"
     position="top"
@@ -53,7 +53,7 @@ export default {
 
   methods: {
     onTabClick() {
-      this.$refs.tabs.focus()
+      this.$refs.mainTabs.focus()
     },
   },
 }
