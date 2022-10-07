@@ -43,6 +43,26 @@ body {
   flex-direction: column;
 }
 
+.flex-grow {
+  flex-grow: 1;
+}
+
+.text-large {
+  font-size: large;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.oblique {
+  font-style: oblique;
+}
+
+.bold {
+  font-weight: bold;
+}
+
 .inline-block {
   display: inline-block !important;
 }

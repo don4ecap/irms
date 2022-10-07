@@ -40,6 +40,35 @@
         <JqxButton theme="office">Load iRMS</JqxButton>
         <JqxButton theme="office">Calculate</JqxButton>
       </div>
+      <div class="col-4 flex flex-column flex-grow">
+        <table>
+          <tbody>
+            <tr width="200px">
+              <td style="table-layout: fixed">Last Nav:</td>
+              <td class="text-left">
+                <span class="text-large"> $14,892,863.92</span>
+                <span class="oblique bold" style="font-size: 0.7rem">
+                  (reconciled)
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Live PNL:</td>
+              <td class="text-left">
+                <span class="text-large" style="color: green">
+                  $31,356.91(+0.21 %)
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Sub/Red:</td>
+              <td class="text-left">
+                <span class="text-large"> Sub/Red: $0.00 </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div>Panel Two</div>
   </JqxSplitter>
