@@ -33,6 +33,13 @@
           />
         </div>
       </div>
+      <div
+        class="col-3 flex flex-column"
+        style="min-width: 8.3rem; gap: 0.3rem"
+      >
+        <JqxButton theme="office">Load iRMS</JqxButton>
+        <JqxButton theme="office">Calculate</JqxButton>
+      </div>
     </div>
     <div>Panel Two</div>
   </JqxSplitter>
