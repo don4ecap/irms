@@ -18,6 +18,7 @@ body {
 .main-panel-top {
   display: flex;
   padding: 0.3rem;
+  gap: 1rem;
 
   .col-1 {
     display: flex;
@@ -31,4 +32,12 @@ body {
 
 .flex {
   display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.inline-block {
+  display: inline-block !important;
 }
