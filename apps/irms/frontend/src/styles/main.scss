@@ -54,12 +54,28 @@ body {
   flex-grow: 1;
 }
 
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
 .text-large {
   font-size: large;
 }
 
 .text-left {
   text-align: left;
+}
+
+.text-center {
+  text-align: center;
 }
 
 .oblique {

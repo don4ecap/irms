@@ -124,8 +124,31 @@
       </div>
       <div>Panel Two</div>
     </JqxSplitter>
-    <div class="end-panel jqx-widget-content flex-grow">
-      <span class="permission">RWX</span>
+    <div class="end-panel jqx-widget-content flex-grow items-start">
+      <div class="flex items-center" style="gap: 0.3rem">
+        <div class="permission bold text-center">RWX</div>
+        <JqxButton class="inline-block" theme="office">Export HTML</JqxButton>
+        <JqxButton class="inline-block" theme="office">Export XLS</JqxButton>
+        <JqxButton class="inline-block" theme="office">
+          Directional Config
+        </JqxButton>
+        <JqxButton class="inline-block" theme="office">
+          Intraday Config
+        </JqxButton>
+        <JqxButton class="inline-block" theme="office">
+          Trader Comments
+        </JqxButton>
+        <label class="flex items-center">
+          <input
+            id="liverisks"
+            type="checkbox"
+            value="liverisks"
+            style="scale: 1.15"
+            checked
+          />
+          <div class="bold">Live Risks</div>
+        </label>
+      </div>
     </div>
   </div>
 </template>
