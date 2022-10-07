@@ -7,7 +7,7 @@
     orientation="horizontal"
   >
     <div class="main-panel-top">
-      <div class="col-1">
+      <div class="col-1 flex-grow" style="max-width: 250px">
         <div class="flex" style="gap: 0.3rem">
           <JqxButton class="inline-block" theme="office">Sector</JqxButton>
           <JqxButton class="inline-block" theme="office">Common</JqxButton>
@@ -40,7 +40,7 @@
         <JqxButton theme="office">Load iRMS</JqxButton>
         <JqxButton theme="office">Calculate</JqxButton>
       </div>
-      <div class="col-4 flex flex-column flex-grow">
+      <div class="col-4 flex flex-column">
         <table>
           <tbody>
             <tr width="200px">
@@ -69,7 +69,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-5 flex flex-column flex-grow">
+      <div class="col-5 flex flex-column">
         <table>
           <tbody>
             <tr width="200px">
@@ -104,7 +104,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-5 flex flex-column flex-grow" style="gap: 0.3rem">
+      <div class="col-5 flex flex-column" style="gap: 0.3rem">
         <div class="flex" style="gap: 0.3rem">
           <JqxButton class="inline-block" theme="office">Generate</JqxButton>
           <JqxButton class="inline-block" theme="office">Preview</JqxButton>
