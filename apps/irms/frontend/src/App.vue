@@ -7,31 +7,17 @@
     position="top"
     theme="office"
     @tabclick="onTabClick()"
+    @selected="onTabSelected()"
   >
+    <!-- TAB HEADER -->
     <ul>
-      <li>EE02</li>
-      <li>EE04</li>
-      <li>FIXUAT</li>
-      <li>JCMA</li>
-      <li>KRIBMA</li>
-      <li>KRMA</li>
+      <li v-for="(account, index) in accounts" :key="index">
+        {{ account }}
+      </li>
     </ul>
-    <div>
-      <main-panel />
-    </div>
-    <div>
-      <main-panel />
-    </div>
-    <div>
-      <main-panel />
-    </div>
-    <div>
-      <main-panel />
-    </div>
-    <div>
-      <main-panel />
-    </div>
-    <div>
+
+    <!-- TAB BODY -->
+    <div v-for="(account, index) in accounts" :key="index">
       <main-panel />
     </div>
   </jqxTabs>
@@ -47,13 +33,26 @@ export default {
     MainPanel,
   },
 
-  // data() {
-  //   return {}
-  // },
+  data() {
+    return {
+      accounts: ['EE02', 'EE04', 'FIXUAT', 'JCMA', 'KRIBMA', 'KRMA'],
+      currentIndex: 0,
+      currentAccount: 'EE02',
+    }
+  },
+
+  mounted() {
+    this.onTabSelected()
+  },
 
   methods: {
     onTabClick() {
       this.$refs.mainTabs.focus()
+    },
+    onTabSelected() {
+      this.currentIndex = this.$refs.mainTabs.val()
+      this.currentAccount = this.accounts[this.currentIndex]
+      document.title = this.currentAccount + ' - ' + ' iRMS'
     },
   },
 }
