@@ -64,7 +64,7 @@
               <tr>
                 <td>Sub/Red:</td>
                 <td class="text-left">
-                  <span class="text-large"> Sub/Red: $0.00 </span>
+                  <span class="text-large">$0.00</span>
                 </td>
               </tr>
             </tbody>
