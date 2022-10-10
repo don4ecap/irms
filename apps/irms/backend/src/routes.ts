@@ -17,7 +17,7 @@ const routes: Array<RouteOptions> = [
             `SELECT * FROM tblfonav WHERE account='${params.account}' AND td <= '${params.trade_date}' ORDER BY TIMESTAMP DESC LIMIT 1;`
           )
           .then((rows) => {
-            res.send(rows[0])
+            return res.send(rows[0])
           })
       })
     },
