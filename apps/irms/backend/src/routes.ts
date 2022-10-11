@@ -14,7 +14,7 @@ const routes: Array<RouteOptions> = [
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
-            `SELECT * FROM tblfonav WHERE account='${params.account}' AND td <= '${params.trade_date}' ORDER BY TIMESTAMP DESC LIMIT 1;`
+            `SELECT * FROM trading.tblfonav WHERE account='${params.account}' AND td <= '${params.trade_date}' ORDER BY TIMESTAMP DESC LIMIT 1;`
           )
           .then((rows) => {
             return res.send(rows[0])
@@ -31,7 +31,7 @@ const routes: Array<RouteOptions> = [
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
-            `SELECT * FROM irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo, irms.year DESC, irms.month DESC`
+            `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo, irms.year DESC, irms.month DESC`
           )
           .then((rows) => {
             return res.send(rows)
@@ -59,7 +59,7 @@ const routes: Array<RouteOptions> = [
               SUM(current_risks_pre) AS current_risks_pre, 
               SUM(target_risks_pre) AS target_risks_pre 
             FROM 
-              irms 
+              trading.irms 
             WHERE 
               account = '${params.account}' 
               AND td = '${params.trade_date}' 
