@@ -49,6 +49,7 @@ const routes: Array<RouteOptions> = [
         connection
           .query(
             `SELECT 
+              id,
               SUM(positions_pct_target) AS positions_pct_target, 
               SUM(qty) AS qty, 
               SUM(current_allocation_pct) AS current_allocation_pct, 
