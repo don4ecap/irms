@@ -18,7 +18,7 @@
 
     <!-- TAB BODY -->
     <div v-for="(account, index) in accounts" :key="index">
-      <main-panel />
+      <main-panel :account="account" />
     </div>
   </jqxTabs>
 </template>

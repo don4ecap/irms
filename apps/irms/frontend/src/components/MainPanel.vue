@@ -15,14 +15,18 @@
             <JqxButton class="inline-block" theme="office">All</JqxButton>
           </div>
 
-          <div class="flex field">JPY Equity</div>
-          <div class="flex field">JPY CCY Futures</div>
-          <div class="flex field">Strategy Allocation</div>
+          <div v-show="isNotEE04Account" class="flex field">JPY Equity</div>
+          <div v-show="isNotEE04Account" class="flex field">
+            JPY CCY Futures
+          </div>
+          <div v-show="isNotEE04Account" class="flex field">
+            Strategy Allocation
+          </div>
           <div class="flex field">Risk</div>
         </div>
         <div class="col-2">
           <div class="flex flex-column" style="gap: 0.3rem">
-            <JqxDateTimeInput width="110" height="28" />
+            <JqxDateTimeInput v-model="bookDate" width="110" height="28" />
             <input
               id="show-non-null"
               type="button"
@@ -38,33 +42,46 @@
           class="col-3 flex flex-column"
           style="min-width: 8.3rem; gap: 0.3rem"
         >
-          <JqxButton theme="office">Load iRMS</JqxButton>
+          <JqxButton theme="office" @click="loadIRMS">Load iRMS</JqxButton>
           <JqxButton theme="office">Calculate</JqxButton>
         </div>
         <div class="col-4 flex flex-column">
           <table>
             <tbody>
               <tr width="200px">
-                <td style="table-layout: fixed">Last Nav:</td>
+                <td style="table-layout: fixed">
+                  {{ account === 'EE04' ? 'EUR NAV' : 'Last Nav' }}:
+                </td>
                 <td class="text-left">
-                  <span class="text-large"> $14,892,863.92</span>
-                  <span class="oblique bold" style="font-size: 0.7rem">
-                    (reconciled)
+                  <span class="text-large">
+                    {{ nav.last_nav }}
+                  </span>
+                  <span
+                    class="oblique bold"
+                    style="font-size: 0.7rem"
+                    :title="nav.live_pnl_status_title"
+                  >
+                    ({{ nav.live_pnl_status }})
                   </span>
                 </td>
               </tr>
               <tr>
                 <td>Live PNL:</td>
                 <td class="text-left">
-                  <span class="text-large" style="color: green">
-                    $31,356.91(+0.21 %)
+                  <span
+                    :class="
+                      'text-large ' +
+                      (nav.live_pnl > 0 ? 'text-green' : 'text-red')
+                    "
+                  >
+                    {{ nav.live_pnl_decorated }}
                   </span>
                 </td>
               </tr>
               <tr>
                 <td>Sub/Red:</td>
                 <td class="text-left">
-                  <span class="text-large">$0.00</span>
+                  <span class="text-large">{{ nav.subred }}</span>
                 </td>
               </tr>
             </tbody>
@@ -74,7 +91,7 @@
           <table>
             <tbody>
               <tr width="200px">
-                <td style="table-layout: fixed">Risk Ratio:</td>
+                <td style="table-layout: fixed">{{ labels.riskRate }}:</td>
                 <td class="text-left">
                   <span class="text-large">0.00 %</span>
                 </td>
@@ -83,23 +100,25 @@
                 <td>Live NAV:</td>
                 <td class="text-left">
                   <span
-                    class="text-large"
+                    :class="
+                      'text-large ' +
+                      (nav.live_pnl > 0 ? 'bg-green-1' : 'bg-red-1')
+                    "
                     style="
-                      background-color: #7cb342;
                       color: #fff;
                       padding: 0.2rem;
                       padding-inline: 0.4rem;
                       border-radius: 0.2rem;
                     "
                   >
-                    $31,356.91(+0.21 %)
+                    {{ nav.live_nav }}
                   </span>
                 </td>
               </tr>
               <tr>
                 <td>Last Calculated:</td>
                 <td class="text-left">
-                  <span>October 7 2022 3:31 PM</span>
+                  <span>{{ nav.last_calculated }}</span>
                 </td>
               </tr>
             </tbody>
@@ -154,29 +173,120 @@
 </template>
 
 <script lang="ts">
+import httpService from '../services/http'
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 
 export default {
   name: 'MainPanel',
+
   components: {
     JqxSplitter,
     JqxButton,
     JqxDateTimeInput,
   },
+
+  props: {
+    account: {
+      type: String,
+      default: 'E002',
+    },
+  },
+
   data() {
     return {
+      bookDate: new Date(),
+      ratioField: 'ratio',
+      nav: {
+        account: 'EE02',
+        td: '2022-10-09T16:00:00.000Z',
+        last_recon_date: '2022-10-06T16:00:00.000Z',
+        last_nav: 0,
+        last_nav_estimated: 0,
+        last_pnl: 0,
+        last_subred: 0,
+        last_pnl_pct: 0,
+        live_nav: 0,
+        live_pnl: 0,
+        live_pnl_pct: 0,
+        subred: 0,
+      },
+      labels: {
+        riskRate: 'Risk Rate',
+      },
       panels: [
         { size: 150, min: 150, max: 150, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
     }
   },
+
+  computed: {
+    isNotEE04Account() {
+      return this.account !== 'EE04'
+    },
+  },
+
   mounted() {
     document
       .querySelectorAll('.main-panel')
       .forEach((mainPanel) => (mainPanel.style.width = null))
+
+    this.loadNav()
+  },
+
+  methods: {
+    loadIRMS() {
+      this.loadNav()
+    },
+
+    loadNav() {
+      const tradeDate = this.bookDate.toISOString().split('T').at(0)
+      // console.log(this.account, tradeDate)
+      httpService
+        .get(`get_nav/${this.account}/${tradeDate}`)
+        .then(({ data }) => {
+          const symbol = this.account !== 'EE04' ? '$' : '€'
+
+          this.nav = {
+            ...data,
+
+            // Formatted
+            live_nav: accounting.formatMoney(parseFloat(data.live_nav), symbol),
+            subred: accounting.formatMoney(data.subred, symbol),
+            live_pnl_decorated: `${accounting.formatMoney(
+              data.live_pnl,
+              symbol
+            )}
+              (${((data.live_pnl_pct || 0) * 100).toFixed(2)}%)`,
+            last_nav: accounting.formatMoney(data.last_nav, symbol),
+            last_calculated: moment(data.timestamp).format('LLL'),
+
+            // Original data convert to int
+            live_pnl: parseInt(data.live_pnl),
+            last_nav_estimated: parseInt(data.last_nav_estimated),
+
+            // New data
+            live_pnl_status:
+              data.last_nav_estimated === 0 ? 'reconciled' : 'estimated',
+            live_pnl_status_title: `Last PNL: ${accounting.formatMoney(
+              data.last_pnl,
+              symbol
+            )}`,
+          }
+
+          if (this.account !== 'EE04') {
+            this.labels.riskRate = 'Risk Ratio'
+            // if (this.account === 'DBPM') {
+            //   this.labels.riskRate = 'Drawdown'
+            // }
+          }
+
+          // TODO: GET RATIO
+          // TODO: Getcurrencyhedging
+        })
+    },
   },
 }
 </script>
