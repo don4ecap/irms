@@ -1,6 +1,6 @@
 import { FastifyReply, RouteOptions } from 'fastify'
 import type { GetNavRequestParams } from './types'
-import db from './db'
+import dbConnection from './db'
 
 const prefix = '/api'
 
@@ -15,7 +15,7 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_nav/:account/:trade_date`,
     handler(req, res) {
-      db.then((connection) => {
+      dbConnection.then((connection) => {
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
@@ -33,7 +33,7 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_book/:account/:trade_date`,
     handler(req, res) {
-      db.then((connection) => {
+      dbConnection.then((connection) => {
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
@@ -51,7 +51,7 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_portfolio/:account/:trade_date`,
     handler(req, res) {
-      db.then((connection) => {
+      dbConnection.then((connection) => {
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
@@ -85,7 +85,7 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_commo_indicator_level`,
     handler(req, res) {
-      db.then((connection) => {
+      dbConnection.then((connection) => {
         connection
           .query(
             `SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live`
