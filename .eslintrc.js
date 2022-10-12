@@ -12,7 +12,9 @@ module.exports = {
     'plugin:vue/recommended',
     'prettier',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
+  root: true,
   overrides: [
     // For vue
     {
