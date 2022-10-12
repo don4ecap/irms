@@ -73,6 +73,22 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  {
+    method: 'GET',
+    url: `${prefix}/get_commo_indicator_level`,
+    handler(req, res) {
+      db.then((connection) => {
+        connection
+          .query(
+            `SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live`
+          )
+          .then((rows) => {
+            return res.send(rows)
+          })
+      })
+    },
+  },
+
   // {
   //   method: 'GET',
   //   url: `${prefix}/test`,
