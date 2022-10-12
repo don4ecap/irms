@@ -37,7 +37,7 @@ const routes: Array<RouteOptions> = [
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
-            `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo, irms.year DESC, irms.month DESC`
+            `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo ASC, irms.year ASC, irms.month ASC`
           )
           .then((rows) => {
             return res.send(rows)
