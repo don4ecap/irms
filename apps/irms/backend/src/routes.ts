@@ -37,7 +37,7 @@ const routes: Array<RouteOptions> = [
         const params: GetNavRequestParams = req.params as GetNavRequestParams
         connection
           .query(
-            `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo ASC, irms.year ASC, irms.month ASC`
+            `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo, irms.year ASC, irms.month ASC`
           )
           .then((rows) => {
             return res.send(rows)
@@ -90,6 +90,21 @@ const routes: Array<RouteOptions> = [
           .query(
             `SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live`
           )
+          .then((rows) => {
+            return res.send(rows)
+          })
+          .catch(internalServerErrorHandler(res))
+      })
+    },
+  },
+
+  {
+    method: 'GET',
+    url: `${prefix}/get_strategies`,
+    handler(req, res) {
+      dbConnection.then((connection) => {
+        connection
+          .query(`SELECT strategy_name from trading.ie_strategy`)
           .then((rows) => {
             return res.send(rows)
           })
