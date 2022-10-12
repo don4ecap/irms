@@ -1,8 +1,13 @@
-import { RouteOptions } from 'fastify'
+import { FastifyReply, RouteOptions } from 'fastify'
 import type { GetNavRequestParams } from './types'
 import db from './db'
 
 const prefix = '/api'
+
+const internalServerErrorHandler = (res: FastifyReply) => (error: any) => {
+  console.error(error)
+  return res.status(500).send({ message: 'Internal server error' })
+}
 
 const routes: Array<RouteOptions> = [
   // GET NAV
@@ -19,6 +24,7 @@ const routes: Array<RouteOptions> = [
           .then((rows) => {
             return res.send(rows[0])
           })
+          .catch(internalServerErrorHandler(res))
       })
     },
   },
@@ -36,6 +42,7 @@ const routes: Array<RouteOptions> = [
           .then((rows) => {
             return res.send(rows)
           })
+          .catch(internalServerErrorHandler(res))
       })
     },
   },
@@ -69,6 +76,7 @@ const routes: Array<RouteOptions> = [
           .then((rows) => {
             return res.send(rows[0])
           })
+          .catch(internalServerErrorHandler(res))
       })
     },
   },
@@ -85,6 +93,7 @@ const routes: Array<RouteOptions> = [
           .then((rows) => {
             return res.send(rows)
           })
+          .catch(internalServerErrorHandler(res))
       })
     },
   },
