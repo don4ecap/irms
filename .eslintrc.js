@@ -1,5 +1,7 @@
 const production = process.env.NODE_ENV === 'production'
 
+const [OFF, WARN, ERROR] = [0, 1, 2]
+
 module.exports = {
   env: {
     browser: true,
@@ -28,7 +30,9 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    'no-debugger': production ? 2 : 0,
-    'no-unused-vars': production ? 2 : 1,
+    'no-debugger': production ? ERROR : OFF,
+    'no-unused-vars': production ? ERROR : WARN,
+    '@typescript-eslint/ban-ts-comment': OFF,
+    '@typescript-eslint/no-explicit-any': OFF,
   },
 }
