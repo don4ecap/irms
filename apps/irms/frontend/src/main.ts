@@ -1,4 +1,5 @@
 import Vue from 'vue'
+//@ts-ignore
 import App from './App.vue'
 import './styles/main.scss'
 
@@ -15,6 +16,7 @@ const accountProperties: IAccountVar = {
   spdRisks: {},
   portfolio: {},
   spdRiskOffsets: {},
+  treeGridID: '',
 }
 
 const accounts = ['EE02', 'EE04', 'FIXUAT', 'JCMA', 'KRIBMA', 'KRMA']
