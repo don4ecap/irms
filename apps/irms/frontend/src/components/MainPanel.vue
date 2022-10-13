@@ -412,7 +412,7 @@ export default {
               //alert("rendered");
             },
             columns: gridColumns,
-            width: (gridContainer?.clientWidth || 1580) + 'px',
+            // width: (gridContainer?.clientWidth || 1580) + 'px',
             selectionMode: 'singleRow',
             columnGroups: [
               { text: 'Exposure', name: 'exposure', align: 'center' },
