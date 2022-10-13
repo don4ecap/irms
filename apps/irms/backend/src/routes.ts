@@ -22,7 +22,7 @@ const routes: Array<RouteOptions> = [
             `SELECT * FROM trading.tblfonav WHERE account='${params.account}' AND td <= '${params.trade_date}' ORDER BY TIMESTAMP DESC LIMIT 1;`
           )
           .then((rows) => {
-            return res.send(rows[0])
+            return res.send(rows[0] || [])
           })
           .catch(internalServerErrorHandler(res))
       })
@@ -73,7 +73,7 @@ const routes: Array<RouteOptions> = [
               AND instrument <> 'cash'`
           )
           .then((rows) => {
-            return res.send(rows[0])
+            return res.send(rows[0] || [])
           })
           .catch(internalServerErrorHandler(res))
       })
