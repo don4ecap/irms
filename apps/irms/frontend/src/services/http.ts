@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const serverAPI = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_IRMS_BACKEND_URL,
 })
 
 serverAPI.interceptors.request.use((req) => {
