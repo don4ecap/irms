@@ -1,0 +1,115 @@
+.nocommorisk {
+  background-color: white;
+}
+.lowcommorisk {
+  background-color: lightpink;
+}
+.medcommorisk {
+  background-color: lightcoral;
+}
+.lowdelta {
+  background-color: lightpink;
+}
+.meddelta {
+  background-color: lightcoral;
+}
+.veryhighdelta {
+  background-color: #ff1b1b;
+  color: white !important;
+}
+.highcommorisk {
+  background-color: indianred;
+}
+
+.veryhighcommorisk {
+  background-color: #ff1b1b;
+}
+.sector {
+  background-color: gray;
+}
+.portfolio {
+  background-color: lightyellow;
+}
+.commo {
+  background-color: lightgrey;
+  border-color: Black;
+}
+
+.nonnull {
+  display: none;
+}
+
+// .nospdrisk {
+/* background-color:white; */
+// }
+
+.lowspdrisk {
+  background-color: lightblue;
+}
+.medspdrisk {
+  background-color: deepskyblue;
+}
+.highspdrisk {
+  background-color: dodgerblue;
+}
+
+.custombutton {
+  vertical-align: baseline;
+  height: 20px;
+  font-size: 8px;
+}
+
+// .editable {
+//
+// }
+
+.white {
+  background-color: White;
+}
+
+.marketclosed {
+  background-color: lightslategray;
+}
+
+.level_0 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: #c0c0c0 !important;
+}
+
+.level_1 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: mediumpurple !important;
+}
+.level_2 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: forestgreen !important;
+}
+.level_3 {
+  /*background-color:deepskyblue;*/
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: deepskyblue !important;
+}
+.level_4 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: lightblue !important;
+}
+.level_5 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: yellow !important;
+}
+.level_6 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: #ff1b1b !important;
+}
+.level_7 {
+  border-left-style: solid !important;
+  border-left-width: 15px !important;
+  border-left-color: orange !important;
+}
