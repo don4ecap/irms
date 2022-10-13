@@ -5,6 +5,7 @@
       width="100%"
       :panels="panels"
       class="main-panel"
+      theme="office"
       orientation="horizontal"
     >
       <div class="main-panel-top">
