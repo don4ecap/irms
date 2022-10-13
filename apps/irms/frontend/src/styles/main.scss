@@ -33,6 +33,10 @@ body {
   }
 }
 
+.main-panel {
+  flex-grow: 1;
+}
+
 .main-panel-top {
   display: flex;
   padding: 0.3rem;
@@ -56,6 +60,7 @@ body {
   border-style: solid;
   border-width: thin;
   margin-top: 0.4rem;
+  max-height: 29px;
   padding: 0.3rem;
 }
 
