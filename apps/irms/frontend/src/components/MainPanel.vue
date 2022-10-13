@@ -28,13 +28,15 @@
           <div class="flex flex-column" style="gap: 0.3rem">
             <JqxDateTimeInput v-model="bookDate" width="110" height="28" />
             <input
-              id="show-non-null"
               type="button"
               value="Non-Null"
               role="button"
-              class="jqx-rc-all jqx-rc-all-office jqx-button jqx-button-office jqx-widget jqx-widget-office jqx-fill-state-normal jqx-fill-state-normal-office inline-block"
-              aria-disabled="tru"
-              aria-checked="true"
+              :class="
+                'jqx-rc-all jqx-rc-all-office jqx-button jqx-button-office jqx-widget jqx-widget-office jqx-fill-state-normal jqx-fill-state-normal-office inline-block ' +
+                (showNonNull ? 'jqx-fill-state-pressed-office' : '')
+              "
+              :aria-checked="showNonNull"
+              @click="onShowNonNullClicked"
             />
           </div>
         </div>
@@ -141,7 +143,18 @@
           </div>
         </div>
       </div>
-      <div>Panel Two</div>
+      <div
+        :id="'tree-grid-container-' + account.toLowerCase()"
+        class="tree-grid-container"
+      >
+        <!-- <JqxGrid
+          ref="mainGrid"
+          width="1580px"
+          :source="dataAdapter"
+          :column-groups="columnGroups"
+          theme="office"
+        /> -->
+      </div>
     </JqxSplitter>
     <div class="end-panel jqx-widget-content flex-grow items-start">
       <div class="flex items-center" style="gap: 0.3rem">
@@ -174,9 +187,15 @@
 
 <script lang="ts">
 import httpService from '../services/http'
+import gridColumns from '../helpers/gridOptions'
+import Risks from '../helpers/Risks'
+import utils from '../helpers'
+
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
+import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
+import JqxTooltip from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtooltip.vue'
 
 export default {
   name: 'MainPanel',
@@ -185,6 +204,8 @@ export default {
     JqxSplitter,
     JqxButton,
     JqxDateTimeInput,
+    JqxTreeGrid,
+    JqxTooltip,
   },
 
   props: {
@@ -219,6 +240,9 @@ export default {
         { size: 150, min: 150, max: 150, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
+      calculateRisksLive: true,
+      forceRenderedOnce: true,
+      showNonNull: false,
     }
   },
 
@@ -229,52 +253,27 @@ export default {
   },
 
   mounted() {
+    // Remove each main panel element width assigned by jqwidgets
     document
       .querySelectorAll('.main-panel')
+      //@ts-ignore
       .forEach((mainPanel) => (mainPanel.style.width = null))
 
     this.loadNav()
   },
 
   methods: {
-    loadIRMS() {
+    async loadIRMS() {
       this.loadNav()
+      this.loadCommoIndicatorLevel().then(() => this.loadBooks())
     },
 
     loadNav() {
-      const tradeDate = this.bookDate.toISOString().split('T').at(0)
-      // console.log(this.account, tradeDate)
-      httpService
+      const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
+      return httpService
         .get(`get_nav/${this.account}/${tradeDate}`)
         .then(({ data }) => {
-          const symbol = this.account !== 'EE04' ? '$' : '€'
-
-          this.nav = {
-            ...data,
-
-            // Formatted
-            live_nav: accounting.formatMoney(parseFloat(data.live_nav), symbol),
-            subred: accounting.formatMoney(data.subred, symbol),
-            live_pnl_decorated: `${accounting.formatMoney(
-              data.live_pnl,
-              symbol
-            )}
-              (${((data.live_pnl_pct || 0) * 100).toFixed(2)}%)`,
-            last_nav: accounting.formatMoney(data.last_nav, symbol),
-            last_calculated: moment(data.timestamp).format('LLL'),
-
-            // Original data convert to int
-            live_pnl: parseInt(data.live_pnl),
-            last_nav_estimated: parseInt(data.last_nav_estimated),
-
-            // New data
-            live_pnl_status:
-              data.last_nav_estimated === 0 ? 'reconciled' : 'estimated',
-            live_pnl_status_title: `Last PNL: ${accounting.formatMoney(
-              data.last_pnl,
-              symbol
-            )}`,
-          }
+          this.nav = utils.formatNavData(data, this.account)
 
           if (this.account !== 'EE04') {
             this.labels.riskRate = 'Risk Ratio'
@@ -286,6 +285,188 @@ export default {
           // TODO: GET RATIO
           // TODO: Getcurrencyhedging
         })
+    },
+
+    loadBooks() {
+      const lowerAccountName = this.account.toLowerCase()
+      const currentTreeGridID = `tree-grid-${lowerAccountName}`
+      const containerSelector = `#tree-grid-container-${lowerAccountName}`
+      const gridContainer = document.querySelector(containerSelector)
+      const existingGridEl = $(`#${currentTreeGridID}`)
+
+      if (existingGridEl?.length) {
+        existingGridEl.jqxTreeGrid('destroy')
+      }
+
+      // Create new grid element for attach the new tree grid
+      const newGrid = document.createElement('div')
+      newGrid.setAttribute('id', `${currentTreeGridID}`)
+      gridContainer?.appendChild(newGrid)
+
+      const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
+      return httpService
+        .get(`get_book/${this.account}/${tradeDate}`)
+        .then(async ({ data: books }) => {
+          currentAccountVar.books = books
+          currentAccountVar.bookIDMap = []
+          currentAccountVar.bookIDMapRev = []
+
+          currentAccountVar.portfolio = await httpService
+            .get(`get_portfolio/${this.account}/${tradeDate}`)
+            .then(({ data }) => data)
+            .catch((error) => console.error('Failed to get portfolio:', error))
+
+          currentAccountVar.portfolio.display = 'PORTFOLIO'
+          currentAccountVar.portfolio.rowType = 'sector'
+          currentAccountVar.portfolio.parent = null
+
+          currentAccountVar.books.unshift(currentAccountVar.portfolio)
+          for (let i = 0; i < currentAccountVar.books.length; i++) {
+            const book = currentAccountVar.books[i]
+            book.expanded = true
+            book.order_size = null
+            book.action = ''
+            currentAccountVar.bookIDMap[i] = parseInt(book.id)
+            currentAccountVar.bookIDMapRev[book.id] = i
+            book.style = 'background-color:red'
+          }
+
+          Risks.ComputeRisks()
+          currentAccountVar.spdRisks = Risks.SpreadRisks()
+
+          const dataAdapter = new $.jqx.dataAdapter({
+            dataType: 'json',
+            dataFields: [
+              { name: 'sector', type: 'string' },
+              { name: 'commo', type: 'string' },
+              { name: 'contract', type: 'string' },
+              { name: 'contract_twodigit', type: 'string' },
+              { name: 'extension', type: 'string' },
+              { name: 'contract', type: 'string' },
+              { name: 'qty', type: 'number' },
+              { name: 'ccy', type: 'string' },
+              { name: 'valuept', type: 'string' },
+              { name: 'settlement', type: 'number' },
+              { name: 'last_price', type: 'number' },
+              { name: 'last_fx', type: 'number' },
+              { name: 'live_fx', type: 'number' },
+              { name: 'last_nav', type: 'number' },
+              { name: 'target_allocation_pct', type: 'number' },
+              { name: 'current_allocation_pct', type: 'number' },
+              { name: 'positions_pct_target', type: 'number' },
+              { name: 'positions_pct_current', type: 'number' },
+              { name: 'target_allocation_lots', type: 'number' },
+              { name: 'target_allocation_delta', type: 'number' },
+              { name: 'current_allocation_lots', type: 'number' },
+              { name: 'current_allocation_delta', type: 'number' },
+              { name: 'current_risks_pre', type: 'number' },
+              { name: 'target_risks_pre', type: 'number' },
+              { name: 'current_risks_post', type: 'number' },
+              { name: 'target_risks_post', type: 'number' },
+              { name: 'rowType', type: 'string' },
+              { name: 'first_notice_date', type: 'string' },
+              { name: 'last_trade_date', type: 'string' },
+              { name: 'expiry4E', type: 'string' },
+              { name: 'notice4E', type: 'string' },
+              { name: 'orderQ', type: 'string' },
+              { name: 'orderP', type: 'string' },
+              { name: 'id', type: 'number' },
+              { name: 'parent', type: 'number' },
+              { name: 'display', type: 'string' },
+              { name: 'expanded', type: 'bool' },
+              { name: 'action', type: 'string' },
+              { name: 'order_size', type: 'number' },
+              { name: 'style', type: 'string' },
+            ],
+            hierarchy: {
+              keyDataField: { name: 'id' },
+              parentDataField: { name: 'parent' },
+            },
+            id: 'id',
+            localData: currentAccountVar.books,
+          })
+
+          $(`#${currentTreeGridID}`).jqxTreeGrid({
+            source: dataAdapter,
+            sortable: true,
+            editable: true,
+            editSettings: {
+              saveOnPageChange: true,
+              saveOnBlur: true,
+              saveOnSelectionChange: true,
+              cancelOnEsc: true,
+              saveOnEnter: true,
+              editSingleCell: true,
+              editOnDoubleClick: false,
+              editOnF2: true,
+            },
+            enableHover: false,
+            ready: () => {
+              currentAccountVar.forceRenderedOnce = false
+              //alert("ready");
+            },
+            rendered: () => {
+              // buildGrid()
+              // LoadComments()
+              //alert("rendered");
+            },
+            columns: gridColumns,
+            width: (gridContainer?.clientWidth || 1580) + 'px',
+            selectionMode: 'singleRow',
+            columnGroups: [
+              { text: 'Exposure', name: 'exposure', align: 'center' },
+              {
+                text: 'Current Allocation',
+                name: 'current_allocation',
+                align: 'center',
+              },
+              {
+                text: 'Target Allocation',
+                name: 'target_allocation',
+                align: 'center',
+              },
+              {
+                text: 'Risks Pre-Orders',
+                name: 'risks_pre',
+                align: 'center',
+              },
+              {
+                text: 'Risks Post-Orders',
+                name: 'risks_post',
+                align: 'center',
+              },
+              { text: 'Orders', name: 'orders', align: 'center' },
+            ],
+            theme: 'office',
+            showStatusbar: false,
+            // renderStatusbar(toolbar) {
+            //   const x = $("<div style='margin: 3px;'></div>")
+            //   const span = $(
+            //     "<span style='float: left; margin-top: 2px; margin-right: 2px;' id='livestatus'></span>"
+            //   )
+            //   toolbar.append(x)
+            //   x.append(span)
+            // },
+          })
+          currentAccountVar.treeGridID = currentTreeGridID
+        })
+        .catch((error) => {
+          console.error(
+            `Failed to fetch books of ${this.account} account\n`,
+            error
+          )
+        })
+    },
+
+    loadCommoIndicatorLevel() {
+      return httpService
+        .get('get_commo_indicator_level')
+        .then(({ data }) => (currentAccountVar.indLevel = data))
+    },
+
+    onShowNonNullClicked() {
+      //@ts-ignore
+      this.showNonNull = window.showNonNull = !this.showNonNull
     },
   },
 }

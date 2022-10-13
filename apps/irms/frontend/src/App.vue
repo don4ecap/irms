@@ -53,6 +53,10 @@ export default {
       this.currentIndex = this.$refs.mainTabs.val()
       this.currentAccount = this.accounts[this.currentIndex]
       document.title = this.currentAccount + ' - ' + ' iRMS'
+
+      if (window.currentAccountVar && window.accountsVar) {
+        window.currentAccountVar = window.accountsVar[this.currentAccount]
+      }
     },
   },
 }
