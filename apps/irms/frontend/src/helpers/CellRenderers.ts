@@ -358,7 +358,9 @@ const cellClass = function (row, dataField, cellText, rowData) {
     return getCommoRisksColor(cellValue)
   }
   if (rowData.rowType == 'contract') {
-    // return (getSpreadRisksColor(spdRisks[rowData.commo][dataField]*100));
+    return getSpreadRisksColor(
+      currentAccountVar.spdRisks[rowData.commo][dataField] * 100
+    )
   }
 }
 const colorType = function (row, dataField, cellText, rowData) {
