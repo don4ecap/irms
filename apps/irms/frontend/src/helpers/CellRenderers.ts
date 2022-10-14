@@ -371,6 +371,7 @@ const colorType = function (row, dataField, cellText, rowData) {
     if (rowData.display == 'PORTFOLIO') return 'portfolio'
     else return 'sector'
   }
+
   if (rowData.rowType == 'commodity') {
     if (dataField.indexOf('current_allocation_delta') != -1) {
       return getDeltaColor(Math.abs(parseFloat(cellText)))
@@ -382,6 +383,7 @@ const colorType = function (row, dataField, cellText, rowData) {
     }
     return 'commo'
   }
+
   if (rowData.rowType == 'contract') {
     // let nonnull = ''
     let commo = ''

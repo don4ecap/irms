@@ -5,6 +5,8 @@ declare global {
     currentAccountVar: IAccountVar
   }
 
+  var strategies: Array<string>
+
   interface IAccountVar {
     bookIDMap: Array<number>
     bookIDMapRev: Array<number>
@@ -18,6 +20,7 @@ declare global {
     showNonNull: boolean
     spdRiskOffsets: any
     spdRisks: any
+    tradeDate: Date | string
     treeGridID: string
   }
 

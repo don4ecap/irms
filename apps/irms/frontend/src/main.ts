@@ -4,18 +4,19 @@ import App from './App.vue'
 import './styles/main.scss'
 
 const accountProperties: IAccountVar = {
-  books: [],
   bookIDMap: [],
   bookIDMapRev: [],
+  books: [],
   calculateRisksLive: true,
   configTags: [],
-  forceRenderedOnce: true,
+  forceRenderedOnce: false,
   indLevel: [],
   pnlUSD: {},
-  showNonNull: false,
-  spdRisks: {},
   portfolio: {},
+  showNonNull: true,
   spdRiskOffsets: {},
+  spdRisks: {},
+  tradeDate: '',
   treeGridID: '',
 }
 
@@ -31,6 +32,7 @@ for (const account of accounts) {
 }
 
 window.currentAccountVar = accountsVar[accounts.at(0)]
+window.strategies = []
 
 new Vue({
   render: (h) => h(App),

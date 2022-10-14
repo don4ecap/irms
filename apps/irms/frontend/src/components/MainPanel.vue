@@ -13,7 +13,9 @@
           <div class="flex" style="gap: 0.3rem">
             <JqxButton class="inline-block" theme="office">Sector</JqxButton>
             <JqxButton class="inline-block" theme="office">Common</JqxButton>
-            <JqxButton class="inline-block" theme="office">All</JqxButton>
+            <JqxButton @click="showContract" class="inline-block" theme="office"
+              >All</JqxButton
+            >
           </div>
 
           <div v-show="isNotEE04Account" class="flex field">JPY Equity</div>
@@ -191,6 +193,7 @@ import httpService from '../services/http'
 import gridColumns from '../helpers/gridOptions'
 import Risks from '../helpers/Risks'
 import utils from '../helpers'
+import Formatters from '../helpers/Formatters'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
@@ -258,12 +261,19 @@ export default {
     this.$el.querySelector('.main-panel').style.width = null
 
     this.loadNav()
+    this.loadStrategies()
   },
 
   methods: {
     async loadIRMS() {
       this.loadNav()
       this.loadCommoIndicatorLevel().then(() => this.loadBooks())
+    },
+
+    loadStrategies() {
+      return httpService
+        .get('get_strategies')
+        .then(({ data }) => (strategies = data))
     },
 
     loadNav() {
@@ -291,6 +301,7 @@ export default {
       const containerSelector = `#tree-grid-container-${lowerAccountName}`
       const gridContainer = document.querySelector(containerSelector)
       const existingGridEl = $(`#${currentTreeGridID}`)
+      currentAccountVar.treeGridID = currentTreeGridID
 
       if (existingGridEl?.length) {
         existingGridEl.jqxTreeGrid('destroy')
@@ -404,7 +415,7 @@ export default {
               //alert("ready");
             },
             rendered: () => {
-              // buildGrid()
+              this.buildGrid()
               // LoadComments()
               //alert("rendered");
             },
@@ -446,7 +457,6 @@ export default {
             //   x.append(span)
             // },
           })
-          currentAccountVar.treeGridID = currentTreeGridID
         })
         .catch((error) => {
           console.error(
@@ -462,9 +472,38 @@ export default {
         .then(({ data }) => (currentAccountVar.indLevel = data))
     },
 
+    buildGrid() {
+      const a = new Date()
+      if (currentAccountVar.calculateRisksLive) {
+        Formatters.filterNonNull(currentAccountVar.books)
+      }
+      const b = new Date()
+      const dif = b - a
+      console.log(`FilterNonNull took ${dif} secs to complete`)
+
+      //InitializeControls();
+    },
+
     onShowNonNullClicked() {
       //@ts-ignore
       this.showNonNull = window.showNonNull = !this.showNonNull
+    },
+
+    showContract() {
+      if (!currentAccountVar.treeGridID.length) {
+        const msg = 'There is no data yet. Please Load iRMS data first'
+        alert(msg)
+        throw SyntaxError(msg)
+      }
+
+      setTimeout(function () {
+        for (let i = 0; i < currentAccountVar.books.length; i++) {
+          const book = currentAccountVar.books[i]
+          if (book.rowType == 'sector') book.expanded = true
+          if (book.rowType == 'commodity') book.expanded = true
+        }
+        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      }, 500)
     },
   },
 }
