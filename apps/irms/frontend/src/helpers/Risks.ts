@@ -1,3 +1,5 @@
+import TreeGridUtils from './TreeGridUtils'
+
 function GetOrderSize(i: number) {
   const row = currentAccountVar.books[i]
 
@@ -17,7 +19,7 @@ function GetOrderSize(i: number) {
       let totalQ = 0
       if (currentAccountVar.spdRiskOffsets[row.contract] != null) {
         totalQ += currentAccountVar.spdRiskOffsets[row.contract]
-        getCell(row.id, 14).addClass('spreadadjustment')
+        TreeGridUtils.getCell(row.id, 14).addClass('spreadadjustment')
       }
       if (orderSize != null && orderSize != '') {
         const numLots = orderSize.toString().split(';')
