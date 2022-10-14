@@ -21,6 +21,11 @@ body {
   }
 }
 
+.jqx-grid-table,
+.jqx-grid-column-header {
+  font-size: 12px;
+}
+
 .jqx-grid-cell-wrap {
   white-space: nowrap !important;
 }
