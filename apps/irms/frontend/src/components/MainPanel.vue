@@ -254,10 +254,7 @@ export default {
 
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
-    document
-      .querySelectorAll('.main-panel')
-      //@ts-ignore
-      .forEach((mainPanel) => (mainPanel.style.width = null))
+    this.$el.querySelector('.main-panel').style.width = null
 
     this.loadNav()
   },
