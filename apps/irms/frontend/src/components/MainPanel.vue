@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-column" style="height: calc(100% - 0.75rem)">
     <JqxSplitter
+      height="calc(100% - 10rem)"
       width="100%"
       :panels="panels"
       class="main-panel"
