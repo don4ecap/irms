@@ -242,7 +242,7 @@ export default {
       ],
       calculateRisksLive: true,
       forceRenderedOnce: true,
-      showNonNull: false,
+      showNonNull: true,
     }
   },
 
