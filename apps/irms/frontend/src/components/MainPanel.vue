@@ -184,6 +184,12 @@
           <div class="bold">Live Risks</div>
         </label>
         <div class="ml-auto">
+          <div v-show="lastBookCalculationScheduler?.length">
+            Last Book Calculation (scheduler):
+            <span>
+              {{ lastBookCalculationScheduler }}
+            </span>
+          </div>
           <div v-show="bookLoadedDate?.length">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
           </div>
@@ -250,6 +256,8 @@ export default {
         { size: '50%', min: '50%', collapsible: false },
       ],
       bookLoadedDate: '',
+      lastBookCalculationScheduler: '',
+      lastBookCalculationSchedulerInterval: null,
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
@@ -273,6 +281,16 @@ export default {
   methods: {
     async loadIRMS() {
       this.bookLoadedDate = moment().format('LLL')
+
+      // Attach last book calclulation scheduler, runs every one minute
+      if (this.lastBookCalculationSchedulerInterval) {
+        console.debug('Check last book calculation scheduler has been attached')
+        this.lastBookCalculationSchedulerInterval = setInterval(
+          this.updateLastBookCalculation,
+          60000
+        )
+      }
+
       this.loadNav()
       this.loadCommoIndicatorLevel().then(() => this.loadBooks())
     },
@@ -284,6 +302,8 @@ export default {
     },
 
     loadNav() {
+      this.updateLastBookCalculation()
+
       const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
       return httpService
         .get(`get_nav/${this.account}/${tradeDate}`)
@@ -511,6 +531,20 @@ export default {
         }
         $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       }, 500)
+    },
+
+    updateLastBookCalculation() {
+      httpService
+        .get(`check_last_calculated/${this.account}`)
+        .then(({ data }) => {
+          this.lastBookCalculationScheduler = moment(data.value).format('LLL')
+        })
+        .catch((error) => {
+          console.error(
+            `Failed to fetch last calculation date for ${this.account}`,
+            error
+          )
+        })
     },
   },
 }
