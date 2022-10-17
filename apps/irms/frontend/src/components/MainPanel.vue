@@ -544,9 +544,11 @@ export default {
     buildGrid() {
       const a = new Date()
       if (currentAccountVar.calculateRisksLive) {
+        //@ts-ignore
         Formatters.filterNonNull(currentAccountVar.books)
       }
       const b = new Date()
+      //@ts-ignore
       const dif = b - a
       console.log(`FilterNonNull took ${dif} secs to complete`)
 
@@ -555,7 +557,8 @@ export default {
 
     onShowNonNullClicked() {
       //@ts-ignore
-      this.showNonNull = window.showNonNull = !this.showNonNull
+      this.showNonNull = currentAccountVar.showNonNull = !this.showNonNull
+      this.buildGrid()
     },
 
     showContract() {
