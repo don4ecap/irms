@@ -9,6 +9,7 @@ const accountProperties: IAccountVar = {
   books: [],
   calculateRisksLive: true,
   configTags: [],
+  fixings: [],
   forceRenderedOnce: false,
   indLevel: [],
   pnlUSD: {},

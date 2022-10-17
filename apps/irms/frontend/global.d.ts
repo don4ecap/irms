@@ -13,6 +13,7 @@ declare global {
     books: Array<any>
     calculateRisksLive: boolean
     configTags: []
+    fixings: []
     forceRenderedOnce: boolean
     indLevel: []
     pnlUSD: any
