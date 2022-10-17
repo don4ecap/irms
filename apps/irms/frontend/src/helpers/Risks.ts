@@ -242,13 +242,13 @@ function ComputeRisksRow(id) {
 }
 
 function SpreadRisks() {
-  const a = new Array()
+  const a = []
   for (let i = 0; i < currentAccountVar.books.length; i++) {
     const row = currentAccountVar.books[i]
     if (row.rowType == 'contract') {
       const commo = row.commo
       if (a[commo] == null) {
-        a[commo] = new Array()
+        a[commo] = []
         a[commo] = {
           current_risks_pre: Math.abs(row.current_risks_pre),
           target_risks_pre: Math.abs(row.target_risks_pre),
