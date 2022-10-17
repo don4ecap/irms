@@ -183,6 +183,11 @@
           />
           <div class="bold">Live Risks</div>
         </label>
+        <div class="ml-auto">
+          <div v-show="bookLoadedDate?.length">
+            Book Loaded: <span>{{ bookLoadedDate }}</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -244,6 +249,7 @@ export default {
         { size: 150, min: 150, max: 150, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
+      bookLoadedDate: '',
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
@@ -266,6 +272,7 @@ export default {
 
   methods: {
     async loadIRMS() {
+      this.bookLoadedDate = moment().format('LLL')
       this.loadNav()
       this.loadCommoIndicatorLevel().then(() => this.loadBooks())
     },
