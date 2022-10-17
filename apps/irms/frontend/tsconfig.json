@@ -1,3 +1,6 @@
 {
-  "extends": "../../../frontend.tsconfig.json"
+  "extends": "../../../frontend.tsconfig.json",
+  "vueCompilerOptions": {
+    "target": 2.7
+  }
 }
