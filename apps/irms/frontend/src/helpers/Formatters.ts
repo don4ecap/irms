@@ -107,7 +107,7 @@ function filterNonNull(datum /* , action */) {
 // }
 
 function colorExpiries(row) {
-  const a = moment(row.notice4E)
+  // const a = moment(row.notice4E)
   const b = moment(row.expiry4E)
   const c = moment(currentAccountVar.tradeDate)
 
