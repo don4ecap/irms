@@ -5,6 +5,7 @@ const db = mariadb.createConnection({
   user: 'root',
   port: 3304,
   password: 'FOUR2008',
+  decimalAsNumber: true,
 })
 
 export default db
