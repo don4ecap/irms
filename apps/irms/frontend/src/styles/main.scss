@@ -65,7 +65,7 @@ body {
   border-style: solid;
   border-width: thin;
   margin-top: 0.4rem;
-  max-height: 29px;
+  max-height: 5rem;
   padding: 0.3rem;
 }
 
@@ -87,6 +87,14 @@ body {
 
 .items-center {
   align-items: center;
+}
+
+.self-center {
+  align-self: center;
+}
+
+.self-baseline {
+  align-self: baseline;
 }
 
 .ml-auto {

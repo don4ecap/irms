@@ -160,30 +160,57 @@
       </div>
     </JqxSplitter>
     <div class="end-panel jqx-widget-content flex-grow items-start">
-      <div class="flex items-center" style="gap: 0.3rem">
-        <div class="permission bold text-center">RWX</div>
-        <JqxButton class="inline-block" theme="office">Export HTML</JqxButton>
-        <JqxButton class="inline-block" theme="office">Export XLS</JqxButton>
-        <JqxButton class="inline-block" theme="office">
-          Directional Config
-        </JqxButton>
-        <JqxButton class="inline-block" theme="office">
-          Intraday Config
-        </JqxButton>
-        <JqxButton class="inline-block" theme="office">
-          Trader Comments
-        </JqxButton>
-        <label class="flex items-center">
-          <input
-            id="liverisks"
-            type="checkbox"
-            value="liverisks"
-            style="scale: 1.15"
-            checked
-          />
-          <div class="bold">Live Risks</div>
-        </label>
-        <div class="ml-auto">
+      <div class="flex">
+        <!-- BUTTONS -->
+        <div class="flex self-baseline" style="gap: 0.3rem">
+          <div class="permission bold text-center self-center">RWX</div>
+          <JqxButton class="inline-block" theme="office">Export HTML</JqxButton>
+          <JqxButton class="inline-block" theme="office">Export XLS</JqxButton>
+          <JqxButton class="inline-block" theme="office">
+            Directional Config
+          </JqxButton>
+          <JqxButton class="inline-block" theme="office">
+            Intraday Config
+          </JqxButton>
+          <JqxButton class="inline-block" theme="office">
+            Trader Comments
+          </JqxButton>
+          <label class="flex items-center">
+            <input
+              id="liverisks"
+              type="checkbox"
+              value="liverisks"
+              style="scale: 1.15"
+              checked
+            />
+            <div class="bold">Live Risks</div>
+          </label>
+        </div>
+
+        <!-- DATES -->
+        <table class="ml-auto">
+          <tr v-show="lastBookCalculation?.length">
+            <td>Last Book Calculated before loading:</td>
+            <td>
+              {{ lastBookCalculation }}
+            </td>
+          </tr>
+          <tr v-show="lastBookCalculationScheduler?.length">
+            <td>Last Book Calculation (scheduler):</td>
+            <td>
+              {{ lastBookCalculationScheduler }}
+            </td>
+          </tr>
+          <tr v-show="bookLoadedDate?.length">
+            <td>Book Loaded:</td>
+            <td>{{ bookLoadedDate }}</td>
+          </tr>
+          <!-- <div v-show="lastBookCalculation?.length" style="display: table">
+            Last Book Calculated before loading:
+            <span>
+              {{ lastBookCalculation }}
+            </span>
+          </div>
           <div v-show="lastBookCalculationScheduler?.length">
             Last Book Calculation (scheduler):
             <span>
@@ -192,8 +219,8 @@
           </div>
           <div v-show="bookLoadedDate?.length">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
-          </div>
-        </div>
+          </div> -->
+        </table>
       </div>
     </div>
   </div>
@@ -257,6 +284,7 @@ export default {
       ],
       bookLoadedDate: '',
       lastBookCalculationScheduler: '',
+      lastBookCalculation: '',
       lastBookCalculationSchedulerInterval: null,
       calculateRisksLive: true,
       forceRenderedOnce: true,
@@ -281,12 +309,16 @@ export default {
   methods: {
     async loadIRMS() {
       this.bookLoadedDate = moment().format('LLL')
+      this.getLastBookCalculation().then((date) => {
+        this.lastBookCalculation = moment(date).format('LLL')
+      })
 
       // Attach last book calclulation scheduler, runs every one minute
+      this.updateLastBookCalculationScheduler()
       if (this.lastBookCalculationSchedulerInterval) {
         console.debug('Check last book calculation scheduler has been attached')
         this.lastBookCalculationSchedulerInterval = setInterval(
-          this.updateLastBookCalculation,
+          this.updateLastBookCalculationScheduler,
           60000
         )
       }
@@ -302,8 +334,6 @@ export default {
     },
 
     loadNav() {
-      this.updateLastBookCalculation()
-
       const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
       return httpService
         .get(`get_nav/${this.account}/${tradeDate}`)
@@ -533,18 +563,23 @@ export default {
       }, 500)
     },
 
-    updateLastBookCalculation() {
-      httpService
+    getLastBookCalculation() {
+      return httpService
         .get(`check_last_calculated/${this.account}`)
-        .then(({ data }) => {
-          this.lastBookCalculationScheduler = moment(data.value).format('LLL')
-        })
+        .then(({ data }) => data.value)
         .catch((error) => {
           console.error(
             `Failed to fetch last calculation date for ${this.account}`,
             error
           )
+          return new Date()
         })
+    },
+
+    updateLastBookCalculationScheduler() {
+      this.getLastBookCalculation().then((date) => {
+        this.lastBookCalculationScheduler = moment(date).format('LLL')
+      })
     },
   },
 }
