@@ -338,6 +338,7 @@ export default {
     },
 
     loadNav() {
+      console.time(`Load ${this.account} nav`)
       const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
       return httpService
         .get(`get_nav/${this.account}/${tradeDate}`)
@@ -354,9 +355,13 @@ export default {
           // TODO: GET RATIO
           // TODO: Getcurrencyhedging
         })
+        .finally(() => {
+          console.timeEnd(`Load ${this.account} nav`)
+        })
     },
 
     loadBooks() {
+      console.time(`Load ${this.account} books`)
       const lowerAccountName = this.account.toLowerCase()
       const currentTreeGridID = `tree-grid-${lowerAccountName}`
       const containerSelector = `#tree-grid-container-${lowerAccountName}`
@@ -524,6 +529,9 @@ export default {
             `Failed to fetch books of ${this.account} account\n`,
             error
           )
+        })
+        .finally(() => {
+          console.timeEnd(`Load ${this.account} books`)
         })
     },
 
