@@ -1,5 +1,5 @@
 import { FastifyReply, RouteOptions } from 'fastify'
-import type { GetNavRequestParams } from './types'
+import type { AccountOnlyParams, GetNavRequestParams } from './types'
 import dbConnection from './db'
 
 const prefix = '/api'
@@ -71,6 +71,31 @@ const routes: Array<RouteOptions> = [
               AND td = '${params.trade_date}' 
               AND rowtype = 'sector' 
               AND instrument <> 'cash'`
+          )
+          .then((rows) => {
+            return res.send(rows[0] || [])
+          })
+          .catch(internalServerErrorHandler(res))
+      })
+    },
+  },
+
+  {
+    method: 'GET',
+    url: `${prefix}/check_last_calculated/:account`,
+    handler(req, res) {
+      dbConnection.then((connection) => {
+        const params: AccountOnlyParams = req.params as AccountOnlyParams
+        connection
+          .query(
+            `SELECT
+              value
+            FROM
+              cacheDB.cache2
+            WHERE
+              name
+            LIKE 'irms_calculate_EE02'
+            LIMIT 1`
           )
           .then((rows) => {
             return res.send(rows[0] || [])
