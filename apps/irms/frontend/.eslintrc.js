@@ -5,5 +5,6 @@ module.exports = {
     currentAccountVar: true,
     moment: true,
     strategies: true,
+    $: true,
   },
 }

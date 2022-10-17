@@ -32,6 +32,7 @@ declare global {
   var currentAccountVar: IAccountVar
   var accounting: any
   var moment: any
+  var $: any
 }
 
 export {}
