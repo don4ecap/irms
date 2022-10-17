@@ -13,9 +13,13 @@
           <div class="flex" style="gap: 0.3rem">
             <JqxButton class="inline-block" theme="office">Sector</JqxButton>
             <JqxButton class="inline-block" theme="office">Common</JqxButton>
-            <JqxButton @click="showContract" class="inline-block" theme="office"
-              >All</JqxButton
+            <JqxButton
+              class="inline-block"
+              theme="office"
+              @click="showContract"
             >
+              All
+            </JqxButton>
           </div>
 
           <div v-show="isNotEE04Account" class="flex field">JPY Equity</div>
