@@ -761,7 +761,7 @@ input[type='submit'].jqx-button {
   position: relative;
   width: 18px;
   height: 18px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .jqx-tree-grid-checkbox {
@@ -799,7 +799,7 @@ input[type='submit'].jqx-button {
 .jqx-tree-grid-expand-button {
   height: 18px;
   width: 18px;
-  vertical-align: top;
+  /* vertical-align: top; */
 }
 
 /*applied to a cell in jqxDataTable*/
