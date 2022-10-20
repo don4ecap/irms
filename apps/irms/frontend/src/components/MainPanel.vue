@@ -518,7 +518,7 @@ export default {
             //   x.append(span)
             // },
           })
-
+          currentAccountVar.editingRowID = -1
           $(`#${currentTreeGridID}`).on('rowClick', EventHandlers.onRowClick)
         })
         .catch((error) => {

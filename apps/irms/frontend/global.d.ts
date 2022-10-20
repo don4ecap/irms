@@ -13,9 +13,12 @@ declare global {
     books: Array<any>
     calculateRisksLive: boolean
     configTags: []
+    editingRowID: number
+    editingRowQty: any
     fixings: []
     forceRenderedOnce: boolean
     indLevel: []
+    isEdited: boolean
     pnlUSD: any
     portfolio: any
     showNonNull: boolean

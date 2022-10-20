@@ -14,6 +14,39 @@ function onRowClick(event) {
     )
     return false
   }
+
+  if (clickEvent.ctrlKey) {
+    // TODO:
+    // console.log(`Chart for ${row.contract} ${row.extension}`)
+    // $('#chart').fadeIn(500)
+    // $('#if_chart').attr(
+    //   'src',
+    //   'chart.aspx?contract=' + row.contract + '&extension=' + row.extension
+    // )
+  } else {
+    // TODO:
+    // if ($('#if_chart').attr('src') != 'about:blank') {
+    //   $('#if_chart').attr('src', 'about:blank')
+    //   $('#chart').fadeOut(500)
+    // }
+
+    if (
+      clickEvent.target.classList.contains('editable')
+      // TODO:
+      // &&
+      // currentAccountVar.editingRowID == -1
+    ) {
+      if (args.row.rowType != 'contract') return
+      currentAccountVar.isEdited = true
+      currentAccountVar.editingRowQty = args.row.orderQ
+      currentAccountVar.editingRowID = args.row.id
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid(
+        'beginRowEdit',
+        args.row.id
+      )
+      console.log(`Editing row id: ${args.row.id}`)
+    }
+  }
 }
 
 export default {
