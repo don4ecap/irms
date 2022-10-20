@@ -16,6 +16,8 @@
       </li>
     </ul>
 
+    <img src="/img/frontlogo.gif" class="logo" />
+
     <!-- TAB BODY -->
     <div v-for="(account, index) in accounts" :key="index">
       <main-panel :account="account" />

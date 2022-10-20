@@ -38,6 +38,13 @@ body {
   }
 }
 
+.logo {
+  max-width: 175px;
+  position: absolute;
+  top: 0.6rem;
+  right: 0;
+}
+
 .main-panel {
   flex-grow: 1;
 }
