@@ -163,10 +163,10 @@
         /> -->
       </div>
     </JqxSplitter>
-    <div class="end-panel jqx-widget-content flex-grow items-start">
-      <div class="flex">
+    <div class="end-panel jqx-widget-content items-start overflow-y-auto">
+      <div class="flex wrap" style="gap: 0.3rem">
         <!-- BUTTONS -->
-        <div class="flex self-baseline" style="gap: 0.3rem">
+        <div class="flex self-baseline wrap" style="gap: 0.3rem">
           <div class="permission bold text-center self-center">RWX</div>
           <JqxButton class="inline-block" theme="office">Export HTML</JqxButton>
           <JqxButton class="inline-block" theme="office">Export XLS</JqxButton>
@@ -192,24 +192,11 @@
         </div>
 
         <!-- DATES -->
-        <table class="ml-auto">
-          <tr v-show="lastBookCalculation?.length">
-            <td>Last Book Calculated before loading:</td>
-            <td>
-              {{ lastBookCalculation }}
-            </td>
-          </tr>
-          <tr v-show="lastBookCalculationScheduler?.length">
-            <td>Last Book Calculation (scheduler):</td>
-            <td>
-              {{ lastBookCalculationScheduler }}
-            </td>
-          </tr>
-          <tr v-show="bookLoadedDate?.length">
-            <td>Book Loaded:</td>
-            <td>{{ bookLoadedDate }}</td>
-          </tr>
-          <!-- <div v-show="lastBookCalculation?.length" style="display: table">
+        <div
+          class="ml-auto flex wrap items-center"
+          style="gap: 1rem; margin-right: 0.3rem"
+        >
+          <div v-show="lastBookCalculation?.length">
             Last Book Calculated before loading:
             <span>
               {{ lastBookCalculation }}
@@ -223,8 +210,8 @@
           </div>
           <div v-show="bookLoadedDate?.length">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
-          </div> -->
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>

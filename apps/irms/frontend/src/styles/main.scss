@@ -76,8 +76,15 @@ body {
   padding: 0.3rem;
 }
 
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
 .flex {
   display: flex;
+  &.wrap {
+    flex-wrap: wrap;
+  }
 }
 
 .flex-column {
