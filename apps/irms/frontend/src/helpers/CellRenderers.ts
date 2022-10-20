@@ -218,15 +218,16 @@ const contractRenderer = function (
       if (chg <= 0) {
         chg =
           "<span style='color:red;font-weight:bold'>  " + chg + ' %' + '</span>'
-        chg =
-          "<span style='color:black;font-weight:bold'> &nbsp; " +
-          accounting.formatNumber(
-            rowData.last_price,
-            PageControls.decimalPlaces(rowData.last_price)
-          ) +
-          '</span>' +
-          chg
       }
+
+      chg =
+        "<span style='color:black;font-weight:bold'> &nbsp; " +
+        accounting.formatNumber(
+          rowData.last_price,
+          PageControls.decimalPlaces(rowData.last_price)
+        ) +
+        '</span>' +
+        chg
     }
     return cellValue + chg
   }
