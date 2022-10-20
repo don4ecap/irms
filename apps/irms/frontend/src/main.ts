@@ -4,6 +4,7 @@ import App from './App.vue'
 import './styles/jqwidgets/jqx.base.css'
 import './styles/jqwidgets/jqx.four-elements.css'
 import './styles/main.scss'
+import 'jqwidgets-framework/jqwidgets/jqxmenu.js'
 
 const accountProperties: IAccountVar = {
   bookIDMap: [],
@@ -36,6 +37,13 @@ for (const account of accounts) {
 
 window.currentAccountVar = accountsVar[accounts.at(0)]
 window.strategies = []
+// Initialize context menu
+window.contextMenu = $('#menu').jqxMenu({
+  width: 200,
+  height: 116,
+  autoOpenPopup: false,
+  mode: 'popup',
+})
 
 new Vue({
   render: (h) => h(App),

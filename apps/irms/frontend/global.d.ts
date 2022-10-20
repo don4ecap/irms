@@ -34,6 +34,7 @@ declare global {
   var accounting: any
   var moment: any
   var $: any
+  var contextMenu: any
 }
 
 export {}

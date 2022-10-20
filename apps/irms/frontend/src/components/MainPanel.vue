@@ -151,6 +151,7 @@
         </div>
       </div>
       <div
+        ref="treeGridContainer"
         :id="'tree-grid-container-' + account.toLowerCase()"
         class="tree-grid-container"
       >
@@ -224,6 +225,7 @@ import gridColumns from '../helpers/gridOptions'
 import Risks from '../helpers/Risks'
 import utils from '../helpers'
 import Formatters from '../helpers/Formatters'
+import EventHandlers from '../helpers/eventHandlers'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
@@ -293,6 +295,11 @@ export default {
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
     this.$el.querySelector('.main-panel').style.width = null
+
+    // Prevent right click
+    this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
+      e.preventDefault()
+    )
 
     this.loadNav()
     this.loadStrategies()
@@ -511,6 +518,8 @@ export default {
             //   x.append(span)
             // },
           })
+
+          $(`#${currentTreeGridID}`).on('rowClick', EventHandlers.onRowClick)
         })
         .catch((error) => {
           console.error(
