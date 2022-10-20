@@ -186,6 +186,7 @@
               value="liverisks"
               style="scale: 1.15"
               checked
+              @change="checkLiveRisks"
             />
             <div class="bold">Live Risks</div>
           </label>
@@ -582,6 +583,14 @@ export default {
       this.getLastBookCalculation().then((date) => {
         this.lastBookCalculationScheduler = moment(date).format('LLL')
       })
+    },
+
+    checkLiveRisks() {
+      currentAccountVar.calculateRisksLive = this.calculateRisksLive
+      if (this.calculateRisksLive) {
+        Risks.ComputeRisks()
+        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      }
     },
   },
 }
