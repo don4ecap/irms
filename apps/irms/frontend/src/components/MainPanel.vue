@@ -22,14 +22,14 @@
             </JqxButton>
           </div>
 
-          <div v-show="isNotEE04Account" class="flex field">JPY Equity</div>
+          <!-- <div v-show="isNotEE04Account" class="flex field">JPY Equity</div>
           <div v-show="isNotEE04Account" class="flex field">
             JPY CCY Futures
           </div>
           <div v-show="isNotEE04Account" class="flex field">
             Strategy Allocation
           </div>
-          <div class="flex field">Risk</div>
+          <div class="flex field">Risk</div> -->
         </div>
         <div class="col-2">
           <div class="flex flex-column" style="gap: 0.3rem">
@@ -271,7 +271,7 @@ export default {
         riskRate: 'Risk Rate',
       },
       panels: [
-        { size: 150, min: 150, max: 150, collapsible: true },
+        { size: 90, min: 90, max: 90, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
       bookLoadedDate: '',
@@ -284,11 +284,11 @@ export default {
     }
   },
 
-  computed: {
-    isNotEE04Account() {
-      return this.account !== 'EE04'
-    },
-  },
+  // computed: {
+  //   isNotEE04Account() {
+  //     return this.account !== 'EE04'
+  //   },
+  // },
 
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
