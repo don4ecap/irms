@@ -1,6 +1,8 @@
 import Vue from 'vue'
 //@ts-ignore
 import App from './App.vue'
+import './styles/jqwidgets/jqx.base.css'
+import './styles/jqwidgets/jqx.four-elements.css'
 import './styles/main.scss'
 
 const accountProperties: IAccountVar = {
