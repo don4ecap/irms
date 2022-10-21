@@ -32,12 +32,13 @@ declare global {
     [key: string]: IAccountVar
   }
 
-  var accountsVar: IAccountsVarMap
-  var currentAccountVar: IAccountVar
-  var accounting: any
-  var moment: any
   var $: any
+  var accounting: any
+  var accountsVar: IAccountsVarMap
   var contextMenu: any
+  var currentAccount: string
+  var currentAccountVar: IAccountVar
+  var moment: any
 }
 
 export {}

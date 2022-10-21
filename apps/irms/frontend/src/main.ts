@@ -30,15 +30,19 @@ const accountProperties: IAccountVar = {
 const accounts = ['EE02', 'EE04', 'FIXUAT', 'JCMA', 'KRIBMA', 'KRMA']
 // Global variable to store and hold each account variable
 window.accountsVar = {}
+// Initialize current account with first account
+window.currentAccount = accounts[0]
 
-// Then initialize and fill them
+// Populate accountsVar
 for (const account of accounts) {
-  accountsVar[account] = {
+  window.accountsVar[account] = {
     ...accountProperties,
   }
 }
 
-window.currentAccountVar = accountsVar[accounts.at(0)]
+// Initialize currentAccountVar with first account
+window.currentAccountVar = window.accountsVar[accounts[0]]
+// Initialize strategies
 window.strategies = []
 // Initialize context menu
 window.contextMenu = $('#menu').jqxMenu({
