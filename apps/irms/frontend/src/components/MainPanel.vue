@@ -33,7 +33,12 @@
         </div>
         <div class="col-2">
           <div class="flex flex-column" style="gap: 0.3rem">
-            <JqxDateTimeInput v-model="bookDate" width="110" height="28" />
+            <JqxDateTimeInput
+              v-model="bookDate"
+              width="110"
+              height="28"
+              @input="updateTradeDate"
+            />
             <input
               type="button"
               value="Non-Null"
@@ -295,6 +300,10 @@ export default {
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
     this.$el.querySelector('.main-panel').style.width = null
+
+    currentAccountVar.tradeDate = utils.getDateFromISO(
+      this.bookDate.toISOString()
+    )
 
     // Prevent right click
     this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
@@ -601,6 +610,12 @@ export default {
         Risks.ComputeRisks()
         $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       }
+    },
+
+    updateTradeDate() {
+      currentAccountVar.tradeDate = utils.getDateFromISO(
+        this.bookDate.toISOString()
+      )
     },
   },
 }
