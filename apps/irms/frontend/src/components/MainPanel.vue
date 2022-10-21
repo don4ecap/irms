@@ -327,9 +327,10 @@ export default {
     },
 
     loadStrategies() {
-      return httpService
-        .get('get_strategies')
-        .then(({ data }) => (strategies = data))
+      return httpService.get('get_strategies').then(({ data }) => {
+        data.unshift('CHECK')
+        strategies = data
+      })
     },
 
     loadNav() {
