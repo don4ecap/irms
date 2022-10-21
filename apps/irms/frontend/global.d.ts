@@ -1,9 +1,9 @@
 /* eslint-disable no-var */
 declare global {
-  interface Window {
-    accountsVar: IAccountsVarMap
-    currentAccountVar: IAccountVar
-  }
+  // interface Window {
+  //   accountsVar: IAccountsVarMap
+  //   currentAccountVar: IAccountVar
+  // }
 
   var strategies: Array<string>
 
