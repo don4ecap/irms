@@ -56,9 +56,8 @@ export default {
       this.currentAccount = this.accounts[this.currentIndex]
       document.title = this.currentAccount + ' - ' + ' iRMS'
 
-      if (window.currentAccountVar && window.accountsVar) {
-        window.currentAccountVar = window.accountsVar[this.currentAccount]
-      }
+      currentAccount = this.currentAccount
+      currentAccountVar = accountsVar[this.currentAccount]
     },
   },
 }
