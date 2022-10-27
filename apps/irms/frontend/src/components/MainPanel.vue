@@ -231,7 +231,6 @@ import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
-import JqxTooltip from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtooltip.vue'
 
 export default {
   name: 'MainPanel',
@@ -240,8 +239,8 @@ export default {
     JqxSplitter,
     JqxButton,
     JqxDateTimeInput,
+    // eslint-disable-next-line vue/no-unused-components
     JqxTreeGrid,
-    JqxTooltip,
   },
 
   props: {
