@@ -6,3 +6,11 @@ export interface GetNavRequestParams {
 export interface AccountOnlyParams {
   account: string
 }
+
+export interface SaveCellBody {
+  id: number
+  contract: string
+  extension: string
+  order_qty: string
+  order_p: string
+}

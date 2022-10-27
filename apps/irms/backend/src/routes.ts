@@ -1,6 +1,11 @@
 import { FastifyReply, RouteOptions } from 'fastify'
-import type { AccountOnlyParams, GetNavRequestParams } from './types'
+import type {
+  AccountOnlyParams,
+  GetNavRequestParams,
+  SaveCellBody,
+} from './types'
 import db from './db'
+import schemas from './schemas'
 
 const prefix = '/api'
 
@@ -166,6 +171,57 @@ const routes: Array<RouteOptions> = [
             })
         })
         .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'POST',
+    url: `${prefix}/save_cell/:account/:trade_date`,
+    schema: schemas.saveCell,
+    handler(req, res) {
+      const params: GetNavRequestParams = req.params as GetNavRequestParams
+      const body: SaveCellBody = req.body as SaveCellBody
+
+      const validateBodyRequest = req.compileValidationSchema(
+        schemas.saveCell.body
+      )
+
+      if (validateBodyRequest(req.body)) {
+        db.getConnection()
+          .then((connection) => {
+            const { account, trade_date } = params
+            const { order_qty, order_p, contract, extension } = body
+            connection
+              .query(
+                `UPDATE
+                    trading.irms
+                SET
+                    orderQ=?,
+                    orderP=?
+                WHERE
+                  irms.account=?
+                  AND
+                  irms.contract=?
+                  AND
+                  irms.extension=?
+                  AND
+                  irms.td=?
+                `,
+                [order_qty, order_p, account, contract, extension, trade_date]
+              )
+              .then((result) => {
+                return res.send({
+                  id: result.affectedRows ? body.id : -1,
+                  result: result.query,
+                })
+              })
+              .catch(internalServerErrorHandler(res))
+              .finally(() => {
+                connection.end()
+              })
+          })
+          .catch(internalServerErrorHandler(res))
+      }
     },
   },
 
