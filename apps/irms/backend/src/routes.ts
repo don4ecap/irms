@@ -155,8 +155,10 @@ const routes: Array<RouteOptions> = [
         .then((connection) => {
           connection
             .query(`SELECT strategy_name from trading.ie_strategy`)
-            .then((rows) => {
-              return res.send(rows)
+            .then((strategies) => {
+              return res.send(
+                strategies.map((strategy: any) => strategy.strategy_name)
+              )
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
