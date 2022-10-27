@@ -174,16 +174,11 @@
         <!-- BUTTONS -->
         <div class="flex self-baseline wrap" style="gap: 0.3rem">
           <div class="permission bold text-center self-center">RWX</div>
-          <JqxButton class="inline-block" theme="office">Export HTML</JqxButton>
-          <JqxButton class="inline-block" theme="office">Export XLS</JqxButton>
           <JqxButton class="inline-block" theme="office">
             Directional Config
           </JqxButton>
           <JqxButton class="inline-block" theme="office">
             Intraday Config
-          </JqxButton>
-          <JqxButton class="inline-block" theme="office">
-            Trader Comments
           </JqxButton>
           <label class="flex items-center">
             <input
