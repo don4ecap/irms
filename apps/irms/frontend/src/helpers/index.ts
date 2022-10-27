@@ -27,8 +27,10 @@ function formatNavData(nav: any, account: string) {
 }
 
 const getDateFromISO = (isoDate: string): string => isoDate.split('T').at(0)
+const isNullOrEmpty = (val: any) => isNaN(val) || val == null || val == ''
 
 export default {
   formatNavData,
   getDateFromISO,
+  isNullOrEmpty,
 }

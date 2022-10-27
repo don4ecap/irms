@@ -1,4 +1,5 @@
 import TreeGridUtils from './TreeGridUtils'
+import helpers from '../helpers'
 
 function filterNonNull(datum /* , action */) {
   console.log('Filter Non Null Called')
@@ -11,31 +12,23 @@ function filterNonNull(datum /* , action */) {
     }
 
     if (data.rowType == 'contract') {
-      TreeGridUtils.getRow(data.id).css('display', 'table-row')
-      if (currentAccountVar.showNonNull) {
-        if (isNaN(data.qty) || data.qty == null || data.qty == '')
-          if (
-            isNaN(data.current_allocation_lots) ||
-            data.current_allocation_lots == null ||
-            data.current_allocation_lots == ''
-          )
-            if (
-              isNaN(data.target_allocation_lots) ||
-              data.target_allocation_lots == null ||
-              data.target_allocation_lots == ''
-            )
-              if (
-                (data.orderQ == null || data.orderQ == '') &&
-                (data.target_risks_post == null || data.target_risks_post == '')
-              ) {
-                TreeGridUtils.getRow(data.id).css('display', 'none')
-              }
+      if (
+        currentAccountVar.showNonNull &&
+        helpers.isNullOrEmpty(data.qty) &&
+        helpers.isNullOrEmpty(data.current_allocation_lots) &&
+        helpers.isNullOrEmpty(data.target_allocation_lots) &&
+        helpers.isNullOrEmpty(data.orderQ) &&
+        helpers.isNullOrEmpty(data.target_risks_post)
+      ) {
+        TreeGridUtils.getRow(data.id).css('display', 'none')
 
         if (!data?.valid && data.instrument != 'Cash') {
-          // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
+          TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
         }
         setTimeout(colorExpiries, 100, data)
         setTimeout(createToolTip, 0, data)
+      } else {
+        TreeGridUtils.getRow(data.id).css('display', 'table-row')
       }
     }
 
