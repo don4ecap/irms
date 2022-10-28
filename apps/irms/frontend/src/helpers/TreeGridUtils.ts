@@ -47,9 +47,8 @@ function getCell(key: string, cellNum: number) {
 }
 
 function getRow(key: string) {
-  const a = $(`#${currentAccountVar.treeGridID} tr`)
-  const b = a.filter(`tr[data-key=${key}]`)
-  return $(b[0])
+  const a = $(`#${currentAccountVar.treeGridID} tr[data-key='${key}']`)
+  return $(a[0])
 }
 
 // function ExpandAllRows() {

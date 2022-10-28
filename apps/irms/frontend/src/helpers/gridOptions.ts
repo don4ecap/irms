@@ -186,55 +186,52 @@ const gridColumns = [
     align: 'center',
     cellClassName: cellRenderers.colorType,
     columnType: 'template',
-    createEditor: function (row, cellvalue, editor, cellText, width, height) {
-      // construct the editor.
-      var inputElement = $('<input/>').prependTo(editor)
-
-      inputElement.jqxInput({
+    createEditor(row, cellvalue, editor, cellText, width, height) {
+      currentAccountVar.inputEl = $('<input />')
+      // @ts-ignore
+      currentAccountVar.inputEl.prependTo(editor).jqxInput({
         placeHolder: 'Strategy',
-        height: 25,
-        width: 380,
-        source: function (query, response) {
-          var item = query.split(/;/).pop()
+        theme: 'office',
+        height: height,
+        width: width,
+        source(query, response) {
+          const item = query.split(/;/).pop()
           // update the search query.
-
           if (item.indexOf('#') != -1) {
-            a = item.indexOf('#')
-            inputElement.jqxInput({ query: item.substr(a + 1) })
-            arr = []
-            j = 0
-            for (var i = 0; i < book.length; i++) {
-              if (book[i].rowType == 'contract') {
-                cont = book[i].contract
-                arr[j] = item.substr(0, a + 1) + cont
+            const a = item.indexOf('#')
+            // @ts-ignore
+            currentAccountVar.inputEl.jqxInput({ query: item.substr(a + 1) })
+            const arr = []
+            let j = 0
+            for (let i = 0; i < currentAccountVar.books.length; i++) {
+              const book = currentAccountVar.books[i]
+              if (book.rowType == 'contract') {
+                const contract = book.contract
+                arr[j] = item.substr(0, a + 1) + contract
                 j++
               }
             }
             response(arr)
           } else {
-            inputElement.jqxInput({ query: item })
+            // @ts-ignore
+            currentAccountVar.inputEl.jqxInput({ query: item })
             response(strategies)
           }
         },
-        renderer: function (itemValue, inputValue) {
-          var terms = inputValue.split(/;/)
-          // remove the current input
+        renderer(itemValue, inputValue) {
+          const terms = inputValue.split(/;/)
           terms.pop()
-          // add the selected item
           terms.push(itemValue)
-          // add placeholder to get the comma-and-space at the end
           terms.push('')
-          var value = terms.join(';')
+          const value = terms.join(';')
           return value
         },
       })
     },
-    initEditor: function (row, cellvalue, editor, celltext, width, height) {
-      // set the editor's current value. The callback is called each time the editor is displayed.
+    initEditor(row, cellvalue, editor /* , celltext, width, height */) {
       editor.find('input').jqxInput('val', cellvalue)
     },
     getEditorValue: function (row, cellvalue, editor) {
-      // return the editor's value.
       return editor.find('input').jqxInput('val')
     },
   },

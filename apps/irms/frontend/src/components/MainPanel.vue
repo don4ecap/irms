@@ -339,6 +339,7 @@ export default {
     loadNav() {
       console.time(`Load ${this.account} nav`)
       const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
+      currentAccountVar.tradeDate = tradeDate
       return httpService
         .get(`get_nav/${this.account}/${tradeDate}`)
         .then(({ data }) => {
@@ -470,7 +471,7 @@ export default {
               saveOnSelectionChange: true,
               cancelOnEsc: true,
               saveOnEnter: true,
-              editSingleCell: true,
+              editSingleCell: false,
               editOnDoubleClick: false,
               editOnF2: true,
             },
@@ -522,8 +523,16 @@ export default {
             //   x.append(span)
             // },
           })
+
+          // Reset editingRowID
           currentAccountVar.editingRowID = -1
+
+          // Attach event listeners
           $(`#${currentTreeGridID}`).on('rowClick', EventHandlers.onRowClick)
+          $(`#${currentTreeGridID}`).on(
+            'rowEndEdit',
+            EventHandlers.onRowEndEdit
+          )
         })
         .catch((error) => {
           console.error(

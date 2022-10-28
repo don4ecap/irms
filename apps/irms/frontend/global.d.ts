@@ -18,6 +18,7 @@ declare global {
     fixings: []
     forceRenderedOnce: boolean
     indLevel: []
+    inputEl: HTMLInputElement
     isEdited: boolean
     pnlUSD: any
     portfolio: any

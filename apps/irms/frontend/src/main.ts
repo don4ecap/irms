@@ -5,6 +5,7 @@ import './styles/jqwidgets/jqx.base.css'
 import './styles/jqwidgets/jqx.four-elements.css'
 import './styles/main.scss'
 import 'jqwidgets-framework/jqwidgets/jqxmenu.js'
+import 'jqwidgets-framework/jqwidgets/jqxinput.js'
 
 const accountProperties: IAccountVar = {
   bookIDMap: [],
@@ -17,6 +18,7 @@ const accountProperties: IAccountVar = {
   fixings: [],
   forceRenderedOnce: false,
   indLevel: [],
+  inputEl: null,
   isEdited: false,
   pnlUSD: {},
   portfolio: {},
