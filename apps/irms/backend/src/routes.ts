@@ -225,6 +225,43 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  {
+    method: 'GET',
+    url: `${prefix}/get_working/:account/:trade_date`,
+    handler(req, res) {
+      db.getConnection()
+        .then((connection) => {
+          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          connection
+            .query(
+              `SELECT
+                contract,
+                extension,
+                instrument,
+                strategy,
+                price
+              FROM
+                trading.tbltrading
+              WHERE
+                  tbltrading.account=?
+                AND
+                  tbltrading.cdate=?
+                AND
+                  tbltrading.status NOT LIKE 'EXPIR%'`,
+              [params.account, params.trade_date]
+            )
+            .then((rows) => {
+              return res.send(rows)
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(() => {
+              connection.end()
+            })
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
   // {
   //   method: 'GET',
   //   url: `${prefix}/test`,
