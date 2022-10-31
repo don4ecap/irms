@@ -39,6 +39,7 @@ declare global {
   var contextMenu: any
   var currentAccount: string
   var currentAccountVar: IAccountVar
+  var ignoreStrategies: string
   var moment: any
 }
 

@@ -2904,8 +2904,7 @@ of the horizontal scrollbar.*/
   overflow: auto;
   text-align: left;
   background-color: transparent;
-  padding: 5px;
-  -webkit-background-clip: padding-box;
+  /* padding: 5px; */
   background-clip: padding-box;
 }
 

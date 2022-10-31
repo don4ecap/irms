@@ -6,6 +6,9 @@ import './styles/jqwidgets/jqx.four-elements.css'
 import './styles/main.scss'
 import 'jqwidgets-framework/jqwidgets/jqxmenu.js'
 import 'jqwidgets-framework/jqwidgets/jqxinput.js'
+import 'jqwidgets-framework/jqwidgets/jqxwindow.js'
+import 'jqwidgets-framework/jqwidgets/jqxgrid.js'
+import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
 
 const accountProperties: IAccountVar = {
   bookIDMap: [],
@@ -53,6 +56,7 @@ window.contextMenu = $('#menu').jqxMenu({
   autoOpenPopup: false,
   mode: 'popup',
 })
+window.ignoreStrategies = ''
 
 new Vue({
   render: (h) => h(App),

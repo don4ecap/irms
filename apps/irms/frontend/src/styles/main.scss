@@ -44,6 +44,23 @@ body {
   }
 }
 
+#preview-window-content {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+
+  .jqx-grid {
+    border-bottom: 1px solid #d4d4d4;
+    flex-grow: 1;
+    margin: 0.3rem;
+    margin-top: 0;
+    max-width: calc(100% - 0.75rem);
+    overflow-x: auto;
+    overflow-y: auto !important;
+    width: 100% !important;
+  }
+}
+
 .logo {
   max-width: 175px;
   position: absolute;

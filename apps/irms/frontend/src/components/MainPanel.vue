@@ -141,7 +141,14 @@
         <div class="col-5 flex flex-column" style="gap: 0.3rem">
           <div class="flex" style="gap: 0.3rem">
             <JqxButton class="inline-block" theme="office">Generate</JqxButton>
-            <JqxButton class="inline-block" theme="office">Preview</JqxButton>
+            <JqxButton
+              ref="btnPreview"
+              class="inline-block"
+              theme="office"
+              @click="$emit('btn-preview-clicked')"
+            >
+              Preview
+            </JqxButton>
             <JqxButton class="inline-block" theme="office">Delete</JqxButton>
             <JqxButton class="inline-block" theme="office">Gen ID</JqxButton>
           </div>
@@ -226,6 +233,7 @@ import Risks from '../helpers/Risks'
 import utils from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
+import RMSOperations from '../helpers/RMSOperations'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
@@ -303,6 +311,8 @@ export default {
     this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
       e.preventDefault()
     )
+
+    // this.$refs.btnPreview.$el.addEventListener('click', RMSOperations.preview)
 
     this.loadNav()
     this.loadStrategies()
