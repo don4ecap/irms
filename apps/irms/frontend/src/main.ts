@@ -61,6 +61,7 @@ window.contextMenu = $('#menu').jqxMenu({
 })
 window.ignoreStrategies = ''
 window.DeleteSector = RMSOperations.DeleteSector
+window.DeleteSingle = RMSOperations.DeleteSingle
 
 new Vue({
   render: (h) => h(App),

@@ -1,6 +1,7 @@
 import { FastifyReply, RouteOptions } from 'fastify'
 import type {
   AccountOnlyParams,
+  DeleteSingleParams,
   GetNavRequestParams,
   SaveCellBody,
 } from './types'
@@ -283,6 +284,38 @@ const routes: Array<RouteOptions> = [
               // @ts-ignore
               req?.body?.sector || '',
             ])
+            .then((result) => {
+              return res.send({
+                updated: result.affectedRows >= 1,
+              })
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(() => {
+              connection.end()
+            })
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'DELETE',
+    url: `${prefix}/delete_single/:account/:trade_date/:contract/:extension`,
+    handler(req, res) {
+      db.getConnection()
+        .then((connection) => {
+          const params: DeleteSingleParams = req.params as DeleteSingleParams
+
+          connection
+            .query(
+              `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=? AND irms.contract=? AND irms.extension=?`,
+              [
+                params.account,
+                params.trade_date,
+                params.contract,
+                params.extension,
+              ]
+            )
             .then((result) => {
               return res.send({
                 updated: result.affectedRows >= 1,

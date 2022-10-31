@@ -281,7 +281,7 @@ function GetParent(id: number) {
   }
 }
 
-function GetBookIndexByID(id: number) {
+function GetBookIndexByID(id: number | string) {
   return currentAccountVar.bookIDMapRev[id]
   //    for (var i = 0; i < book.length; i++) {
   //        if (book[i].id == id) {

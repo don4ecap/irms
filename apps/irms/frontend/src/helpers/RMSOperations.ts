@@ -288,17 +288,26 @@ function DeleteSector(sector: string) {
 //     }
 //   )
 // }
-// function DeleteSingle(contract, extension, id) {
-//   api.deletesingle(td, account, contract, extension, id, function (response) {
-//     index = GetBookIndexByID(response.result)
-//     book[index].orderQ = null
-//     book[index].orderP = null
-//     ComputeRisks()
-//     $('#treeGrid').jqxTreeGrid('updateBoundData')
-//     $('#treeGrid').jqxTreeGrid('selectRow', book[index].id)
-//     success('Deleted orders for: ' + contract)
-//   })
-// }
+
+function DeleteSingle(contract: string, extension: string, id: string) {
+  http
+    .delete(
+      `delete_single/${currentAccount}/${currentAccountVar.tradeDate}/${contract}/${extension}`
+    )
+    .then((/* { data } */) => {
+      const index = Risks.GetBookIndexByID(id)
+      const book = currentAccountVar.books[index]
+      book.orderQ = null
+      book.orderP = null
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('selectRow', book.id)
+      // TODO: Success notification
+      // success('Deleted orders for: ' + contract)
+    })
+    .catch((error) => {
+      console.error('Failed to delete single', error)
+    })
+}
 
 async function BuildPreview(sector) {
   let sectorRows = $.grep(
@@ -654,4 +663,5 @@ async function BuildPreview(sector) {
 export default {
   preview,
   DeleteSector,
+  DeleteSingle,
 }

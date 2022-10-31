@@ -45,6 +45,8 @@ declare global {
   // Global functions
   // eslint-disable-next-line no-unused-vars
   function DeleteSector(sector: string)
+  // eslint-disable-next-line no-unused-vars
+  function DeleteSingle(contract: string, extension: string, id: string)
 }
 
 export {}

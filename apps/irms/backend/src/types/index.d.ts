@@ -3,6 +3,11 @@ export interface GetNavRequestParams {
   trade_date: string
 }
 
+export interface DeleteSingleParams extends GetNavRequestParams {
+  contract: string
+  extension: string
+}
+
 export interface AccountOnlyParams {
   account: string
 }

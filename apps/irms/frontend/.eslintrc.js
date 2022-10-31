@@ -7,6 +7,9 @@ module.exports = {
     currentAccountVar: true,
     moment: true,
     strategies: true,
+
+    // Global helper functions
     DeleteSector: true,
+    DeleteSingle: true,
   },
 }
