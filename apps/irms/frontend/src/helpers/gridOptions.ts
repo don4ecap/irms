@@ -192,7 +192,7 @@ const gridColumns = [
       currentAccountVar.inputEl.prependTo(editor).jqxInput({
         placeHolder: 'Strategy',
         theme: 'office',
-        height: height,
+        height: '100%',
         width: width,
         source(query, response) {
           const item = query.split(/;/).pop()
