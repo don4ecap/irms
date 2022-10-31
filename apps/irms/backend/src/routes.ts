@@ -1,7 +1,6 @@
 import { FastifyReply, RouteOptions } from 'fastify'
 import type {
   AccountOnlyParams,
-  DeleteAllOrderParams,
   GetNavRequestParams,
   SaveCellBody,
 } from './types'
