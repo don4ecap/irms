@@ -149,7 +149,13 @@
             >
               Preview
             </JqxButton>
-            <JqxButton class="inline-block" theme="office">Delete</JqxButton>
+            <JqxButton
+              class="inline-block"
+              theme="office"
+              @click="deleteSector"
+            >
+              Delete
+            </JqxButton>
             <JqxButton class="inline-block" theme="office">Gen ID</JqxButton>
           </div>
           <div class="flex" style="gap: 0.3rem">
@@ -615,6 +621,33 @@ export default {
       this.getLastBookCalculation().then((date) => {
         this.lastBookCalculationScheduler = moment(date).format('LLL')
       })
+    },
+
+    deleteSector(sector = '') {
+      httpService
+        .delete(
+          `delete_all_orders/${currentAccount}/${currentAccountVar.tradeDate}`,
+          { sector }
+        )
+        .then((/* { data } */) => {
+          for (let i = 0; i < currentAccountVar.books.length; i++) {
+            const book = currentAccountVar.books[i]
+            if (book.sector == sector && book.rowType == 'contract') {
+              book.orderQ = null
+              book.orderP = null
+            }
+            if (sector == '' && book.rowType == 'contract') {
+              book.orderQ = null
+              book.orderP = null
+            }
+          }
+          Risks.ComputeRisks()
+          $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+          // TODO: Success notification
+        })
+        .catch((error) => {
+          console.error(error)
+        })
     },
 
     checkLiveRisks() {
