@@ -10,6 +10,9 @@ import 'jqwidgets-framework/jqwidgets/jqxwindow.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
 
+// Helpers, load it here so we can globally expose it
+import RMSOperations from './helpers/RMSOperations'
+
 const accountProperties: IAccountVar = {
   bookIDMap: [],
   bookIDMapRev: [],
@@ -57,6 +60,7 @@ window.contextMenu = $('#menu').jqxMenu({
   mode: 'popup',
 })
 window.ignoreStrategies = ''
+window.DeleteSector = RMSOperations.DeleteSector
 
 new Vue({
   render: (h) => h(App),

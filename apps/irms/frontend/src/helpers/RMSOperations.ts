@@ -1,4 +1,5 @@
 import http from '../services/http'
+import Risks from './Risks'
 
 function preview(event) {
   const btn = event.target
@@ -232,23 +233,35 @@ function preview(event) {
 //   sector = $(btn).attr('tag')
 //   DeleteSector(sector)
 // }
-// function DeleteSector(sector) {
-//   api.deleteallorders(td, account, sector, function (response) {
-//     for (var i = 0; i < book.length; i++) {
-//       if (book[i].sector == sector && book[i].rowType == 'contract') {
-//         book[i].orderQ = null
-//         book[i].orderP = null
-//       }
-//       if (sector == '' && book[i].rowType == 'contract') {
-//         book[i].orderQ = null
-//         book[i].orderP = null
-//       }
-//     }
-//     ComputeRisks()
-//     $('#treeGrid').jqxTreeGrid('updateBoundData')
-//     success('Deleted orders for: ' + sector)
-//   })
-// }
+
+function DeleteSector(sector: string) {
+  return http
+    .delete(
+      `delete_all_orders/${currentAccount}/${currentAccountVar.tradeDate}`,
+      //  @ts-ignore
+      { sector }
+    )
+    .then((/* { data } */) => {
+      for (let i = 0; i < currentAccountVar.books.length; i++) {
+        const book = currentAccountVar.books[i]
+        if (book.sector == sector && book.rowType == 'contract') {
+          book.orderQ = null
+          book.orderP = null
+        }
+        if (sector == '' && book.rowType == 'contract') {
+          book.orderQ = null
+          book.orderP = null
+        }
+      }
+      Risks.ComputeRisks()
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      // TODO: Success notification
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
 // function DeleteCommodity(commodity, extension, instrument) {
 //   api.deletecommo(
 //     td,
@@ -640,4 +653,5 @@ async function BuildPreview(sector) {
 
 export default {
   preview,
+  DeleteSector,
 }

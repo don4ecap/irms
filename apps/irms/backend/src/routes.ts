@@ -270,38 +270,28 @@ const routes: Array<RouteOptions> = [
         .then((connection) => {
           const params: GetNavRequestParams = req.params as GetNavRequestParams
 
-          let query = `UPDATE
-                trading.irms
-              SET 
-                irms.orderQ=NULL,
-                irms.orderP=NULL
-              WHERE
-                  irms.account=?
-                AND
-                  irms.td=?`
-
+          let query = `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=?`
           // @ts-ignore
           if (req?.body?.sector) {
             query += 'AND irms.sector=?'
           }
 
-          if (params)
-            connection
-              .query(query, [
-                params.account,
-                params.trade_date,
-                // @ts-ignore
-                req?.body?.sector || '',
-              ])
-              .then((result) => {
-                return res.send({
-                  updated: result.affectedRows >= 1,
-                })
+          connection
+            .query(query, [
+              params.account,
+              params.trade_date,
+              // @ts-ignore
+              req?.body?.sector || '',
+            ])
+            .then((result) => {
+              return res.send({
+                updated: result.affectedRows >= 1,
               })
-              .catch(internalServerErrorHandler(res))
-              .finally(() => {
-                connection.end()
-              })
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(() => {
+              connection.end()
+            })
         })
         .catch(internalServerErrorHandler(res))
     },

@@ -7,5 +7,6 @@ module.exports = {
     currentAccountVar: true,
     moment: true,
     strategies: true,
+    DeleteSector: true,
   },
 }

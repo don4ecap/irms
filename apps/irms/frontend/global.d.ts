@@ -41,6 +41,10 @@ declare global {
   var currentAccountVar: IAccountVar
   var ignoreStrategies: string
   var moment: any
+
+  // Global functions
+  // eslint-disable-next-line no-unused-vars
+  function DeleteSector(sector: string)
 }
 
 export {}

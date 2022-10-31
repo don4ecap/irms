@@ -152,7 +152,7 @@
             <JqxButton
               class="inline-block"
               theme="office"
-              @click="deleteSector"
+              @click="deleteAllSector"
             >
               Delete
             </JqxButton>
@@ -623,31 +623,8 @@ export default {
       })
     },
 
-    deleteSector(sector = '') {
-      httpService
-        .delete(
-          `delete_all_orders/${currentAccount}/${currentAccountVar.tradeDate}`,
-          { sector }
-        )
-        .then((/* { data } */) => {
-          for (let i = 0; i < currentAccountVar.books.length; i++) {
-            const book = currentAccountVar.books[i]
-            if (book.sector == sector && book.rowType == 'contract') {
-              book.orderQ = null
-              book.orderP = null
-            }
-            if (sector == '' && book.rowType == 'contract') {
-              book.orderQ = null
-              book.orderP = null
-            }
-          }
-          Risks.ComputeRisks()
-          $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-          // TODO: Success notification
-        })
-        .catch((error) => {
-          console.error(error)
-        })
+    deleteAllSector() {
+      window.DeleteSector('')
     },
 
     checkLiveRisks() {
