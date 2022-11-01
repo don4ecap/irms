@@ -53,6 +53,7 @@ export default {
 
   methods: {
     initialize() {
+      if (!currentAccountVar.books.length) return
       this.loading.get = true
       http
         .get(`get_working/${currentAccount}/${currentAccountVar.tradeDate}`)
@@ -60,7 +61,7 @@ export default {
           this.existingOrders = data
           const orders = this.buildPreview()
           const sourcePreview = {
-            localdata: orders,
+            localdata: orders ?? [],
             datafields: [
               {
                 name: 'contract',
@@ -242,14 +243,16 @@ export default {
               //   api.ordercontracts(sectorRow.contract, strat.split('#')[1]),
               //   extension
               // )
-              contract =
-                ordered[0].contract_onedigit +
-                '-' +
-                ordered[1].contract_onedigit
-              contract_twodigit =
-                ordered[0].contract_twodigit +
-                '-' +
-                ordered[1].contract_twodigit
+              if (ordered.length) {
+                contract =
+                  ordered[0].contract_onedigit +
+                  '-' +
+                  ordered[1].contract_onedigit
+                contract_twodigit =
+                  ordered[0].contract_twodigit +
+                  '-' +
+                  ordered[1].contract_twodigit
+              }
             }
             strat = strat.replace('#' + strat.split('#')[1], '')
           }
