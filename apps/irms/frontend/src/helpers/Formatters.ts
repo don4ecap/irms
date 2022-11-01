@@ -1,11 +1,11 @@
 import TreeGridUtils from './TreeGridUtils'
 import helpers from '../helpers'
 
-function filterNonNull(datum /* , action */) {
+function filterNonNull(/* datum, action */) {
   console.log('Filter Non Null Called')
   // console.log('caller is ' + arguments.callee.caller.toString())
-  for (let i = 0; i < datum.length; i++) {
-    const data = datum[i]
+  for (let i = 0; i < currentAccountVar.books.length; i++) {
+    const data = currentAccountVar.books[i]
     if (data.rowType == 'sector') {
       TreeGridUtils.getCell(data.id, 16).css('text-align', 'right')
       setTimeout(createSectorToolTip, 500, data)
@@ -33,13 +33,13 @@ function filterNonNull(datum /* , action */) {
       }
     }
 
-    if (
-      !currentAccountVar.forceRenderedOnce &&
-      !currentAccountVar.showNonNull
-    ) {
-      currentAccountVar.forceRenderedOnce = true
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
-    }
+    // if (
+    // !currentAccountVar.forceRenderedOnce &&
+    // !currentAccountVar.showNonNull
+    // ) {
+    // currentAccountVar.forceRenderedOnce = true
+    // $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
+    // }
   }
 }
 

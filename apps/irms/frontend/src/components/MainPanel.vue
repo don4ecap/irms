@@ -571,7 +571,7 @@ export default {
       const a = new Date()
       if (currentAccountVar.calculateRisksLive) {
         //@ts-ignore
-        Formatters.filterNonNull(currentAccountVar.books)
+        Formatters.filterNonNull()
       }
       const b = new Date()
       //@ts-ignore
