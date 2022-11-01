@@ -223,7 +223,7 @@ function createToolTip(row) {
       '</div>',
     position: 'mouse',
     name: 'contractToolTip',
-    theme: 'metro',
+    theme: 'office',
     opacity: 1,
     autoHideDelay: 15000,
   })
