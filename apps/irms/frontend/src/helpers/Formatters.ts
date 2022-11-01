@@ -12,23 +12,24 @@ function filterNonNull(datum /* , action */) {
     }
 
     if (data.rowType == 'contract') {
-      if (
-        currentAccountVar.showNonNull &&
-        helpers.isNullOrEmpty(data.qty) &&
-        helpers.isNullOrEmpty(data.current_allocation_lots) &&
-        helpers.isNullOrEmpty(data.target_allocation_lots) &&
-        helpers.isNullOrEmpty(data.orderQ) &&
-        helpers.isNullOrEmpty(data.target_risks_post)
-      ) {
-        TreeGridUtils.getRow(data.id).css('display', 'none')
+      if (currentAccountVar.showNonNull) {
+        if (
+          helpers.isNullOrEmpty(data.qty) &&
+          helpers.isNullOrEmpty(data.current_allocation_lots) &&
+          helpers.isNullOrEmpty(data.target_allocation_lots) &&
+          helpers.isNullOrEmpty(data.orderQ) &&
+          helpers.isNullOrEmpty(data.target_risks_post)
+        ) {
+          TreeGridUtils.getRow(data.id).css('display', 'none')
+        } else {
+          TreeGridUtils.getRow(data.id).css('display', 'table-row')
+        }
 
-        if (!data?.valid && data.instrument != 'Cash') {
-          TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
+        if (!data.valid && data.instrument != 'Cash') {
+          // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
         }
         setTimeout(colorExpiries, 100, data)
         setTimeout(createToolTip, 0, data)
-      } else {
-        TreeGridUtils.getRow(data.id).css('display', 'table-row')
       }
     }
 
