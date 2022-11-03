@@ -8,6 +8,11 @@ export interface DeleteSingleParams extends GetNavRequestParams {
   extension: string
 }
 
+export interface DeleteCommodityParams extends GetNavRequestParams {
+  commodity: string
+  extension: string
+}
+
 export interface AccountOnlyParams {
   account: string
 }

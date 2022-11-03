@@ -11,5 +11,6 @@ module.exports = {
     // Global helper functions
     DeleteSector: true,
     DeleteSingle: true,
+    DeleteCommodity: true,
   },
 }

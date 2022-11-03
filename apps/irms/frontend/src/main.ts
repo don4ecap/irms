@@ -60,8 +60,11 @@ window.contextMenu = $('#menu').jqxMenu({
   mode: 'popup',
 })
 window.ignoreStrategies = ''
-window.DeleteSector = RMSOperations.DeleteSector
-window.DeleteSingle = RMSOperations.DeleteSingle
+
+// Expose RMSOperations functions to global
+for (const [prop, val] of Object.entries(RMSOperations)) {
+  window[prop] = val
+}
 
 new Vue({
   render: (h) => h(App),

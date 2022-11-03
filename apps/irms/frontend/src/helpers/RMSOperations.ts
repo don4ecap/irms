@@ -262,32 +262,39 @@ function DeleteSector(sector: string) {
     })
 }
 
-// function DeleteCommodity(commodity, extension, instrument) {
-//   api.deletecommo(
-//     td,
-//     account,
-//     commodity,
-//     extension,
-//     instrument,
-//     function (response) {
-//       for (var i = 0; i < book.length; i++) {
-//         if (
-//           book[i].commo == commodity &&
-//           book[i].extension == extension &&
-//           book[i].instrument == instrument &&
-//           book[i].rowType == 'contract'
-//         ) {
-//           book[i].orderQ = null
-//           book[i].orderP = null
-//         }
-//       }
-//       ComputeRisks()
-//       $('#treeGrid').jqxTreeGrid('updateBoundData')
-//       $('#treeGrid').jqxTreeGrid('selectRow', row.id)
-//       success('Deleted orders for: ' + commodity)
-//     }
-//   )
-// }
+function DeleteCommodity(
+  commodity: string,
+  extension: string,
+  instrument: string
+) {
+  http
+    .delete(
+      `delete_commodity/${currentAccount}/${currentAccountVar.tradeDate}/${commodity}/${extension}`
+    )
+    .then((/* {data} */) => {
+      for (let i = 0; i < currentAccountVar.books.length; i++) {
+        const book = currentAccountVar.books[i]
+        if (
+          book.commo == commodity &&
+          book.extension == extension &&
+          book.instrument == instrument &&
+          book.rowType == 'contract'
+        ) {
+          book.orderQ = null
+          book.orderP = null
+        }
+      }
+      Risks.ComputeRisks()
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      // TODO: what the code below do?
+      // treeGrid.jqxTreeGrid('selectRow', row.id)
+      // TODO: success notification
+      // success('Deleted orders for: ' + commodity)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 
 function DeleteSingle(contract: string, extension: string, id: string) {
   http
@@ -664,4 +671,5 @@ export default {
   preview,
   DeleteSector,
   DeleteSingle,
+  DeleteCommodity,
 }

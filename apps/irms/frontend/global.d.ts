@@ -43,10 +43,13 @@ declare global {
   var moment: any
 
   // Global functions
-  // eslint-disable-next-line no-unused-vars
   function DeleteSector(sector: string)
-  // eslint-disable-next-line no-unused-vars
   function DeleteSingle(contract: string, extension: string, id: string)
+  function DeleteCommodity(
+    commodity: string,
+    extension: string,
+    instrument: string
+  )
 }
 
 export {}
