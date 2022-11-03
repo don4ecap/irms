@@ -21,15 +21,14 @@ function filterNonNull(/* datum, action */) {
           helpers.isNullOrEmpty(data.target_risks_post)
         ) {
           TreeGridUtils.getRow(data.id).css('display', 'none')
-        } else {
-          TreeGridUtils.getRow(data.id).css('display', 'table-row')
+          if (!data.valid && data.instrument != 'Cash') {
+            // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
+          }
+          setTimeout(colorExpiries, 100, data)
+          setTimeout(createToolTip, 0, data)
         }
-
-        if (!data.valid && data.instrument != 'Cash') {
-          // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
-        }
-        setTimeout(colorExpiries, 100, data)
-        setTimeout(createToolTip, 0, data)
+      } else {
+        TreeGridUtils.getRow(data.id).css('display', 'table-row')
       }
     }
 
