@@ -40,6 +40,12 @@
 //   )
 // }
 
+function getCell2(key: string, cellNum: number) {
+  const row = getRow2(key)
+  if (!row) return null
+  return row.children[cellNum]
+}
+
 function getCell(key: string, cellNum: number) {
   const a = $(`#${currentAccountVar.treeGridID} tr`)
   const b = a.filter(`tr[data-key=${key}]`)
@@ -49,6 +55,12 @@ function getCell(key: string, cellNum: number) {
 function getRow(key: string) {
   const a = $(`#${currentAccountVar.treeGridID} tr[data-key='${key}']`)
   return $(a[0])
+}
+
+function getRow2(key: string) {
+  return document.body.querySelector(
+    `#${currentAccountVar.treeGridID} tr[data-key='${key}']`
+  )
 }
 
 // function ExpandAllRows() {
@@ -95,4 +107,6 @@ function getRow(key: string) {
 export default {
   getCell,
   getRow,
+  getRow2,
+  getCell2,
 }

@@ -2,16 +2,20 @@ import TreeGridUtils from './TreeGridUtils'
 import helpers from '../helpers'
 
 function filterNonNull(/* datum, action */) {
-  console.log('Filter Non Null Called')
+  // console.log('Filter Non Null Called')
+  console.time('filterNonNull')
   // console.log('caller is ' + arguments.callee.caller.toString())
   for (let i = 0; i < currentAccountVar.books.length; i++) {
     const data = currentAccountVar.books[i]
-    if (data.rowType == 'sector') {
-      TreeGridUtils.getCell(data.id, 16).css('text-align', 'right')
+    if (data.rowType == 'sector' && data.id) {
+      const cell = TreeGridUtils.getCell2(data.id, 16)
+      // @ts-ignore
+      cell.style.textAlign === 'right'
       setTimeout(createSectorToolTip, 500, data)
     }
 
     if (data.rowType == 'contract') {
+      const row = TreeGridUtils.getRow2(data.id)
       if (currentAccountVar.showNonNull) {
         if (
           helpers.isNullOrEmpty(data.qty) &&
@@ -20,26 +24,33 @@ function filterNonNull(/* datum, action */) {
           helpers.isNullOrEmpty(data.orderQ) &&
           helpers.isNullOrEmpty(data.target_risks_post)
         ) {
-          TreeGridUtils.getRow(data.id).css('display', 'none')
-          if (!data.valid && data.instrument != 'Cash') {
-            // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
-          }
-          setTimeout(colorExpiries, 100, data)
-          setTimeout(createToolTip, 0, data)
+          // @ts-ignore
+          row && (row.style.display = 'none')
         }
       } else {
-        TreeGridUtils.getRow(data.id).css('display', 'table-row')
+        // @ts-ignore
+        row && (row.style.display = 'table-row')
       }
-    }
 
-    // if (
-    // !currentAccountVar.forceRenderedOnce &&
-    // !currentAccountVar.showNonNull
-    // ) {
-    // currentAccountVar.forceRenderedOnce = true
-    // $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
-    // }
+      // if (!data.valid && data.instrument != 'Cash' && data.id) {
+      // const cell = TreeGridUtils.getCell2(data.id, 0)
+      // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
+      // @ts-ignore
+      // cell.style.backgroundColor = '#ff1b1b'
+      // }
+      setTimeout(colorExpiries, 100, data)
+      setTimeout(createToolTip, 0, data)
+    }
   }
+
+  // if (
+  // !currentAccountVar.forceRenderedOnce &&
+  // !currentAccountVar.showNonNull
+  // ) {
+  // currentAccountVar.forceRenderedOnce = true
+  // $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
+  // }
+  console.timeEnd('filterNonNull')
 }
 
 // function filterNonNullCommo(data, commo, extension, instrument, obj) {
@@ -90,10 +101,10 @@ function filterNonNull(/* datum, action */) {
 
 // function colorFixings(row) {
 //   if (fixings.indexOf(row.contract) != -1) {
-//     TreeGridUtils.getCell(row.id, 12)
+//     TreeGridUtils.getCell2(row.id, 12)
 //       .css('border-width', '3px')
 //       .css('border-color', 'lightslategray')
-//     TreeGridUtils.getCell(row.id, 14)
+//     TreeGridUtils.getCell2(row.id, 14)
 //       .css('border-width', '3px')
 //       .css('border-color', 'lightslategray')
 //   }
@@ -107,19 +118,21 @@ function colorExpiries(row) {
   let cell
   if (c - b == 0) {
     for (let i = 0; i < 17; i++) {
-      cell = TreeGridUtils.getCell(row.id, i)
-      if (cell.css('background-color') == 'rgb(255, 255, 255)') {
-        cell.css('background-color', 'purple')
-        cell.css('color', 'white')
+      cell = TreeGridUtils.getCell2(row.id, i)
+      if (cell.style.backgroundColor !== 'purple') {
+        cell.style.backgroundColor = 'purple'
+        cell.style.color = 'white'
       }
     }
   } else if (c > b) {
     //Expiry4E
     for (let i = 0; i < 17; i++) {
-      cell = TreeGridUtils.getCell(row.id, i)
-      if (cell.css('background-color') == 'rgb(255, 255, 255)') {
-        cell.css('background-color', 'red')
-        cell.css('color', 'white')
+      cell = TreeGridUtils.getCell2(row.id, i)
+      if (cell.style.backgroundColor !== 'purple') {
+        cell.style.backgroundColor = 'red'
+        cell.style.color = 'white'
+        // cell.css('background-color', 'red')
+        // cell.css('color', 'white')
       }
     }
   }
@@ -139,20 +152,18 @@ function colorExpiries(row) {
   } */
 
   if (row.settlement_available == 'FALSE') {
-    cell = TreeGridUtils.getCell(row.id, 0)
-    cell.css('background-color', 'brown')
-    cell.css('color', 'yellow')
+    cell = TreeGridUtils.getCell2(row.id, 0)
+    cell.style.backgroundColor = 'brown'
+    cell.style.color = 'yellow'
   }
 }
 
 function createSectorToolTip(row) {
-  if (!('id' in row)) {
-    return
-  }
+  if (!('id' in row)) return
 
-  const cell = TreeGridUtils.getCell(row.id, 4)
+  const cell = TreeGridUtils.getCell2(row.id, 4)
 
-  cell.jqxTooltip({
+  $(cell).jqxTooltip({
     content:
       '<div style="text-align:left;background-color:black;color:yellow">' +
       '<b>Abs by Commdity: </b>' +
@@ -166,14 +177,20 @@ function createSectorToolTip(row) {
 }
 
 function createToolTip(row) {
-  const cell = TreeGridUtils.getCell(row.id, 0)
-  if (cell.length == 0) return
+  const cell = TreeGridUtils.getCell2(row.id, 0)
+  if (!cell) return
   let comment = ''
   if (row.comment != null && row.comment != '') {
     comment = '<b>Comment: ' + row.comment + '</b></br><br/>'
-    TreeGridUtils.getCell(row.id, 17).css('background-color', 'black')
-    TreeGridUtils.getCell(row.id, 16).css('background-color', 'black')
+    const cell17 = TreeGridUtils.getCell2(row.id, 17)
+    // @ts-ignore
+    if (cell17) cell17.style.backgroundColor = '#000'
+
+    const cell16 = TreeGridUtils.getCell2(row.id, 17)
+    // @ts-ignore
+    if (cell16) cell16.style.backgroundColor = '#000'
   }
+
   let option = ''
   if (row.instrument.indexOf('Option') != -1) {
     option =
@@ -202,7 +219,8 @@ function createToolTip(row) {
       accounting.formatNumber(row.vega * 100, 4) +
       ' %<br/><br/>'
   }
-  cell.jqxTooltip({
+
+  $(cell).jqxTooltip({
     content:
       '<br/><div style="text-align:left;background-color:black;color:yellow">' +
       comment +

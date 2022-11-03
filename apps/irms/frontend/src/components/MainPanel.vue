@@ -497,7 +497,11 @@ export default {
               //alert("ready");
             },
             rendered: () => {
-              this.buildGrid()
+              if (currentAccountVar.calculateRisksLive) {
+                //@ts-ignore
+                Formatters.filterNonNull()
+              }
+              // this.buildGrid()
               // LoadComments()
               //alert("rendered");
             },
@@ -568,17 +572,16 @@ export default {
     },
 
     buildGrid() {
-      const a = new Date()
+      // const a = new Date()
       if (currentAccountVar.calculateRisksLive) {
-        //@ts-ignore
         Formatters.filterNonNull()
       }
-      const b = new Date()
+      // const b = new Date()
       //@ts-ignore
-      const dif = b - a
-      console.log(`FilterNonNull took ${dif} secs to complete`)
+      // const dif = b - a
+      // console.log(`FilterNonNull took ${dif} secs to complete`)
 
-      //InitializeControls();
+      // InitializeControls();
     },
 
     onShowNonNullClicked() {
