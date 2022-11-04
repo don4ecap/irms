@@ -25,11 +25,11 @@ function filterNonNull(/* datum, action */) {
           helpers.isNullOrEmpty(data.target_risks_post)
         ) {
           // @ts-ignore
-          row && (row.style.display = 'none')
+          if (row) Promise.resolve().then(() => (row.style.display = 'none'))
         }
       } else {
         // @ts-ignore
-        row && (row.style.display = 'table-row')
+        if (row) Promise.resolve().then(() => (row.style.display = 'table-row'))
       }
 
       // if (!data.valid && data.instrument != 'Cash' && data.id) {
@@ -38,8 +38,10 @@ function filterNonNull(/* datum, action */) {
       // @ts-ignore
       // cell.style.backgroundColor = '#ff1b1b'
       // }
-      setTimeout(colorExpiries, 100, data)
-      setTimeout(createToolTip, 0, data)
+      // setTimeout(colorExpiries, 100, data)
+      Promise.resolve().then(() => colorExpiries(data))
+      // setTimeout(createToolTip, 0, data)
+      Promise.resolve().then(() => createToolTip(data))
     }
   }
 
@@ -66,11 +68,14 @@ async function filterNonNullCommo(commo, extension, instrument, expandEl) {
           helpers.isNullOrEmpty(book.target_risks_post)
         ) {
           // @ts-ignore
-          if (row) setTimeout(() => (row.style.display = 'none'), 10)
+          // if (row) setTimeout(() => (row.style.display = 'none'), 10)
+          if (row) Promise.resolve().then(() => (row.style.display = 'none'))
         }
       } else {
-        // @ts-ignore
-        if (row) setTimeout(() => (row.style.display = 'table-row'), 10)
+        // if (row) setTimeout(() => (row.style.display = 'table-row'), 10)
+        if (row)
+          // @ts-ignore
+          Promise.resolve().then(() => (row.style.display = 'table-row'))
       }
     }
   }
