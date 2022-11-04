@@ -50,6 +50,7 @@ declare global {
     extension: string,
     instrument: string
   )
+  function filterNonNullCommo(commo, extension, instrument, expandEl)
 }
 
 export {}

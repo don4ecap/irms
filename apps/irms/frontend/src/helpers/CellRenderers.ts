@@ -162,7 +162,7 @@ const contractRenderer = function (
         }
       }
       nonNullText =
-        "  <a href='#' style='text-decoration: none;color:blue;font-weight:bold' val='false' onclick=\"filterNonNullCommo(book,'" +
+        "  <a href='#' style='text-decoration: none;color:blue;font-weight:bold' val='false' onclick=\"filterNonNullCommo('" +
         r.commo +
         "','" +
         r.extension +

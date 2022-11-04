@@ -53,52 +53,50 @@ function filterNonNull(/* datum, action */) {
   console.timeEnd('filterNonNull')
 }
 
-// function filterNonNullCommo(data, commo, extension, instrument, obj) {
-//   for (var i = 0; i < data.length; i++) {
-//     if (
-//       data[i].rowType == 'contract' &&
-//       data[i].commo == commo &&
-//       data[i].extension == extension &&
-//       data[i].instrument == instrument
-//     ) {
-//       TreeGridUtils.getRow(data[i].id).css('display', 'table-row')
-//       if ($(obj).attr('val') == 'true') {
-//         if (isNaN(data[i].qty) || data[i].qty == null || data[i].qty == '')
-//           if (
-//             isNaN(data[i].current_allocation_lots) ||
-//             data[i].current_allocation_lots == null ||
-//             data[i].current_allocation_lots == ''
-//           )
-//             if (
-//               isNaN(data[i].target_allocation_lots) ||
-//               data[i].target_allocation_lots == null ||
-//               data[i].target_allocation_lots == ''
-//             )
-//               if (data[i].orderQ == null || data[i].orderQ == '')
-//                 if (
-//                   data[i].target_risks_post == null ||
-//                   data[i].target_risks_post == ''
-//                 )
-//                   TreeGridUtils.getRow(data[i].id).css('display', 'none')
-//       }
-//     }
-//     if (
-//       !currentAccountVar.forceRenderedOnce &&
-//       !currentAccountVar.showNonNull
-//     ) {
-//       currentAccountVar.forceRenderedOnce = true
-//       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
-//     }
-//   }
-//   if ($(obj).html() == '+') {
-//     $(obj).html('-')
-//     $(obj).attr('val', 'true')
-//   } else {
-//     $(obj).html('+')
-//     $(obj).attr('val', 'false')
-//   }
-// }
+async function filterNonNullCommo(commo, extension, instrument, expandEl) {
+  for (let i = 0; i < currentAccountVar.books.length; i++) {
+    const book = currentAccountVar.books[i]
+    if (
+      book.rowType == 'contract' &&
+      book.commo == commo &&
+      book.extension == extension &&
+      book.instrument == instrument
+    ) {
+      const row = TreeGridUtils.getRow2(book.id)
+      if (expandEl.getAttribute('val') == 'true') {
+        if (
+          helpers.isNullOrEmpty(book.qty) &&
+          helpers.isNullOrEmpty(book.current_allocation_lots) &&
+          helpers.isNullOrEmpty(book.target_allocation_lots) &&
+          helpers.isNullOrEmpty(book.orderQ) &&
+          helpers.isNullOrEmpty(book.target_risks_post)
+        ) {
+          // @ts-ignore
+          if (row) setTimeout(() => (row.style.display = 'none'), 10)
+        }
+      } else {
+        // @ts-ignore
+        if (row) setTimeout(() => (row.style.display = 'table-row'), 10)
+      }
+    }
 
+    if (
+      !currentAccountVar.forceRenderedOnce &&
+      !currentAccountVar.showNonNull
+    ) {
+      currentAccountVar.forceRenderedOnce = true
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
+    }
+  }
+
+  if (expandEl.innerHTML == '+') {
+    expandEl.innerHTML = '-'
+    expandEl.setAttribute('val', 'true')
+  } else {
+    expandEl.innerHTML = '+'
+    expandEl.setAttribute('val', 'false')
+  }
+}
 // function colorFixings(row) {
 //   if (fixings.indexOf(row.contract) != -1) {
 //     TreeGridUtils.getCell2(row.id, 12)
@@ -300,4 +298,5 @@ function createToolTip(row) {
 
 export default {
   filterNonNull,
+  filterNonNullCommo,
 }

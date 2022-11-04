@@ -12,5 +12,6 @@ module.exports = {
     DeleteSector: true,
     DeleteSingle: true,
     DeleteCommodity: true,
+    filterNonNullCommo: true,
   },
 }

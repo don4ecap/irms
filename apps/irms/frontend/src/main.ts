@@ -12,6 +12,7 @@ import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
 
 // Helpers, load it here so we can globally expose it
 import RMSOperations from './helpers/RMSOperations'
+import Formatters from './helpers/Formatters'
 
 const accountProperties: IAccountVar = {
   bookIDMap: [],
@@ -65,6 +66,8 @@ window.ignoreStrategies = ''
 for (const [prop, val] of Object.entries(RMSOperations)) {
   window[prop] = val
 }
+
+window.filterNonNullCommo = Formatters.filterNonNullCommo
 
 new Vue({
   render: (h) => h(App),
