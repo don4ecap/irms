@@ -43,13 +43,7 @@ function filterNonNull(/* datum, action */) {
     }
   }
 
-  // if (
-  // !currentAccountVar.forceRenderedOnce &&
-  // !currentAccountVar.showNonNull
-  // ) {
-  // currentAccountVar.forceRenderedOnce = true
-  // $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
-  // }
+  render()
   console.timeEnd('filterNonNull')
 }
 
@@ -79,15 +73,9 @@ async function filterNonNullCommo(commo, extension, instrument, expandEl) {
         if (row) setTimeout(() => (row.style.display = 'table-row'), 10)
       }
     }
-
-    if (
-      !currentAccountVar.forceRenderedOnce &&
-      !currentAccountVar.showNonNull
-    ) {
-      currentAccountVar.forceRenderedOnce = true
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
-    }
   }
+
+  render()
 
   if (expandEl.innerHTML == '+') {
     expandEl.innerHTML = '-'
@@ -97,6 +85,14 @@ async function filterNonNullCommo(commo, extension, instrument, expandEl) {
     expandEl.setAttribute('val', 'false')
   }
 }
+
+function render() {
+  if (!currentAccountVar.forceRenderedOnce && !currentAccountVar.showNonNull) {
+    currentAccountVar.forceRenderedOnce = true
+    $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
+  }
+}
+
 // function colorFixings(row) {
 //   if (fixings.indexOf(row.contract) != -1) {
 //     TreeGridUtils.getCell2(row.id, 12)
