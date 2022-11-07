@@ -28,6 +28,7 @@
       </div>
     </jqxTabs>
     <PreviewAllOrdersWindow ref="previewAllOrders" />
+    <PreviewSingleOrderWindow ref="previewSingleOrderWindow" />
   </div>
 </template>
 
@@ -35,6 +36,7 @@
 import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
 import MainPanel from './components/MainPanel.vue'
 import PreviewAllOrdersWindow from './components/PreviewAllOrdersWindow.vue'
+import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
 
 export default {
   name: 'AppRoot',
@@ -43,6 +45,7 @@ export default {
     JqxTabs,
     MainPanel,
     PreviewAllOrdersWindow,
+    PreviewSingleOrderWindow,
   },
 
   data() {
@@ -55,6 +58,9 @@ export default {
 
   mounted() {
     this.onTabSelected()
+
+    // Expose it so can be accessed globally
+    window.previewSingleOrderWindow = this.$refs.previewSingleOrderWindow
   },
 
   methods: {

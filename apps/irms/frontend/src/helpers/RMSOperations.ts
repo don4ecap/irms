@@ -618,53 +618,80 @@ async function BuildPreview(sector) {
 //     $('#configWin').jqxWindow('destroy')
 //   })
 // }
-// var popup = null
-// function ODetails(rowid, qty, strat) {
-//   //if(qty=="null") qty=null;
-//   $('#odcontainer').html('<div tag="' + rowid + '" id="od"></div>')
-//   $('#od').html(
-//     "<div>Order Details</div><div><iframe width='500' height='500' id='win' src='orderdetails.aspx?q=" +
-//       qty +
-//       '&p=' +
-//       strat +
-//       "'></iframe><button onclick='saveod()'>Update</button></div>"
-//   )
-//   $('#od').jqxWindow({
-//     theme: 'shinyblack',
-//     width: 600,
-//     height: 600,
-//     isModal: true,
-//   })
-// }
-// function saveod() {
-//   qty = $('#win').contents().find('#odqty').text()
-//   strat = $('#win').contents().find('#odstrat').text()
-//   rowid = $('#od').attr('tag')
-//   index = GetBookIndexByID(rowid)
-//   book[index].orderQ = qty
-//   book[index].orderP = strat
 
-//   api.savecell(
-//     td,
-//     account,
-//     book[index].contract,
-//     book[index].extension,
-//     book[index].orderQ,
-//     book[index].orderP,
-//     book[index].id,
-//     function (response) {
-//       index = GetBookIndexByID(response.result)
-//       book[index].orderQ = qty
-//       book[index].orderP = strat
+// const odContiner = $('#order-detail-container')
+// const od = $('#od')
+// const odIframe = $('#order-detail-iframe')
+// const idSaveBtn = $('#save-order-button')
+
+function openPreviewSingleOrderWindow(rowID: number) {
+  window.previewSingleOrderWindow.open(rowID)
+}
+
+// function saveod() {
+//   const qty = odIframe.contents().find('#odqty').text()
+//   const strat = odIframe.contents().find('#odstrat').text()
+
+//   const rowid = od.attr('tag')
+//   const index = Risks.GetBookIndexByID(rowid)
+//   const book = currentAccountVar.books[index]
+
+//   book.orderQ = qty
+//   book.orderP = strat
+
+//   const cellData = {
+//     id: book.id,
+//     contract: book.contract,
+//     extension: book.extension || null,
+//     order_qty: book.orderQ || null,
+//     order_p: book.orderP || null,
+//   }
+
+//   // Send request to server for save cell
+//   http
+//     .post(
+//       `save_cell/${currentAccount}/${currentAccountVar.tradeDate}`,
+//       cellData
+//     )
+//     .then(({ data }) => {
+//       if (parseInt(data.id) == -1) {
+//         // TODO: Notify failure
+//         console.error('Data is not saved')
+//         return
+//       }
 //       //ComputeRisksRow(index);
-//       ComputeRisks()
-//       $('#treeGrid').jqxTreeGrid('updateBoundData')
-//       $('#od').jqxWindow('destroy')
-//       success('Risks Updated')
-//       //if(editingRowID!=-1)
-//       //$("#treeGrid").jqxTreeGrid('beginRowEdit', editingRowID);
-//     }
-//   )
+//       Risks.ComputeRisks()
+//       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+//       od.jqxWindow('destroy')
+//       // success('Risks Updated')
+//       // if(editingRowID!=-1)
+//       // $("#treeGrid").jqxTreeGrid('beginRowEdit', editingRowID);
+//     })
+//     .catch((error) => {
+//       console.error('Failed to save cell.', '\nError:', error)
+//     })
+
+//   // api.savecell(
+//   //   td,
+//   //   account,
+//   //   book.contract,
+//   //   book.extension,
+//   //   book.orderQ,
+//   //   book.orderP,
+//   //   book.id,
+//   //   function (response) {
+//   //     index = GetBookIndexByID(response.result)
+//   //     book.orderQ = qty
+//   //     book.orderP = strat
+//   //     //ComputeRisksRow(index);
+//   //     ComputeRisks()
+//   //     $('#treeGrid').jqxTreeGrid('updateBoundData')
+//   //     $('#od').jqxWindow('destroy')
+//   //     success('Risks Updated')
+//   //     //if(editingRowID!=-1)
+//   //     //$("#treeGrid").jqxTreeGrid('beginRowEdit', editingRowID);
+//   //   }
+//   // )
 // }
 
 export default {
@@ -672,4 +699,5 @@ export default {
   DeleteSector,
   DeleteSingle,
   DeleteCommodity,
+  openPreviewSingleOrderWindow,
 }

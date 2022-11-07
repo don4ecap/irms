@@ -41,6 +41,7 @@ declare global {
   var currentAccountVar: IAccountVar
   var ignoreStrategies: string
   var moment: any
+  var previewSingleOrderWindow: any
 
   // Global functions
   function DeleteSector(sector: string)

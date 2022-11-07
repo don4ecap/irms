@@ -302,12 +302,8 @@ const aRenderer = function (row, dataField, cellValue, rowData, cellText) {
     )
   if (rowData.rowType == 'contract') {
     return (
-      "<img src='img/glass.png' onclick='ODetails(\"" +
+      "<img src='img/glass.png' onclick='openPreviewSingleOrderWindow(\"" +
       rowData.id +
-      '","' +
-      rowData.orderQ +
-      '","' +
-      rowData.orderP +
       '");\'/>' +
       "<img src='img/trash.png' onclick='DeleteSingle(\"" +
       rowData.contract +
