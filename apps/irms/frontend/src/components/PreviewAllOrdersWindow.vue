@@ -33,7 +33,7 @@ import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 
 export default {
-  name: 'PreviewDialog',
+  name: 'PreviewAllOrdersWindow',
 
   components: {
     JqxWindow,

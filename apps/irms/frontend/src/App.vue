@@ -27,14 +27,14 @@
         />
       </div>
     </jqxTabs>
-    <PreviewWindow ref="previewWindow" />
+    <PreviewAllOrdersWindow ref="previewAllOrders" />
   </div>
 </template>
 
 <script lang="ts">
 import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
 import MainPanel from './components/MainPanel.vue'
-import PreviewWindow from './components/PreviewWindow.vue'
+import PreviewAllOrdersWindow from './components/PreviewAllOrdersWindow.vue'
 
 export default {
   name: 'AppRoot',
@@ -42,7 +42,7 @@ export default {
   components: {
     JqxTabs,
     MainPanel,
-    PreviewWindow,
+    PreviewAllOrdersWindow,
   },
 
   data() {
@@ -66,14 +66,14 @@ export default {
       this.currentIndex = this.$refs.mainTabs.val()
       this.currentAccount = this.accounts[this.currentIndex]
       document.title = this.currentAccount + ' - ' + ' iRMS'
-      this.$refs.previewWindow.initialize()
+      this.$refs.previewAllOrders.initialize()
 
       currentAccount = this.currentAccount
       currentAccountVar = accountsVar[this.currentAccount]
     },
 
     openPreviewWindow() {
-      this.$refs.previewWindow.open()
+      this.$refs.previewAllOrders.open()
     },
   },
 }
