@@ -11,7 +11,7 @@
         Preview Orders
         <span v-show="tag?.length">- {{ tag }}</span>
       </h2>
-      <div id="preview-window-content">
+      <div class="preview-window-content">
         <div class="flex" style="padding: 5px; gap: 0.3rem">
           <JqxButton theme="office" @click="selectAllRows">
             Select All
@@ -234,9 +234,9 @@ export default {
           let ordered
           if (strat.indexOf('#') != -1) {
             //contract = sectorRow.contract + "-" + strat.split('#')[1];
-            if (strat.split('#')[1] == '')
+            if (strat.split('#')[1] == '') {
               contract = sectorRow.contract + '-' + strat.split('#')[1]
-            else {
+            } else {
               // TODO:
               ordered = this.existingOrders
               // ordered = JSON.parse(
