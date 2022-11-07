@@ -27,7 +27,7 @@
         />
       </div>
     </jqxTabs>
-    <PreviewAllOrdersWindow ref="previewAllOrders" />
+    <PreviewAllOrdersWindow ref="previewAllOrdersWindow" />
     <PreviewSingleOrderWindow ref="previewSingleOrderWindow" />
   </div>
 </template>
@@ -60,6 +60,7 @@ export default {
     this.onTabSelected()
 
     // Expose it so can be accessed globally
+    window.previewAllOrdersWindow = this.$refs.previewAllOrdersWindow
     window.previewSingleOrderWindow = this.$refs.previewSingleOrderWindow
   },
 
@@ -72,14 +73,14 @@ export default {
       this.currentIndex = this.$refs.mainTabs.val()
       this.currentAccount = this.accounts[this.currentIndex]
       document.title = this.currentAccount + ' - ' + ' iRMS'
-      this.$refs.previewAllOrders.initialize()
+      this.$refs.previewAllOrdersWindow.initialize()
 
       currentAccount = this.currentAccount
       currentAccountVar = accountsVar[this.currentAccount]
     },
 
     openPreviewWindow() {
-      this.$refs.previewAllOrders.open()
+      this.$refs.previewAllOrdersWindow.open()
     },
   },
 }

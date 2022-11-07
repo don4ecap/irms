@@ -1,166 +1,166 @@
 import http from '../services/http'
 import Risks from './Risks'
 
-function preview(event) {
-  const btn = event.target
-  const tag = btn.getAttribute('tag') || ''
-  // console.log(`Generating for sector: ${tag}`)
-  $('#dynacontainer').html(
-    `<div id="preview" style="width:1300px">
-        <div id="windowHeader">
-            <h2>Preview Orders - ${tag} </h2>
-        </div>
-        <div style="overflow: hidden" id="windowContent"></div>
-    </div>`
-  )
-  $('#preview').jqxWindow({
-    minHeight: '70vh',
-    minWidth: '1200px',
-    maxHeight: '85vh',
-    autoOpen: true,
-    isModal: true,
-    animationType: 'slide',
-    initContent() {
-      const a = BuildPreview(tag)
-      $('#windowContent').html('<div id="previewtable"></div>')
-      const source_preview = {
-        localdata: a,
-        datafields: [
-          {
-            name: 'contract',
-            type: 'number',
-          },
-          {
-            name: 'extension',
-            type: 'string',
-          },
-          {
-            name: 'qty',
-            type: 'string',
-          },
-          {
-            name: 'strategy',
-            type: 'string',
-          },
-          {
-            name: 'price',
-            type: 'number',
-          },
-          {
-            name: 'account',
-            type: 'number',
-          },
-          {
-            name: 'freetext',
-            type: 'number',
-          },
-          {
-            name: 'contract_twodigit',
-            type: 'number',
-          },
-          {
-            name: 'commo',
-            type: 'string',
-          },
-          {
-            name: 'instrument',
-            type: 'string',
-          },
-        ],
-        datatype: 'array',
-      }
-      const dataAdapter_preview = new $.jqx.dataAdapter(source_preview)
-      // initialize jqxGrid
-      $('#previewtable').jqxGrid({
-        width: 1150,
-        height: 700,
-        theme: 'office',
-        source: dataAdapter_preview,
-        columns: [
-          {
-            text: 'Contract',
-            datafield: 'contract',
-          },
-          {
-            text: 'Extension',
-            datafield: 'extension',
-          },
-          {
-            text: 'Quantity',
-            datafield: 'qty',
-          },
-          {
-            text: 'Strategy',
-            datafield: 'strategy',
-            cellsalign: 'center',
-            width: 200,
-          },
-          {
-            text: 'Price',
-            datafield: 'price',
-          },
-          {
-            text: 'FreeText',
-            datafield: 'freetext',
-            width: 150,
-          },
-          {
-            text: 'Account',
-            datafield: 'account',
-            width: 150,
-          },
-        ],
-        selectionmode: 'multiplerowsextended',
-        showtoolbar: true,
-        rendertoolbar: function (toolbar) {
-          // const me = this
-          const container = $("<div style='margin: 5px;'></div>")
-          // const span = $(
-          //   "<span style='float: left; margin-top: 5px; margin-right: 4px;'>Search City: </span>"
-          // )
-          const input = $(
-            "<input class='jqx-input jqx-widget-content jqx-rc-all' id='selectAll' type='button' style='height: 23px; float: left; width: 150px;' value='Select All' />"
-          )
-          const input2 = $(
-            "<input class='jqx-input jqx-widget-content jqx-rc-all' id='selectAll' type='button' style='height: 23px; float: left; width: 150px;' value='Send to iTrade' />"
-          )
-          toolbar.append(container)
-          container.append(input)
-          container.append(input2)
-          // const theme = 'office'
-          // if (theme != '') {
-          //   input.addClass('jqx-widget-content-' + theme)
-          //   input.addClass('jqx-rc-all-' + theme)
-          //   input2.addClass('jqx-widget-content-' + theme)
-          //   input2.addClass('jqx-rc-all-' + theme)
-          // }
-          // const oldVal = ''
-          input.on('click', () => $('#previewtable').jqxGrid('selectallrows'))
-          input2.on('click', () => {
-            const selected = $('#previewtable').jqxGrid('getselectedrowindexes')
-            // const rows = $('#previewtable').jqxGrid('getrows')
-            // const j = 0
-            for (let i = 0; i < selected.length; i++) {
-              // api.sendtoitrade(
-              //   selected[i],
-              //   rows[selected[i]],
-              //   td,
-              //   function (response) {
-              //     $('#previewtable').jqxGrid('unselectrow', response.result)
-              //     $('#previewtable').jqxGrid('deleterow', response.result)
-              //   }
-              // )
-            }
-          })
-        },
-      })
-    },
-  })
-  //   $('#preview').on('close', function (event) {
-  //     $('#previewtable').jqxGrid('destroy')
-  //     $('#preview').jqxWindow('destroy')
-  //   })
-}
+// function preview(event) {
+//   const btn = event.target
+//   const tag = btn.getAttribute('tag') || ''
+//   // console.log(`Generating for sector: ${tag}`)
+//   $('#dynacontainer').html(
+//     `<div id="preview" style="width:1300px">
+//         <div id="windowHeader">
+//             <h2>Preview Orders - ${tag} </h2>
+//         </div>
+//         <div style="overflow: hidden" id="windowContent"></div>
+//     </div>`
+//   )
+//   $('#preview').jqxWindow({
+//     minHeight: '70vh',
+//     minWidth: '1200px',
+//     maxHeight: '85vh',
+//     autoOpen: true,
+//     isModal: true,
+//     animationType: 'slide',
+//     initContent() {
+//       const a = BuildPreview(tag)
+//       $('#windowContent').html('<div id="previewtable"></div>')
+//       const source_preview = {
+//         localdata: a,
+//         datafields: [
+//           {
+//             name: 'contract',
+//             type: 'number',
+//           },
+//           {
+//             name: 'extension',
+//             type: 'string',
+//           },
+//           {
+//             name: 'qty',
+//             type: 'string',
+//           },
+//           {
+//             name: 'strategy',
+//             type: 'string',
+//           },
+//           {
+//             name: 'price',
+//             type: 'number',
+//           },
+//           {
+//             name: 'account',
+//             type: 'number',
+//           },
+//           {
+//             name: 'freetext',
+//             type: 'number',
+//           },
+//           {
+//             name: 'contract_twodigit',
+//             type: 'number',
+//           },
+//           {
+//             name: 'commo',
+//             type: 'string',
+//           },
+//           {
+//             name: 'instrument',
+//             type: 'string',
+//           },
+//         ],
+//         datatype: 'array',
+//       }
+//       const dataAdapter_preview = new $.jqx.dataAdapter(source_preview)
+//       // initialize jqxGrid
+//       $('#previewtable').jqxGrid({
+//         width: 1150,
+//         height: 700,
+//         theme: 'office',
+//         source: dataAdapter_preview,
+//         columns: [
+//           {
+//             text: 'Contract',
+//             datafield: 'contract',
+//           },
+//           {
+//             text: 'Extension',
+//             datafield: 'extension',
+//           },
+//           {
+//             text: 'Quantity',
+//             datafield: 'qty',
+//           },
+//           {
+//             text: 'Strategy',
+//             datafield: 'strategy',
+//             cellsalign: 'center',
+//             width: 200,
+//           },
+//           {
+//             text: 'Price',
+//             datafield: 'price',
+//           },
+//           {
+//             text: 'FreeText',
+//             datafield: 'freetext',
+//             width: 150,
+//           },
+//           {
+//             text: 'Account',
+//             datafield: 'account',
+//             width: 150,
+//           },
+//         ],
+//         selectionmode: 'multiplerowsextended',
+//         showtoolbar: true,
+//         rendertoolbar: function (toolbar) {
+//           // const me = this
+//           const container = $("<div style='margin: 5px;'></div>")
+//           // const span = $(
+//           //   "<span style='float: left; margin-top: 5px; margin-right: 4px;'>Search City: </span>"
+//           // )
+//           const input = $(
+//             "<input class='jqx-input jqx-widget-content jqx-rc-all' id='selectAll' type='button' style='height: 23px; float: left; width: 150px;' value='Select All' />"
+//           )
+//           const input2 = $(
+//             "<input class='jqx-input jqx-widget-content jqx-rc-all' id='selectAll' type='button' style='height: 23px; float: left; width: 150px;' value='Send to iTrade' />"
+//           )
+//           toolbar.append(container)
+//           container.append(input)
+//           container.append(input2)
+//           // const theme = 'office'
+//           // if (theme != '') {
+//           //   input.addClass('jqx-widget-content-' + theme)
+//           //   input.addClass('jqx-rc-all-' + theme)
+//           //   input2.addClass('jqx-widget-content-' + theme)
+//           //   input2.addClass('jqx-rc-all-' + theme)
+//           // }
+//           // const oldVal = ''
+//           input.on('click', () => $('#previewtable').jqxGrid('selectallrows'))
+//           input2.on('click', () => {
+//             const selected = $('#previewtable').jqxGrid('getselectedrowindexes')
+//             // const rows = $('#previewtable').jqxGrid('getrows')
+//             // const j = 0
+//             for (let i = 0; i < selected.length; i++) {
+//               // api.sendtoitrade(
+//               //   selected[i],
+//               //   rows[selected[i]],
+//               //   td,
+//               //   function (response) {
+//               //     $('#previewtable').jqxGrid('unselectrow', response.result)
+//               //     $('#previewtable').jqxGrid('deleterow', response.result)
+//               //   }
+//               // )
+//             }
+//           })
+//         },
+//       })
+//     },
+//   })
+//   //   $('#preview').on('close', function (event) {
+//   //     $('#previewtable').jqxGrid('destroy')
+//   //     $('#preview').jqxWindow('destroy')
+//   //   })
+// }
 
 // function Generate(btn) {
 //   a = $(btn).text()
@@ -628,6 +628,10 @@ function openPreviewSingleOrderWindow(rowID: number) {
   window.previewSingleOrderWindow.open(rowID)
 }
 
+function openPreviewAllOrdersWindow(sector: string) {
+  window.previewAllOrdersWindow.open(sector)
+}
+
 // function saveod() {
 //   const qty = odIframe.contents().find('#odqty').text()
 //   const strat = odIframe.contents().find('#odstrat').text()
@@ -695,9 +699,9 @@ function openPreviewSingleOrderWindow(rowID: number) {
 // }
 
 export default {
-  preview,
   DeleteSector,
   DeleteSingle,
   DeleteCommodity,
+  openPreviewAllOrdersWindow,
   openPreviewSingleOrderWindow,
 }

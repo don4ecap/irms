@@ -9,7 +9,7 @@
     >
       <h2 id="preview-window-header" style="margin: 0">
         Preview Orders
-        <span v-show="tag?.length">- {{ tag }}</span>
+        <span id="tag1"></span>
       </h2>
       <div class="preview-window-content">
         <div class="flex" style="padding: 5px; gap: 0.3rem">
@@ -37,13 +37,13 @@ export default {
 
   components: {
     JqxWindow,
-    JqxGrid,
     JqxButton,
+    // eslint-disable-next-line vue/no-unused-components
+    JqxGrid,
   },
 
   data() {
     return {
-      tag: '',
       sector: '',
       loading: {
         get: false,
@@ -310,9 +310,16 @@ export default {
       $('#preview-orders-grid').jqxGrid('selectallrows')
     },
 
-    open() {
+    open(sector: string) {
+      this.sector = sector
       this.$refs.currentWindow.open()
       this.initialize()
+      const sectorNameEl = this.$refs.currentWindow.$el.querySelector('#tag1')
+      if (this.sector?.length) {
+        sectorNameEl.textContent = `- ${this.sector}`
+      } else {
+        sectorNameEl.textContent = ''
+      }
     },
 
     close() {

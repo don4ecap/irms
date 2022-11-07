@@ -272,11 +272,10 @@ const pRenderer = function (row, dataField, cellValue, rowData, cellText) {
       "<button class='custombutton' name='generate' tag='" +
       rowData.sector +
       "' onclick='GenerateID(this)'>gen id</button>"
+
     return (
       genBtn +
-      "<button class='custombutton' name='preview' tag='" +
-      rowData.sector +
-      "'  onclick='Preview(this)'>prev</button>"
+      `<button class="custombutton" name="preview" onclick="openPreviewAllOrdersWindow('${rowData.sector}')">prev</button>`
     )
   }
   if (rowData.rowType == 'commodity') return cellValue

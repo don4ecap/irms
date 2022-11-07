@@ -41,6 +41,7 @@ declare global {
   var currentAccountVar: IAccountVar
   var ignoreStrategies: string
   var moment: any
+  var previewAllOrdersWindow: any
   var previewSingleOrderWindow: any
 
   // Global functions

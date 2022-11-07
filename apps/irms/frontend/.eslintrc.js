@@ -7,6 +7,7 @@ module.exports = {
     currentAccountVar: true,
     moment: true,
     strategies: true,
+    previewAllOrdersWindow: true,
     previewSingleOrderWindow: true,
 
     // Global helper functions
