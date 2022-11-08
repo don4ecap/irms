@@ -14,7 +14,13 @@
             <JqxButton class="inline-block" theme="office" @click="showSector">
               Sector
             </JqxButton>
-            <JqxButton class="inline-block" theme="office">Common</JqxButton>
+            <JqxButton
+              class="inline-block"
+              theme="office"
+              @click="showCommodity"
+            >
+              Commo
+            </JqxButton>
             <JqxButton
               class="inline-block"
               theme="office"
@@ -614,6 +620,20 @@ export default {
         for (let i = 0; i < currentAccountVar.books.length; i++) {
           const book = currentAccountVar.books[i]
           if (book.rowType == 'sector') {
+            book.expanded = false
+          }
+        }
+        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      })
+    },
+
+    showCommodity() {
+      Promise.resolve().then(() => {
+        for (let i = 0; i < currentAccountVar.books.length; i++) {
+          const book = currentAccountVar.books[i]
+          if (book.rowType == 'sector') {
+            book.expanded = true
+          } else if (book.rowType == 'commodity') {
             book.expanded = false
           }
         }
