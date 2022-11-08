@@ -27,7 +27,8 @@ const routes: Array<RouteOptions> = [
           const params: GetNavRequestParams = req.params as GetNavRequestParams
           connection
             .query(
-              `SELECT * FROM trading.tblfonav WHERE account='${params.account}' AND td <= '${params.trade_date}' ORDER BY TIMESTAMP DESC LIMIT 1;`
+              'SELECT * FROM trading.tblfonav WHERE account=? AND td <= ? ORDER BY TIMESTAMP DESC LIMIT 1',
+              [params.account, params.trade_date]
             )
             .then((rows) => {
               return res.send(rows[0] || [])
@@ -50,7 +51,8 @@ const routes: Array<RouteOptions> = [
           const params: GetNavRequestParams = req.params as GetNavRequestParams
           connection
             .query(
-              `SELECT * FROM trading.irms WHERE irms.account='${params.account}' AND td='${params.trade_date}' ORDER BY irms.orderNo, irms.year ASC, irms.month ASC`
+              'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',
+              [params.account, params.trade_date]
             )
             .then((rows) => {
               return res.send(rows)
@@ -85,10 +87,11 @@ const routes: Array<RouteOptions> = [
             FROM 
               trading.irms 
             WHERE 
-              account = '${params.account}' 
-              AND td = '${params.trade_date}' 
-              AND rowtype = 'sector' 
-              AND instrument <> 'cash'`
+              account=? 
+              AND td=?
+              AND rowtype='sector' 
+              AND instrument <> 'cash'`,
+              [params.account, params.trade_date]
             )
             .then((rows) => {
               return res.send(rows[0] || [])
@@ -111,14 +114,8 @@ const routes: Array<RouteOptions> = [
           const params: AccountOnlyParams = req.params as AccountOnlyParams
           connection
             .query(
-              `SELECT
-              value
-            FROM
-              cacheDB.cache2
-            WHERE
-              name
-            LIKE 'irms_calculate_${params.account}'
-            LIMIT 1`
+              'SELECT value FROM cacheDB.cache2 WHERE name LIKE ? LIMIT 1',
+              [`irms_calculated_${params.account}`]
             )
             .then((rows) => {
               return res.send(rows[0] || [])
@@ -140,7 +137,7 @@ const routes: Array<RouteOptions> = [
         .then((connection) => {
           connection
             .query(
-              `SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live`
+              'SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live'
             )
             .then((rows) => {
               return res.send(rows)
@@ -161,7 +158,7 @@ const routes: Array<RouteOptions> = [
       db.getConnection()
         .then((connection) => {
           connection
-            .query(`SELECT strategy_name from trading.ie_strategy`)
+            .query('SELECT strategy_name FROM trading.ie_strategy')
             .then((strategies) => {
               return res.send(
                 strategies.map((strategy: any) => strategy.strategy_name)
