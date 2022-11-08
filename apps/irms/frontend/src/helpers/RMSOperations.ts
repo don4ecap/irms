@@ -264,8 +264,8 @@ function DeleteSector(sector: string) {
 
 function DeleteCommodity(
   commodity: string,
-  extension: string,
-  instrument: string
+  extension: string
+  // instrument: string
 ) {
   http
     .delete(
@@ -277,7 +277,7 @@ function DeleteCommodity(
         if (
           book.commo == commodity &&
           book.extension == extension &&
-          book.instrument == instrument &&
+          // book.instrument == instrument &&
           book.rowType == 'contract'
         ) {
           book.orderQ = null
