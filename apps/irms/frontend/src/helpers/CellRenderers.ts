@@ -1,13 +1,18 @@
 import PageControls from './PageControls'
 
-const pct_renderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (
-    cellValue === null ||
-    cellValue === 'NA' ||
-    parseFloat(cellValue) === 0 ||
-    cellValue == ''
-  )
+const isEmpty = (val: string) =>
+  val === null || val === 'NA' || parseFloat(val) === 0 || val === ''
+
+const pct_renderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData,
+  cellText
+) {
+  if (isEmpty(cellValue)) {
     return ''
+  }
 
   return contractRenderer(
     row,
@@ -18,73 +23,80 @@ const pct_renderer = function (row, dataField, cellValue, rowData, cellText) {
   )
 }
 
-const size_renderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (rowData.rowType != 'contract') return ''
-  if (
-    cellValue == null ||
-    cellValue == 'NA' ||
-    parseFloat(cellValue) == 0 ||
-    cellValue == ''
-  )
+const size_renderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
+) {
+  if (rowData.rowType != 'contract') {
     return ''
-  else
-    return (
-      "<span style='font-size:4pt'>" +
-      accounting.formatNumber(parseFloat(cellValue) * 100, 2) +
-      ' %</span>'
-    )
-}
-const lots_renderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (
-    cellValue == null ||
-    cellValue == 'NA' ||
-    parseFloat(cellValue) == 0 ||
-    cellValue == ''
-  )
-    return ''
-  else {
-    if (rowData.rowType == 'sector' && dataField == 'qty')
-      return pct_renderer(row, dataField, cellValue, rowData, cellText)
-    else return contractRenderer(row, dataField, cellValue, rowData, cellText)
   }
+
+  if (isEmpty(cellValue)) {
+    return ''
+  }
+
+  const span = document.createElement('span')
+  span.style.fontSize = '4pt'
+  span.textContent = accounting.formatNumber(parseFloat(cellValue) * 100, 2)
+
+  return span.outerHTML
 }
-const lots_renderer_decimal = function (
+
+const lots_renderer: RendererCallback = function (
   row,
   dataField,
   cellValue,
   rowData,
   cellText
 ) {
-  if (
-    cellValue == null ||
-    cellValue == 'NA' ||
-    parseFloat(cellValue) == 0 ||
-    cellValue == ''
-  )
+  if (isEmpty(cellValue)) {
     return ''
-  else {
-    if (
-      rowData.rowType == 'sector' &&
-      (dataField == 'target_allocation_lots' ||
-        dataField == 'current_allocation_lots')
-    )
-      return pct_renderer(row, dataField, cellValue, rowData, cellText)
-    return contractRenderer(
-      row,
-      dataField,
-      accounting.formatNumber(cellValue, 2),
-      rowData,
-      cellText
-    )
+  }
+
+  if (rowData.rowType === 'sector' && dataField === 'qty') {
+    return pct_renderer(row, dataField, cellValue, rowData, cellText)
+  } else {
+    return contractRenderer(row, dataField, cellValue, rowData, cellText)
   }
 }
 
-const contractRenderer = function (
+const lots_renderer_decimal: RendererCallback = function (
   row,
   dataField,
   cellValue,
   rowData,
   cellText
+) {
+  if (isEmpty(cellValue)) {
+    return ''
+  }
+
+  if (
+    rowData.rowType == 'sector' &&
+    (dataField == 'target_allocation_lots' ||
+      dataField == 'current_allocation_lots')
+  ) {
+    return pct_renderer(row, dataField, cellValue, rowData, cellText)
+  }
+
+  return contractRenderer(
+    row,
+    dataField,
+    accounting.formatNumber(cellValue, 2),
+    rowData,
+    cellText
+  )
+}
+
+const contractRenderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
 ) {
   if (rowData.rowType == 'sector') {
     // const key = currentAccountVar.bookIDMapRev[row]
@@ -110,32 +122,25 @@ const contractRenderer = function (
     //   }
     // }
 
+    const span = document.createElement('span')
+    span.style.fontStyle = 'oblique'
+    span.style.fontWeight = 'bold'
+    span.textContent = cellValue
+
     if (
       dataField == 'qty' ||
       dataField == 'target_allocation_lots' ||
       dataField == 'current_allocation_lots'
     ) {
-      return (
-        "<span style='font-style: oblique;font-weight: bold;'>[" +
-        cellValue +
-        ']</span>'
-      )
-    } else {
-      if (dataField == 'display') {
-        return (
-          "<span style='font-style: oblique;font-weight: bold;'>" +
-          cellValue +
-          '</span>  ' +
-          pnlText
-        )
-      } else {
-        return (
-          "<span style='font-style: oblique;font-weight: bold;'>" +
-          cellValue +
-          '</span>'
-        )
-      }
+      span.textContent = `[${cellValue}]`
+      return span.outerHTML
     }
+
+    if (dataField == 'display') {
+      return span.outerHTML + ' ' + pnlText
+    }
+
+    return span.outerHTML
   }
 
   if (rowData.rowType == 'commodity') {
@@ -146,7 +151,7 @@ const contractRenderer = function (
       const key = currentAccountVar.bookIDMapRev[row]
       const r = currentAccountVar.books[key]
 
-      let pnl = null
+      const pnl = null
 
       // if (pnlUSD != null) {
       //   pnl = pnlUSD[r.commo + ' ' + r.extension + ' ' + r.instrument]
@@ -154,178 +159,252 @@ const contractRenderer = function (
       //   pnl = null
       // }
 
-      if (pnl != null) {
-        if (pnl > 0) {
-          pnlText = '   <span style="color:green">+' + pnl + 'K</span>'
-        } else {
-          pnlText = '   <span style="color:red">' + pnl + 'K</span>'
-        }
+      if (pnl) {
+        const pnlEl = document.createElement('span')
+        pnlEl.textContent = pnl + 'K'
+        pnlEl.style.color = pnl > 0 ? 'green' : 'red'
+        pnlText = pnlEl.outerHTML
       }
-      nonNullText =
-        "  <a href='#' style='text-decoration: none;color:blue;font-weight:bold' val='false' onclick=\"filterNonNullCommo('" +
-        r.commo +
-        "','" +
-        r.extension +
-        "','" +
-        r.instrument +
-        '\',this)">+</a>'
+
+      const showNonNullEl = document.createElement('button')
+      showNonNullEl.classList.add('btn__reset')
+      showNonNullEl.classList.add('btn__show-non-null')
+      showNonNullEl.setAttribute('val', 'false')
+      showNonNullEl.setAttribute(
+        'onclick',
+        `filterNonNullCommo('${r.commo}', '${r.extension}', '${r.instrument}', this)`
+      )
+      showNonNullEl.textContent = '+'
+      nonNullText = showNonNullEl.outerHTML
     }
 
-    return (
-      nonNullText +
-      '  <span style="font-weight: bold";background-color:black>' +
-      cellValue +
-      pnlText +
-      '</span>'
-    )
+    const commoCellEl = document.createElement('span')
+    commoCellEl.style.fontWeight = 'bold'
+    commoCellEl.textContent = cellValue + pnlText
+
+    return nonNullText + commoCellEl.outerHTML
   }
 
   if (rowData.rowType == 'contract') {
-    let chg: any = '',
-      position = cellValue
+    let change: any = ''
+    // position = cellValue
 
     if (dataField == 'display') {
-      chg = parseFloat((rowData.last_price / rowData.settlement - 1) * 100)
+      const calc = (rowData.last_price / rowData.settlement - 1) * 100
+      change = parseFloat(calc.toString()).toFixed(2)
 
-      chg = chg.toFixed(2)
+      const positionEl = document.createElement('span')
+      positionEl.textContent = cellValue
 
-      if (chg > 0) {
+      if (change > 0) {
         if (rowData.qty > 0) {
-          position = "<span style='color:green'>" + cellValue + '</span>'
+          positionEl.style.color = 'green'
         }
         if (rowData.qty < 0) {
-          position = "<span style='color:red'>" + cellValue + '</span>'
+          positionEl.style.color = 'red'
         }
-      } else if (chg <= 0) {
+      } else if (change <= 0) {
         if (rowData.qty > 0) {
-          position = "<span style='color:red'>" + cellValue + '</span>'
+          positionEl.style.color = 'red'
         }
         if (rowData.qty < 0) {
-          position = "<span style='color:green'>" + cellValue + '</span>'
+          positionEl.style.color = 'gree'
         }
-      } else {
-        position = '<span>' + cellValue + '</span>'
       }
 
-      if (chg > 0) {
-        chg =
-          "<span style='color:green;font-weight:bold'>" +
-          '  +' +
-          chg +
-          ' %' +
-          '</span>'
-      }
-      if (chg <= 0) {
-        chg =
-          "<span style='color:red;font-weight:bold'>  " + chg + ' %' + '</span>'
+      // position = positionEl.outerHTML
+
+      const changeEl = document.createElement('span')
+      changeEl.style.fontWeight = 'bold'
+
+      if (change > 0) {
+        changeEl.style.color = 'green'
+        changeEl.innerHTML = `&nbsp; +${change} %`
+      } else if (change <= 0) {
+        changeEl.style.color = 'red'
+        changeEl.innerHTML = `&nbsp; ${change} %`
       }
 
-      chg =
-        "<span style='color:black;font-weight:bold'> &nbsp; " +
-        accounting.formatNumber(
-          rowData.last_price,
-          PageControls.decimalPlaces(rowData.last_price)
-        ) +
-        '</span>' +
-        chg
+      const finalEl = document.createElement('span')
+      finalEl.style.color = 'black'
+      finalEl.style.fontWeight = 'bold'
+      finalEl.innerHTML = '&nbsp;'
+      finalEl.innerHTML += accounting.formatNumber(
+        rowData.last_price,
+        PageControls.decimalPlaces(rowData.last_price)
+      )
+
+      change = finalEl.outerHTML + changeEl.outerHTML
     }
-    return cellValue + chg
+
+    return cellValue + change
   }
 }
 
-const extensionRenderer = function (
+const extensionRenderer: RendererCallback = function (
   row,
   dataField,
   cellValue,
-  rowData,
-  cellText
+  rowData
+  // cellText
 ) {
-  if (rowData.rowType == 'sector') return ''
-  if (rowData.rowType == 'commodity')
-    return (
-      '<span style="font-weight: bold;background-color:\'silver\'">' +
-      cellValue +
-      '</span>'
-    )
+  if (rowData.rowType == 'sector') {
+    return ''
+  }
+
+  if (rowData.rowType == 'commodity') {
+    const extensionCellEl = document.createElement('span')
+    extensionCellEl.style.fontWeight = 'bold'
+    extensionCellEl.style.backgroundColor = 'silver'
+    extensionCellEl.textContent = cellValue
+    return extensionCellEl.outerHTML
+  }
 }
 
-const qRenderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (rowData.rowType == 'sector') return cellValue
-  if (rowData.rowType == 'commodity') return cellValue
-  if (rowData.rowType == 'contract') return cellValue // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/>");
+const qRenderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
+) {
+  if (
+    rowData.rowType === 'sector' ||
+    rowData.rowType === 'commodity' ||
+    rowData.rowType === 'contract'
+  ) {
+    return cellValue
+  }
+  // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/ > ");
 }
-const pRenderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (rowData.rowType == 'sector' && rowData.display != 'PORTFOLIO') {
-    let genBtn = ''
+
+const pRenderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
+) {
+  if (rowData.rowType === 'commodity' || rowData.rowType === 'contract') {
+    return cellValue
+  }
+
+  if (rowData.rowType === 'sector' && rowData.display !== 'PORTFOLIO') {
+    let generateButtons = ''
     for (let i = 0; i < currentAccountVar.configTags.length; i++) {
       const configTag = currentAccountVar.configTags[i]
-      genBtn +=
-        "<button class='custombutton' name='generate' tag='" +
-        rowData.sector +
-        "' section='" +
-        configTag +
-        "' onclick='Generate(this)'>gen " +
-        configTag +
-        '</button>'
+      const generateButton = document.createElement('button')
+      generateButton.classList.add('custombutton')
+      generateButton.setAttribute('name', 'generate')
+      generateButton.setAttribute('tag', rowData.sector)
+      generateButton.setAttribute('section', configTag)
+      generateButton.setAttribute('onclick', 'Generate(this)')
+      generateButton.textContent = `gen ${configTag}`
+      generateButtons += generateButton.outerHTML
     }
-    genBtn +=
-      "<button class='custombutton' name='generate' tag='" +
-      rowData.sector +
-      "' onclick='GenerateID(this)'>gen id</button>"
 
-    return (
-      genBtn +
-      `<button class="custombutton" name="preview" onclick="openPreviewAllOrdersWindow('${rowData.sector}')">prev</button>`
+    const generateIDButton = document.createElement('button')
+    generateIDButton.classList.add('custombutton')
+    generateIDButton.setAttribute('name', 'generate')
+    generateIDButton.setAttribute('tag', rowData.sector)
+    generateIDButton.setAttribute('onclick', 'Generate(this)')
+    generateIDButton.textContent = 'gen id'
+    generateButtons += generateIDButton.outerHTML
+
+    const previewOrderBySectorButton = document.createElement('button')
+    previewOrderBySectorButton.classList.add('custombutton')
+    previewOrderBySectorButton.setAttribute('name', 'preview')
+    previewOrderBySectorButton.setAttribute(
+      'onclick',
+      `openPreviewAllOrdersWindow('${rowData.sector}')`
     )
+    previewOrderBySectorButton.textContent = 'prev'
+    generateButtons += previewOrderBySectorButton.outerHTML
+
+    return generateButtons
   }
-  if (rowData.rowType == 'commodity') return cellValue
-  if (rowData.rowType == 'contract') return cellValue // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/>");
+
+  // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/>");
 }
-const aRenderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (rowData.rowType == 'sector' && rowData.display != 'PORTFOLIO') {
-    return (
-      "<a href='#' style='font-size:10pt;font-weight:bold;color:black' onclick='DeleteSector(\"" +
-      rowData.sector +
-      '");\'>X</a>'
+
+const aRenderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
+) {
+  if (rowData.rowType === 'sector' && rowData.display !== 'PORTFOLIO') {
+    const deleteSectorButton = document.createElement('button')
+    deleteSectorButton.classList.add('btn__reset')
+    deleteSectorButton.classList.add('btn__delete-sector')
+    deleteSectorButton.setAttribute(
+      'onclick',
+      `DeleteSector('${rowData.sector}')`
     )
+    deleteSectorButton.textContent = 'X'
+    return deleteSectorButton.outerHTML
   }
-  if (rowData.rowType == 'commodity')
-    return (
-      "<a href='#' style='font-size:10pt;font-weight:bold;color:blue' onclick='DeleteCommodity(\"" +
-      rowData.commo +
-      '","' +
-      rowData.extension +
-      '","' +
-      rowData.instrument +
-      '");\'>X</a>'
+
+  if (rowData.rowType === 'commodity') {
+    const deleteCommodityButton = document.createElement('button')
+    deleteCommodityButton.classList.add('btn__reset')
+    deleteCommodityButton.classList.add('btn__delete-sector')
+    deleteCommodityButton.setAttribute(
+      'onclick',
+      `DeleteCommodity('${rowData.commo}', '${rowData.extension}', '${rowData.instrument}')`
     )
-  if (rowData.rowType == 'contract') {
-    return (
-      "<img src='img/glass.png' onclick='openPreviewSingleOrderWindow(\"" +
-      rowData.id +
-      '");\'/>' +
-      "<img src='img/trash.png' onclick='DeleteSingle(\"" +
-      rowData.contract +
-      '","' +
-      rowData.extension +
-      '",' +
-      rowData.id +
-      ");'/>"
+    deleteCommodityButton.textContent = 'X'
+    return deleteCommodityButton.outerHTML
+  }
+
+  if (rowData.rowType === 'contract') {
+    const container = document.createElement('div')
+    container.classList.add('flex')
+    container.classList.add('justify-center')
+    container.style.gap = '0.3rem'
+
+    const previewButton = document.createElement('img')
+    previewButton.classList.add('cursor-pointer')
+    previewButton.setAttribute('src', 'img/glass.png')
+    previewButton.setAttribute(
+      'onclick',
+      `openPreviewSingleOrderWindow('${rowData.id}')`
     )
+    container.appendChild(previewButton)
+
+    const deleteSingleButton = document.createElement('img')
+    deleteSingleButton.classList.add('cursor-pointer')
+    deleteSingleButton.setAttribute('src', 'img/trash.png')
+    deleteSingleButton.setAttribute(
+      'onclick',
+      `DeleteSingle('${rowData.contract}', '${rowData.extension}', '${rowData.id}')`
+    )
+    container.appendChild(deleteSingleButton)
+
+    return container.outerHTML
     //+"<a href='#' style='font-size:10pt;font-weight:bold;color:red' onclick='DeleteSingle(\"" + rowData.contract + "\",\"" + rowData.extension + "\"," + rowData.id + ");'>X</a>";
   }
 }
-const risksRenderer = function (row, dataField, cellValue, rowData, cellText) {
-  if (cellValue == null || cellValue == 'NA' || cellValue == '') return ''
-  else {
-    cellValue = accounting.formatNumber(parseFloat(cellValue) * 100, 3) + ' %'
-    if (rowData.rowType == 'commodity') {
-      return '<span style="font-weight: bold">' + cellValue + '</span>'
-    }
+
+const risksRenderer: RendererCallback = function (
+  row,
+  dataField,
+  cellValue,
+  rowData
+  // cellText
+) {
+  if (isEmpty(cellValue)) {
+    return ''
+  }
+
+  if (rowData.rowType === 'commodity') {
+    cellValue = accounting.formatNumber(parseFloat(cellValue) * 100, 3)
+    return `<span style="font-weight: bold">${cellValue} %</span>`
   }
 }
 
-function getCommoRisksColor(val) {
+function getCommoRisksColor(val: number) {
   if (val < 0.5) return 'nocommorisk'
   else if (val > 0.5 && val < 1) return 'lowcommorisk'
   else if (val > 1 && val < 1.5) return 'medcommorisk'
@@ -333,33 +412,43 @@ function getCommoRisksColor(val) {
   else if (val > 2) return 'veryhighcommorisk'
 }
 
-function getDeltaColor(val) {
+function getDeltaColor(val: number) {
   if (val < 1) return 'white'
   else if (val > 1 && val < 2) return 'lowdelta'
   else if (val > 2 && val < 4) return 'meddelta'
   else if (val > 4) return 'veryhighdelta'
 }
 
-function getSpreadRisksColor(val) {
+function getSpreadRisksColor(val: number) {
   if (val < 1.5) return 'nospdrisk'
   else if (val > 1.5 && val < 3) return 'lowspdrisk'
   else if (val > 3 && val < 4.5) return 'medspdrisk'
   else if (val > 4.5) return 'highspdrisk'
 }
 
-const cellClass = function (row, dataField, cellText, rowData) {
-  if (rowData.rowType == 'sector' || rowData.rowType == 'commodity') {
+const cellClass: RendererCallback = function (
+  row,
+  dataField,
+  cellText,
+  rowData
+) {
+  if (rowData.rowType === 'sector' || rowData.rowType === 'commodity') {
     const cellValue = Math.abs(rowData[dataField] * 100)
-
     return getCommoRisksColor(cellValue)
   }
-  if (rowData.rowType == 'contract') {
+  if (rowData.rowType === 'contract') {
     return getSpreadRisksColor(
       currentAccountVar.spdRisks[rowData.commo][dataField] * 100
     )
   }
 }
-const colorType = function (row, dataField, cellText, rowData) {
+
+const colorType: RendererCallback = function (
+  row,
+  dataField,
+  cellText,
+  rowData
+) {
   if (dataField == 'target_allocation_delta') {
     if (rowData.rowType == 'contract') return 'commo'
   }

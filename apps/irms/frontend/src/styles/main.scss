@@ -31,6 +31,23 @@ body {
 //   white-space: nowrap !important;
 // }
 
+.btn__reset {
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.btn__delete-sector {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.btn__show-non-null {
+  color: #1a1aff;
+  font-weight: bold;
+}
+
 .jqx-grid-cell-selected .jqx-input-widget {
   border: none !important;
   padding: 6px;
@@ -134,6 +151,10 @@ body {
   align-self: baseline;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .ml-auto {
   margin-left: auto;
 }
@@ -176,6 +197,10 @@ body {
 
 .inline-block {
   display: inline-block !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 @import './risks.scss';
