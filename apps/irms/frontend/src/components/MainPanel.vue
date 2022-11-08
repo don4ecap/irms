@@ -11,7 +11,9 @@
       <div class="main-panel-top">
         <div class="col-1 flex-grow" style="max-width: 250px">
           <div class="flex" style="gap: 0.3rem">
-            <JqxButton class="inline-block" theme="office">Sector</JqxButton>
+            <JqxButton class="inline-block" theme="office" @click="showSector">
+              Sector
+            </JqxButton>
             <JqxButton class="inline-block" theme="office">Common</JqxButton>
             <JqxButton
               class="inline-block"
@@ -605,6 +607,18 @@ export default {
         }
         $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       }, 500)
+    },
+
+    showSector() {
+      Promise.resolve().then(() => {
+        for (let i = 0; i < currentAccountVar.books.length; i++) {
+          const book = currentAccountVar.books[i]
+          if (book.rowType == 'sector') {
+            book.expanded = false
+          }
+        }
+        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      })
     },
 
     getLastBookCalculation() {
