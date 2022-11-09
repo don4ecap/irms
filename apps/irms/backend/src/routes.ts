@@ -4,6 +4,7 @@ import type {
   DeleteCommodityParams,
   DeleteSingleParams,
   GetNavRequestParams,
+  OrderContractsBody,
   SaveCellBody,
 } from './types'
 import db from './db'
@@ -358,6 +359,65 @@ const routes: Array<RouteOptions> = [
             })
         })
         .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'POST',
+    url: `${prefix}/order_contracts`,
+    schema: schemas.orderContracts,
+    handler(req, res) {
+      const body: OrderContractsBody = req.body as OrderContractsBody
+
+      const validateBodyRequest = req.compileValidationSchema(
+        schemas.orderContracts.body as FastifySchema
+      )
+
+      if (validateBodyRequest(req.body)) {
+        db.getConnection()
+          .then((connection) => {
+            const { contract1, contract2, extension } = body
+            let query: string
+
+            if (extension !== 'Comdty') {
+              query = `SELECT
+                          contract_onedigit,
+                          contract_twodigit 
+                        FROM
+                          trading.tbltradinguniverse
+                        WHERE
+                          contract_onedigit=?
+                        UNION
+                          SELECT
+                            contract_onedigit,
+                            contract_twodigit
+                          FROM
+                            trading.tbltradinguniverse
+                          WHERE
+                            contract_onedigit=?`
+            } else {
+              query = `SELECT
+                        contract_onedigit,
+                        contract_twodigit
+                      FROM 
+                        trading.tbltradinguniverse
+                      WHERE
+                        contract_onedigit IN (?, ?)
+                      ORDER BY
+                        year,month`
+            }
+            connection
+              .query(query, [contract1, contract2])
+              .then((rows) => {
+                return res.send(rows || [])
+              })
+              .catch(internalServerErrorHandler(res))
+              .finally(() => {
+                connection.end()
+              })
+          })
+          .catch(internalServerErrorHandler(res))
+      }
     },
   },
   // {

@@ -18,6 +18,17 @@ const schemas: ValidationSchemas = {
       },
     },
   },
+  orderContracts: {
+    body: {
+      type: 'object',
+      required: ['contract1', 'contract2', 'extension'],
+      properties: {
+        contract1: { type: 'string' },
+        contract2: { type: 'string' },
+        extension: { type: ['string', 'null'], nullable: true },
+      },
+    },
+  },
 }
 
 export default schemas

@@ -24,3 +24,9 @@ export interface SaveCellBody {
   order_qty: string
   order_p: string
 }
+
+export interface OrderContractsBody {
+  contract1: string
+  contract2: string
+  extension: string
+}
