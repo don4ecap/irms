@@ -27,6 +27,7 @@
 
 <script lang="ts">
 import http from '../services/http'
+import API from '../services/api'
 
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
@@ -44,7 +45,6 @@ export default {
 
   data() {
     return {
-      sector: '',
       loading: {
         get: false,
       },
@@ -57,11 +57,10 @@ export default {
       this.loading.get = true
       http
         .get(`get_working/${currentAccount}/${currentAccountVar.tradeDate}`)
-        .then(({ data }) => {
-          this.existingOrders = data
-          const orders = this.buildPreview()
+        .then(async ({ data }) => {
+          const orders = await this.buildPreview(this.sector || '', data)
           const sourcePreview = {
-            localdata: orders ?? [],
+            localdata: orders,
             datafields: [
               {
                 name: 'contract',
@@ -160,31 +159,32 @@ export default {
         })
     },
 
-    buildPreview() {
-      const sector = this.sector
-      let sectorRows = currentAccountVar.books.filter(
-        (book) => book.sector === this.sector
-      )
-      if (this.sector === '') {
+    async buildPreview(sector: string, existingOrders: Array<any>) {
+      let sectorRows
+
+      if (sector === '') {
         sectorRows = currentAccountVar.books
+      } else {
+        sectorRows = currentAccountVar.books.filter(
+          (book) => book.sector === sector
+        )
       }
 
-      // ignoreStrategies = 'CHECK'
+      let ignoreStrategies = 'CHECK'
       let excluded = 0
-      let excludedStrategy = 0
-      const existingOrders = this.existingOrders
+      // let excludedStrategy = 0
 
       const orders = []
+
       let j = 0
       for (let i = 0; i < sectorRows.length; i++) {
         const sectorRow = sectorRows[i]
-        let quantities = sectorRow.orderQ
 
-        if (quantities == '' || quantities == null) {
+        if (!sectorRow.orderQ || sectorRow.orderQ === '') {
           continue
         }
 
-        quantities = quantities.split(';')
+        const quantities = sectorRow.orderQ.split(';')
         const strategies = sectorRow.orderP.split(';')
 
         if (quantities.length > strategies.length) {
@@ -207,14 +207,14 @@ export default {
           let contract = sectorRow.contract
           let contract_twodigit = sectorRow.contract_twodigit
 
-          const q = quantities[k]
-          let strat, price
+          const qty = quantities[k]
+          let strategy: string, price: string
 
           if (strategies[k].indexOf('@') != -1) {
-            strat = strategies[k].split('@')[0]
+            strategy = strategies[k].split('@')[0]
             price = strategies[k].split('@')[1]
           } else {
-            strat = strategies[k]
+            strategy = strategies[k]
             price = '0'
           }
 
@@ -232,17 +232,15 @@ export default {
           }
 
           let ordered
-          if (strat.indexOf('#') != -1) {
-            //contract = sectorRow.contract + "-" + strat.split('#')[1];
-            if (strat.split('#')[1] == '') {
-              contract = sectorRow.contract + '-' + strat.split('#')[1]
+          if (strategy.indexOf('#') != -1) {
+            if (strategy.split('#')[1] == '') {
+              contract = sectorRow.contract + '-' + strategy.split('#')[1]
             } else {
-              // TODO:
-              ordered = this.existingOrders
-              // ordered = JSON.parse(
-              //   api.ordercontracts(sectorRow.contract, strat.split('#')[1]),
-              //   extension
-              // )
+              ordered = await API.postOrderContracts(
+                sectorRow.contract,
+                strategy.split('#')[1],
+                extension
+              )
               if (ordered.length) {
                 contract =
                   ordered[0].contract_onedigit +
@@ -254,19 +252,19 @@ export default {
                   ordered[1].contract_twodigit
               }
             }
-            strat = strat.replace('#' + strat.split('#')[1], '')
+            strategy = strategy.replace('#' + strategy.split('#')[1], '')
           }
-          const a: any = {}
-          if (strat === window.ignoreStrategies) continue
+
+          if (strategy === ignoreStrategies) continue
+
           let flag = false
-          // @ts-ignore
           for (let l = 0; l < existingOrders.length; l++) {
             const existingOrder = existingOrders[l]
             if (
               existingOrder.contract == contract &&
               existingOrder.extension == extension &&
               existingOrder.price == price &&
-              existingOrder.strategy == strat
+              existingOrder.strategy == strategy
             ) {
               flag = true
               break
@@ -278,23 +276,24 @@ export default {
             continue
           }
 
-          if (strategies.indexOf(strat) == -1) {
-            excludedStrategy++
+          if (strategies.indexOf(strategy) == -1) {
+            // excludedStrategy++
             continue
           }
 
-          a.contract = contract
-          a.extension = extension
-          a.account = account
-          a.qty = q
-          a.strategy = strat
-          a.price = price
-          a.freetext = freetext
-          a.contract_twodigit = contract_twodigit
-          a.commo = commo
-          a.instrument = instrument
-          orders[j] = a
-          j = j + 1
+          orders[j] = {
+            account,
+            commo,
+            contract_twodigit,
+            contract,
+            extension,
+            freetext,
+            instrument,
+            price,
+            qty,
+            strategy,
+          }
+          j++
         }
       }
 
@@ -303,6 +302,7 @@ export default {
           excluded + ' orders have been excluded as they are already in iTrade.'
         )
       }
+
       return orders
     },
 
