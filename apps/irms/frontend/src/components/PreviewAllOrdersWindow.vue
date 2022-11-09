@@ -59,6 +59,9 @@ export default {
         .get(`get_working/${currentAccount}/${currentAccountVar.tradeDate}`)
         .then(async ({ data }) => {
           const orders = await this.buildPreview(this.sector || '', data)
+
+          this.$refs.currentWindow.open()
+
           const sourcePreview = {
             localdata: orders,
             datafields: [
@@ -108,7 +111,8 @@ export default {
 
           const dataAdapter = new $.jqx.dataAdapter(sourcePreview)
           $('#preview-orders-grid').jqxGrid({
-            // width: 1150,
+            width: 1150,
+            height: 700,
             // autoheight: true,
             autowidth: true,
             theme: 'office',
@@ -312,7 +316,6 @@ export default {
 
     open(sector: string) {
       this.sector = sector
-      this.$refs.currentWindow.open()
       this.initialize()
       const sectorNameEl = this.$refs.currentWindow.$el.querySelector('#tag1')
       if (this.sector?.length) {
