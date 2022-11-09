@@ -73,7 +73,7 @@ export default {
       this.currentIndex = this.$refs.mainTabs.val()
       this.currentAccount = this.accounts[this.currentIndex]
       document.title = this.currentAccount + ' - ' + ' iRMS'
-      this.$refs.previewAllOrdersWindow.initialize()
+      // this.$refs.previewAllOrdersWindow.initialize()
 
       currentAccount = this.currentAccount
       currentAccountVar = accountsVar[this.currentAccount]

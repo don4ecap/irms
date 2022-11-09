@@ -111,9 +111,7 @@ export default {
 
           const dataAdapter = new $.jqx.dataAdapter(sourcePreview)
           $('#preview-orders-grid').jqxGrid({
-            width: 1150,
-            height: 700,
-            // autoheight: true,
+            // width: 1150,
             autowidth: true,
             theme: 'office',
             source: dataAdapter,
