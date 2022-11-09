@@ -4,7 +4,7 @@ interface ValidationSchemas {
   [key: string]: FastifySchema
 }
 
-const schemas = {
+const schemas: ValidationSchemas = {
   saveCell: {
     body: {
       type: 'object',

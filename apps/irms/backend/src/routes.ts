@@ -1,4 +1,4 @@
-import { FastifyReply, RouteOptions } from 'fastify'
+import { FastifyReply, FastifySchema, RouteOptions } from 'fastify'
 import type {
   AccountOnlyParams,
   DeleteCommodityParams,
@@ -182,7 +182,7 @@ const routes: Array<RouteOptions> = [
       const body: SaveCellBody = req.body as SaveCellBody
 
       const validateBodyRequest = req.compileValidationSchema(
-        schemas.saveCell.body
+        schemas.saveCell.body as FastifySchema
       )
 
       if (validateBodyRequest(req.body)) {
