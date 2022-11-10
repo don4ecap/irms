@@ -23,9 +23,22 @@
       href="http://fonts.googleapis.com/css?family=Open+Sans&display=swap"
       onload="this.rel='stylesheet'"
     />
+    <link
+      rel="preload"
+      as="style"
+      href="./css/alertify.core.css"
+      onload="this.rel='stylesheet'"
+    />
+    <link
+      rel="preload"
+      as="style"
+      href="./css/alertify.default.css"
+      onload="this.rel='stylesheet'"
+    />
     <title>iRMS</title>
-    <script async src="./js/accounting.min.js"></script>
-    <script async src="./js/moment.min.js"></script>
+    <script defer async src="./js/accounting.min.js"></script>
+    <script defer async src="./js/moment.min.js"></script>
+    <script defer async src="./js/alertify.min.js"></script>
   </head>
   <body>
     <div id="app" class="jqxWidget"></div>

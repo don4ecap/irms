@@ -36,6 +36,7 @@ declare global {
   var $: any
   var accounting: any
   var accountsVar: IAccountsVarMap
+  var alertify: any
   var contextMenu: any
   var currentAccount: string
   var currentAccountVar: IAccountVar

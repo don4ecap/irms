@@ -3,6 +3,7 @@ module.exports = {
     $: true,
     accounting: true,
     accountsVar: true,
+    alertify: true,
     currentAccount: true,
     currentAccountVar: true,
     moment: true,
