@@ -174,7 +174,7 @@ export default {
 
       let ignoreStrategies = 'CHECK'
       let excluded = 0
-      // let excludedStrategy = 0
+      let excludedStrategy = 0
 
       const orders = []
 
@@ -182,7 +182,7 @@ export default {
       for (let i = 0; i < sectorRows.length; i++) {
         const sectorRow = sectorRows[i]
 
-        if (!sectorRow.orderQ || sectorRow.orderQ === '') {
+        if (sectorRow.orderQ == '' || sectorRow.orderQ == null) {
           continue
         }
 
@@ -204,7 +204,7 @@ export default {
         }
 
         for (let k = 0; k < quantities.length; k++) {
-          const account = currentAccount
+          const account = sectorRow.account
           const { commo, extension, instrument } = sectorRow
           let contract = sectorRow.contract
           let contract_twodigit = sectorRow.contract_twodigit
@@ -233,26 +233,23 @@ export default {
             price = '0'
           }
 
-          let ordered
           if (strategy.indexOf('#') != -1) {
             if (strategy.split('#')[1] == '') {
               contract = sectorRow.contract + '-' + strategy.split('#')[1]
             } else {
-              ordered = await API.postOrderContracts(
+              let ordered = await API.postOrderContracts(
                 sectorRow.contract,
                 strategy.split('#')[1],
                 extension
               )
-              if (ordered.length) {
-                contract =
-                  ordered[0].contract_onedigit +
-                  '-' +
-                  ordered[1].contract_onedigit
-                contract_twodigit =
-                  ordered[0].contract_twodigit +
-                  '-' +
-                  ordered[1].contract_twodigit
-              }
+              contract =
+                ordered[0].contract_onedigit +
+                '-' +
+                ordered[1].contract_onedigit
+              contract_twodigit =
+                ordered[0].contract_twodigit +
+                '-' +
+                ordered[1].contract_twodigit
             }
             strategy = strategy.replace('#' + strategy.split('#')[1], '')
           }
@@ -279,8 +276,8 @@ export default {
           }
 
           if (strategies.indexOf(strategy) == -1) {
-            // excludedStrategy++
-            continue
+            excludedStrategy++
+            // continue
           }
 
           orders[j] = {
@@ -304,6 +301,8 @@ export default {
           excluded + ' orders have been excluded as they are already in iTrade.'
         )
       }
+
+      console.log(orders)
 
       return orders
     },
