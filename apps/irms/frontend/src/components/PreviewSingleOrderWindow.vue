@@ -7,16 +7,79 @@
       :min-height="500"
       :auto-open="false"
     >
-      <h2 id="preview-single-window-header" style="margin: 0">Preview Order</h2>
-      <div class="preview-window-content">
-        <div class="flex" style="padding: 5px; gap: 0.3rem">
-          <JqxButton theme="office" @click="selectAllRows">
-            Select All
-          </JqxButton>
-          <!-- TODO -->
-          <!-- <JqxButton theme="office">Send to iTrade</JqxButton> -->
+      <h2 id="preview-single-window-header" style="margin: 0">Order Details</h2>
+      <div class="preview-window-content single-order-preview">
+        <div class="orders-container flex-grow">
+          <div v-for="(order, index) in orders" :key="index" class="item">
+            <input v-model="order.qty" type="number" placeholder="Quantity" />
+            <input
+              v-model="order.strategy"
+              type="text"
+              placeholder="Strategy"
+              autocomplete="order_strategy"
+            />
+            <input v-model="order.price" type="number" placeholder="Price" />
+            <input
+              v-model="order.freetext"
+              type="text"
+              placeholder="Freetext"
+            />
+            <jqxButton class="btn-delete" theme="office" @click="remove(index)">
+              DELETE
+            </jqxButton>
+          </div>
+
+          <form
+            id="some"
+            class="item"
+            style="margin-top: 0.5rem"
+            @submit.prevent="add"
+          >
+            <input
+              v-model="newOrder.qty"
+              type="number"
+              placeholder="Quantity"
+            />
+            <input
+              v-model="newOrder.strategy"
+              type="text"
+              placeholder="Strategy"
+              name="order_strategy"
+            />
+            <input v-model="newOrder.price" type="number" placeholder="Price" />
+            <input
+              v-model="newOrder.freetext"
+              type="text"
+              placeholder="Freetext"
+            />
+            <input
+              type="submit"
+              hidden
+              aria-hidden="true"
+              style="display: none"
+              value=""
+            />
+            <jqxButton
+              type="submit"
+              class="btn-add"
+              theme="office"
+              @click="add"
+            >
+              ADD
+            </jqxButton>
+          </form>
+
+          <div class="order-details">
+            <div>Quantity: {{ quantities }}</div>
+            <div style="margin-top: 1rem">Strategy: {{ strategies }}</div>
+          </div>
         </div>
-        <div id="preview-single-orders-grid"></div>
+
+        <div>
+          <jqxButton theme="office" @click="save">
+            {{ loading.update ? 'UPDATING...' : 'UPDATE' }}
+          </jqxButton>
+        </div>
       </div>
     </JqxWindow>
   </div>
@@ -24,9 +87,17 @@
 
 <script lang="ts">
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
-import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import helpers from '../helpers'
+import Risks from '../helpers/Risks'
+import http from '../services/http'
+
+const newOrder = {
+  qty: '',
+  strategy: '',
+  price: '',
+  freetext: '',
+}
 
 export default {
   name: 'PreviewSingleDialog',
@@ -34,255 +105,100 @@ export default {
   components: {
     JqxWindow,
     JqxButton,
-    // eslint-disable-next-line vue/no-unused-components
-    JqxGrid,
   },
 
-  // data() {
-  //   return {
-  //     sector: '',
-  //   }
-  // },
+  data() {
+    return {
+      rowID: 0,
+      origin: {
+        strategy: '',
+        quantity: '',
+      },
+      orders: [],
+      newOrder: { ...newOrder },
+      loading: {
+        update: false,
+      },
+    }
+  },
+
+  computed: {
+    quantities() {
+      return helpers.getOrderStrategyString(this.orders).quantity
+    },
+
+    strategies() {
+      return helpers.getOrderStrategyString(this.orders).strategy
+    },
+  },
 
   methods: {
-    initialize(rowID: number) {
+    open(rowID: number) {
+      this.$refs.currentWindow.open()
+      this.rowID = rowID
       if (!currentAccountVar.books.length) return
 
       const currentBook = currentAccountVar.books.find(
         (book) => book.id === rowID
       )
 
-      const orders =
+      this.origin.quantity = currentBook.orderQ
+      this.origin.strategy = currentBook.orderP
+
+      this.orders =
         helpers.parseOrder(currentBook.orderQ, currentBook.orderP) || []
-
-      const dataAdapter = new $.jqx.dataAdapter({
-        localdata: orders,
-        datafields: [
-          {
-            name: 'qty',
-            type: 'string',
-          },
-          {
-            name: 'strategy',
-            type: 'string',
-          },
-          {
-            name: 'price',
-            type: 'number',
-          },
-          {
-            name: 'account',
-            type: 'number',
-          },
-          {
-            name: 'freetext',
-            type: 'number',
-          },
-        ],
-        datatype: 'array',
-      })
-
-      $('#preview-single-orders-grid').jqxGrid({
-        autowidth: true,
-        theme: 'office',
-        source: dataAdapter,
-        columns: [
-          // {
-          //   text: 'Contract',
-          //   datafield: 'contract',
-          // },
-          // {
-          //   text: 'Extension',
-          //   datafield: 'extension',
-          // },
-          {
-            text: 'Quantity',
-            datafield: 'qty',
-          },
-          {
-            text: 'Strategy',
-            datafield: 'strategy',
-            cellsalign: 'center',
-            width: 200,
-          },
-          {
-            text: 'Price',
-            datafield: 'price',
-          },
-          {
-            text: 'FreeText',
-            datafield: 'freetext',
-            width: 150,
-          },
-          {
-            text: 'Account',
-            datafield: 'account',
-            width: 150,
-          },
-        ],
-        // selectionmode: 'multiplerowsextended',
-      })
-      $('#jqxwindow').on('close', (/* event */) => {
-        $('#preview-single-orders-grid').jqxGrid('destroy')
-      })
     },
 
-    // buildPreview() {
-    //   const sector = this.sector
-    //   let sectorRows = currentAccountVar.books
-    //     .filter((book) => book.sector === this.sector)
-    //     .filter((book) => book.contract === this.contract)
-
-    //   console.log(sectorRows)
-
-    //   if (this.sector === '') {
-    //     sectorRows = currentAccountVar.books
-    //   }
-
-    //   // ignoreStrategies = 'CHECK'
-    //   let excluded = 0
-    //   let excludedStrategy = 0
-    //   const existingOrders = this.existingOrders
-
-    //   const orders = []
-    //   let j = 0
-    //   for (let i = 0; i < sectorRows.length; i++) {
-    //     const sectorRow = sectorRows[i]
-    //     let quantities = sectorRow.orderQ
-
-    //     if (quantities == '' || quantities == null) {
-    //       continue
-    //     }
-
-    //     quantities = quantities.split(';')
-    //     const strategies = sectorRow.orderP.split(';')
-
-    //     if (quantities.length > strategies.length) {
-    //       const msg = `You have more quantities than strategies for ${sectorRow.contract} ${sectorRow.extension}`
-    //       alert(msg)
-    //       console.log(msg)
-    //       return
-    //     }
-
-    //     if (quantities.length < strategies.length) {
-    //       const msg = `You have more strategies than quantities for ${sectorRow.contract} ${sectorRow.extension}`
-    //       alert(msg)
-    //       console.log(msg)
-    //       return
-    //     }
-
-    //     for (let k = 0; k < quantities.length; k++) {
-    //       const account = currentAccount
-    //       const { commo, extension, instrument } = sectorRow
-    //       let contract = sectorRow.contract
-    //       let contract_twodigit = sectorRow.contract_twodigit
-
-    //       const q = quantities[k]
-    //       let strat, price
-
-    //       if (strategies[k].indexOf('@') != -1) {
-    //         strat = strategies[k].split('@')[0]
-    //         price = strategies[k].split('@')[1]
-    //       } else {
-    //         strat = strategies[k]
-    //         price = '0'
-    //       }
-
-    //       let freetext
-    //       if (price.indexOf('/') != -1) {
-    //         freetext = price.split('/')[1]
-    //         price = price.split('/')[0]
-    //       } else {
-    //         freetext = ''
-    //       }
-
-    //       if (isNaN(parseFloat(price))) {
-    //         freetext = price
-    //         price = '0'
-    //       }
-
-    //       let ordered
-    //       if (strat.indexOf('#') != -1) {
-    //         //contract = sectorRow.contract + "-" + strat.split('#')[1];
-    //         if (strat.split('#')[1] == '')
-    //           contract = sectorRow.contract + '-' + strat.split('#')[1]
-    //         else {
-    //           // TODO:
-    //           ordered = this.existingOrders
-    //           // ordered = JSON.parse(
-    //           //   api.ordercontracts(sectorRow.contract, strat.split('#')[1]),
-    //           //   extension
-    //           // )
-    //           if (ordered.length) {
-    //             contract =
-    //               ordered[0].contract_onedigit +
-    //               '-' +
-    //               ordered[1].contract_onedigit
-    //             contract_twodigit =
-    //               ordered[0].contract_twodigit +
-    //               '-' +
-    //               ordered[1].contract_twodigit
-    //           }
-    //         }
-    //         strat = strat.replace('#' + strat.split('#')[1], '')
-    //       }
-    //       const a: any = {}
-    //       if (strat === window.ignoreStrategies) continue
-    //       let flag = false
-    //       // @ts-ignore
-    //       for (let l = 0; l < existingOrders.length; l++) {
-    //         const existingOrder = existingOrders[l]
-    //         if (
-    //           existingOrder.contract == contract &&
-    //           existingOrder.extension == extension &&
-    //           existingOrder.price == price &&
-    //           existingOrder.strategy == strat
-    //         ) {
-    //           flag = true
-    //           break
-    //         }
-    //       }
-
-    //       if (flag) {
-    //         excluded++
-    //         continue
-    //       }
-
-    //       if (strategies.indexOf(strat) == -1) {
-    //         excludedStrategy++
-    //         continue
-    //       }
-
-    //       a.contract = contract
-    //       a.extension = extension
-    //       a.account = account
-    //       a.qty = q
-    //       a.strategy = strat
-    //       a.price = price
-    //       a.freetext = freetext
-    //       a.contract_twodigit = contract_twodigit
-    //       a.commo = commo
-    //       a.instrument = instrument
-    //       orders[j] = a
-    //       j = j + 1
-    //     }
-    //   }
-
-    //   if (excluded > 0) {
-    //     alert(
-    //       excluded + ' orders have been excluded as they are already in iTrade.'
-    //     )
-    //   }
-    //   return orders
-    // },
-
-    selectAllRows() {
-      $('#preview-single-orders-grid').jqxGrid('selectallrows')
+    add() {
+      this.orders.push({ ...this.newOrder })
+      this.newOrder = { ...newOrder }
     },
 
-    open(rowID: number) {
-      this.$refs.currentWindow.open()
-      this.initialize(rowID)
+    save() {
+      this.loading.update = true
+      const bookIndex = Risks.GetBookIndexByID(this.rowID)
+      const book = currentAccountVar.books[bookIndex]
+
+      const cellData = {
+        id: book.id,
+        contract: book.contract,
+        extension: book.extension || null,
+        order_qty: this.quantities || null,
+        order_p: this.strategies || null,
+      }
+
+      http
+        .post(
+          `save_cell/${currentAccount}/${currentAccountVar.tradeDate}`,
+          cellData
+        )
+        .then(({ data }) => {
+          if (parseInt(data.id) == -1) {
+            // TODO: Notify failure
+            console.error('Data is not saved')
+            return
+          }
+          book.orderQ = this.quantities
+          book.orderP = this.strategies
+          //ComputeRisksRow(bookIndex);
+          console.time('Saving data')
+          Risks.ComputeRisks()
+          $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+          console.timeEnd('Saving data')
+          // TODO: Show success notification
+          //  success('Risks Updated')
+          this.close()
+        })
+        .catch((error) => {
+          console.error('Failed to save cell.', '\nError:', error)
+        })
+        .finally(() => {
+          this.loading.update = false
+        })
+    },
+
+    remove(index: number) {
+      this.orders.splice(index, 1)
     },
 
     close() {

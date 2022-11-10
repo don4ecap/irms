@@ -115,6 +115,30 @@ body {
   padding: 0.3rem;
 }
 
+.single-order-preview {
+  padding: 0.5rem;
+
+  .orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .item {
+    display: grid;
+    gap: 0.4rem;
+    grid-auto-flow: column;
+    grid-template-columns: 5rem 1fr 5rem 0.8fr minmax(2rem, 5rem);
+  }
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }

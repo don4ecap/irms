@@ -95,9 +95,35 @@ function parseOrder(quantity: string, strategy: string) {
   return orders
 }
 
+function getOrderStrategyString(orders: Array<any>) {
+  let strat = ''
+  let quantity = ''
+
+  for (let i = 0; i < orders.length; i++) {
+    const order = orders[i]
+    const q = order.qty
+    if (!q || q === '') continue
+    quantity += q + ';'
+    let s = order.strategy
+    if (order.price != '' && order.price != null) {
+      s = s + '@' + order.price
+      if (order.freetext != '' && order.freetext != null) {
+        s = s + '/' + order.freetext
+      }
+    }
+    strat = strat + s + ';'
+  }
+
+  return {
+    quantity: quantity.substr(0, quantity.length - 1),
+    strategy: strat.substr(0, strat.length - 1),
+  }
+}
+
 export default {
   formatNavData,
   getDateFromISO,
   isNullOrEmpty,
   parseOrder,
+  getOrderStrategyString,
 }
