@@ -65,7 +65,9 @@
           style="min-width: 8.3rem; gap: 0.3rem"
         >
           <JqxButton theme="office" @click="loadIRMS">Load iRMS</JqxButton>
-          <JqxButton theme="office">Calculate</JqxButton>
+          <JqxButton ref="btnCalculate" theme="office" @click="calculate">
+            {{ label.calculateBook }}
+          </JqxButton>
         </div>
         <div class="col-4 flex flex-column">
           <table>
@@ -247,12 +249,13 @@ import Risks from '../helpers/Risks'
 import utils from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
-import RMSOperations from '../helpers/RMSOperations'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
+
+let lastExecuteRInterval
 
 export default {
   name: 'MainPanel',
@@ -304,6 +307,9 @@ export default {
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
+      label: {
+        calculateBook: 'Calculate',
+      },
     }
   },
 
@@ -676,6 +682,38 @@ export default {
       currentAccountVar.tradeDate = utils.getDateFromISO(
         this.bookDate.toISOString()
       )
+    },
+
+    calculate() {
+      this.label.calculateBook = 'Processing'
+      $(this.$refs.btnCalculate.$el).jqxButton({ disabled: true })
+
+      const excecuteR = currentAccountVar.excecuteR
+      excecuteR.connect(
+        'calculate',
+        `iRMS.createBook(iRMS(account='${currentAccount}'),TRUE,FALSE)`
+      )
+
+      lastExecuteRInterval = setInterval(() => {
+        if (excecuteR.scripts['calculate'] == null) {
+          this.label.calculateBook = 'Queued.'
+        } else if (parseFloat(excecuteR.scripts['calculate'].data) == 1) {
+          excecuteR.scripts['calculate'] = null
+          this.label.calculateBook = 'Done.'
+          //Reload();
+          $(this.$refs.btnCalculate.$el).jqxButton({ disabled: false })
+          clearInterval(lastExecuteRInterval)
+          this.label.calculateBook = 'Calculate'
+          this.loadIRMS()
+        } else if (excecuteR.scripts['calculate'].data == 'fail') {
+          this.label.calculateBook = 'Error'
+          // Reload()
+          excecuteR.scripts['calculate'] = null
+          this.label.calculateBook = 'Calculate'
+          $('#btn-calculate-book').jqxButton({ disabled: false })
+          clearInterval(lastExecuteRInterval)
+        }
+      }, 1000)
     },
   },
 }

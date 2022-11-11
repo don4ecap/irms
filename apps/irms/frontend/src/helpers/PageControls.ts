@@ -109,30 +109,33 @@ function decimalPlaces(num: number) {
 //var console = {};
 //console.log = function (stat) { $("#livestatus").text(stat); };
 
-// function log(text) {
-//   alertify.set({ delay: 2000 })
-//   alertify.log(text)
-// }
+function log(text: string) {
+  alertify.set({ delay: 2000 })
+  alertify.log(text)
+}
 
-// function success(text) {
-//   alertify.set({ delay: 2000 })
-//   //alertify.success(text);
-//   small_success(text, 2000)
-// }
+function success(text) {
+  alertify.set({ delay: 2000 })
+  //alertify.success(text);
+  small_success(text, 2000)
+}
 
-// function error(text) {
-//   alertify.set({ delay: 5000 })
-//   alertify.error(text)
-// }
+function error(text) {
+  alertify.set({ delay: 5000 })
+  alertify.error(text)
+}
 
-// function small_success(text, timeout) {
-//   $('#small_success').text(text)
-//   $('#small_success').fadeIn(1000)
-//   setTimeout(function () {
-//     $('#small_success').fadeOut(1000)
-//   }, timeout)
-// }
+function small_success(text, timeout) {
+  // $('#small_success').text(text)
+  // $('#small_success').fadeIn(1000)
+  // setTimeout(function () {
+  //   $('#small_success').fadeOut(1000)
+  // }, timeout)
+}
 
 export default {
   decimalPlaces,
+  error,
+  log,
+  success,
 }

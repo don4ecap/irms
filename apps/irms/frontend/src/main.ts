@@ -13,6 +13,7 @@ import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
 // Helpers, load it here so we can globally expose it
 import RMSOperations from './helpers/RMSOperations'
 import Formatters from './helpers/Formatters'
+import ExecuteR from './helpers/ExecuteR'
 
 const accountProperties: IAccountVar = {
   bookIDMap: [],
@@ -22,6 +23,7 @@ const accountProperties: IAccountVar = {
   configTags: [],
   editingRowID: -1,
   editingRowQty: null,
+  excecuteR: new ExecuteR(),
   fixings: [],
   forceRenderedOnce: false,
   indLevel: [],

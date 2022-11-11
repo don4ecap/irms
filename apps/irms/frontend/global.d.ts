@@ -1,3 +1,5 @@
+import ExecuteR from './src/helpers/ExecuteR'
+
 /* eslint-disable no-var */
 declare global {
   // interface Window {
@@ -15,6 +17,7 @@ declare global {
     configTags: []
     editingRowID: number
     editingRowQty: any
+    excecuteR: ExecuteR
     fixings: []
     forceRenderedOnce: boolean
     indLevel: []
