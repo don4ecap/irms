@@ -302,8 +302,6 @@ export default {
         )
       }
 
-      console.log(orders)
-
       return orders
     },
 
