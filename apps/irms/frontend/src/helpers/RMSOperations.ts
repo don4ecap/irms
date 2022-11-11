@@ -199,35 +199,48 @@ import Risks from './Risks'
 //   $(btn).text(a)
 // }
 
-// function GenerateID(btn) {
-//   a = $(btn).text()
-//   $(btn).text('Processing')
-//   console.log('Generating ID for sector: ' + $(btn).attr('tag'))
-//   key = 'generateSectorID' + $(btn).attr('tag')
+function GenerateID(btn) {
+  const a = $(btn).text()
+  $(btn).text('Processing')
 
-//   section = '"' + $(btn).attr('section') + '"'
-//   if ($(btn).attr('section') == '') section = 'NULL'
-//   sector = '"' + $(btn).attr('tag') + '"'
-//   if ($(btn).attr('tag') == '') sector = 'NULL'
-//   code = 'generateIDOrders("' + account + '","irms",' + sector + ')'
-//   connect(key, code)
-//   console.log('Sending: ' + code)
-//   xx = setInterval(function myfunction() {
-//     if (scripts[key] == null) $(btn).text('Queued.')
-//     else if (parseFloat(scripts[key].data) == 1) {
-//       scripts[key] = null
-//       $(btn).text('Done.')
-//       SoftReload()
-//       clearInterval(xx)
-//     } else if (scripts[key].data == 'fail') {
-//       $(btn).text(a)
-//       SoftReload()
-//       scripts[key] = null
-//       clearInterval(xx)
-//     }
-//   }, 1000)
-//   $(btn).text(a)
-// }
+  const tag = $(btn).attr('tag')
+
+  let sector = tag
+  let section = $(btn).attr('section')
+
+  if (section == '' || section == null) {
+    section = 'NULL'
+  }
+  if (tag == '' || tag == null) {
+    sector = 'NULL'
+  }
+
+  console.log(`Generating ID for sector: ${sector}`)
+  const key = `generateSectorID${sector}`
+
+  const code = `generateIDOrders("${currentAccount}","irms",' ${sector})`
+  currentAccountVar.excecuteR.connect(key, code)
+  console.log(`Sending: ${code}`)
+  currentAccountVar.excecuteR.intervals.set(
+    code,
+    setInterval(function () {
+      if (currentAccountVar.excecuteR.scripts[key] == null)
+        $(btn).text('Queued.')
+      else if (parseFloat(currentAccountVar.excecuteR.scripts[key].data) == 1) {
+        currentAccountVar.excecuteR.scripts[key] = null
+        $(btn).text('Done.')
+        // SoftReload()
+        clearInterval(currentAccountVar.excecuteR.intervals.get(code))
+      } else if (currentAccountVar.excecuteR.scripts[key].data == 'fail') {
+        $(btn).text(a)
+        // SoftReload()
+        currentAccountVar.excecuteR.scripts[key] = null
+        clearInterval(currentAccountVar.excecuteR.intervals.get(code))
+      }
+    }, 1000)
+  )
+  $(btn).text(a)
+}
 
 // function Delete(btn) {
 //   sector = $(btn).attr('tag')
@@ -458,27 +471,37 @@ async function BuildPreview(sector) {
   return orders
 }
 
-// function SoftReload() {
-//   api.getbook(td, account, function (response) {
-//     book = JSON.parse(response.result)
-//     source.localdata = book
-//     port = JSON.parse(api.getportfolio(td, account))[0]
-//     port['display'] = 'PORTFOLIO'
-//     port['rowType'] = 'sector'
-//     port['parent'] = null
-//     //port["id"] = 0;
-//     book.unshift(port)
-//     for (i = 0; i < book.length; i++) {
-//       book[i].expanded = true
-//       book[i].order_size = null
-//     }
+function SoftReload() {
+  http
+    .get(`get_book/${currentAccount}/${currentAccountVar.tradeDate}`)
+    .then(async ({ data: books }) => {
+      currentAccountVar.books = books
 
-//     ComputeRisks()
-//     spdRisks = SpreadRisks()
+      currentAccountVar.portfolio = await http
+        .get(`get_portfolio/${this.account}/${currentAccountVar.tradeDate}`)
+        .then(({ data }) => data)
+        .catch((error) => console.error('Failed to get portfolio:', error))
 
-//     $('#treeGrid').jqxTreeGrid('updateBoundData')
-//   })
-// }
+      currentAccountVar.portfolio.display = 'PORTFOLIO'
+      currentAccountVar.portfolio.rowType = 'sector'
+      currentAccountVar.portfolio.parent = null
+
+      currentAccountVar.books.unshift(currentAccountVar.portfolio)
+      for (let i = 0; i < currentAccountVar.books.length; i++) {
+        const book = currentAccountVar.books[i]
+        book.expanded = true
+        book.order_size = null
+      }
+
+      Risks.ComputeRisks()
+      currentAccountVar.spdRisks = Risks.SpreadRisks()
+
+      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+    })
+    .catch((error) => {
+      console.error(`Failed to fetch books of ${this.account} account\n`, error)
+    })
+}
 // function Reload() {
 //   api.getbook(td, account, function (response) {
 //     //        book = JSON.parse(response.result);
@@ -699,9 +722,10 @@ function openPreviewAllOrdersWindow(sector: string) {
 // }
 
 export default {
+  DeleteCommodity,
   DeleteSector,
   DeleteSingle,
-  DeleteCommodity,
+  GenerateID,
   openPreviewAllOrdersWindow,
   openPreviewSingleOrderWindow,
 }

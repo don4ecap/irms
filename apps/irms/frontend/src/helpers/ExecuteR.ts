@@ -6,6 +6,7 @@ export default class ExecuteR {
 
   public script: string
   public scripts = { calculate: null }
+  public intervals = new Map()
 
   connect(id: string, script: string) {
     try {
@@ -53,6 +54,13 @@ export default class ExecuteR {
       xmlDoc.getElementsByTagName('result')[0].childNodes[0].childNodes[0]
     this.scripts[id] = result
     PageControls.success(`Received: ${message.data}`)
+  }
+
+  getInterval(key: string) {
+    if (!this.intervals.has(key)) {
+      this.intervals.set(key, 0)
+    }
+    return this.intervals.get(key)
   }
 
   onClose() {

@@ -166,7 +166,13 @@
             >
               Delete
             </JqxButton>
-            <JqxButton class="inline-block" theme="office">Gen ID</JqxButton>
+            <JqxButton
+              class="inline-block"
+              theme="office"
+              onclick="GenerateID(this)"
+            >
+              Gen ID
+            </JqxButton>
           </div>
           <div class="flex" style="gap: 0.3rem">
             <JqxButton class="inline-block" theme="office">Gen MORN</JqxButton>
