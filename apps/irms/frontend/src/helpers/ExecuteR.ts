@@ -48,6 +48,7 @@ export default class ExecuteR {
     ) {
       this.scripts[id] = 'fail'
       PageControls.error(`Script ${id} failed`)
+      clearInterval(this.intervals.get(id))
       return
     }
     const result =
