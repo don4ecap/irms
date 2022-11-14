@@ -120,10 +120,14 @@ function getOrderStrategyString(orders: Array<any>) {
   }
 }
 
+const quoteStringOrNullString = (str: string) =>
+  str != null && str.length ? `'${str}'` : 'NULL'
+
 export default {
   formatNavData,
   getDateFromISO,
   isNullOrEmpty,
   parseOrder,
   getOrderStrategyString,
+  quoteStringOrNullString,
 }

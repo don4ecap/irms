@@ -70,29 +70,44 @@
 //   $('.custombutton').jqxButton({ theme: 'office' })
 // }
 
-// function CreateGenerateButtons() {
-//   ht = ''
+function CreateGenerateButtons() {
+  const configTagsButtonContainer = document.querySelector(
+    `#${currentAccount}-config-tags-button-container`
+  )
 
-//   $('#btnContainer').html('')
-//   for (var i = 0; i < configTags.length; i++) {
-//     ht +=
-//       "<button class='custombutton' name='generate' tag='' section='" +
-//       configTags[i] +
-//       "' onclick='Generate(this)'>Gen " +
-//       configTags[i] +
-//       '</button>'
-//   }
-//   custombuttons = api.getconfigbuttons(account)
-//   for (var p in custombuttons) {
-//     ht +=
-//       "<button class='custombutton' name='generate' script=" +
-//       custombuttons[p] +
-//       " onclick='SendCustomScript(this);'>" +
-//       p +
-//       '</button>'
-//   }
-//   $('#btnContainer').html(ht)
-// }
+  const accountVar = accountsVar[currentAccount]
+
+  Array.from(configTagsButtonContainer.children || []).forEach((child) =>
+    child.remove()
+  )
+
+  for (let i = 0; i < accountVar.configTags.length; i++) {
+    const configTag = accountVar.configTags[i]
+
+    const button = document.createElement('button')
+    // button.className = 'custombutton'
+    button.name = 'generate'
+    button.setAttribute('tag', '')
+    button.setAttribute('section', configTag)
+    button.setAttribute('onclick', 'Generate(this)')
+    button.textContent = `Gen ${configTag}`
+
+    configTagsButtonContainer.appendChild(button)
+    $(button).jqxButton({ theme: 'office' })
+  }
+
+  // TODO: Get Custom Buttons
+  // custombuttons = api.getconfigbuttons(account)
+  // for (var p in custombuttons) {
+  //   ht +=
+  //     "<button class='custombutton' name='generate' script=" +
+  //     custombuttons[p] +
+  //     " onclick='SendCustomScript(this);'>" +
+  //     p +
+  //     '</button>'
+  // }
+  // $('#btnContainer').html(ht)
+}
 
 function decimalPlaces(num: number) {
   const match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
@@ -138,4 +153,5 @@ export default {
   error,
   log,
   success,
+  CreateGenerateButtons,
 }

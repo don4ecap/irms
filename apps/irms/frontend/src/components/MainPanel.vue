@@ -65,8 +65,12 @@
           style="min-width: 8.3rem; gap: 0.3rem"
         >
           <JqxButton theme="office" @click="loadIRMS">Load iRMS</JqxButton>
-          <JqxButton ref="btnCalculate" theme="office" @click="calculate">
-            {{ label.calculateBook }}
+          <JqxButton
+            ref="btnCalculate"
+            theme="office"
+            onclick="Calculate(this)"
+          >
+            Calculate
           </JqxButton>
         </div>
         <div class="col-4 flex flex-column">
@@ -150,7 +154,14 @@
         </div>
         <div class="col-5 flex flex-column" style="gap: 0.3rem">
           <div class="flex" style="gap: 0.3rem">
-            <JqxButton class="inline-block" theme="office">Generate</JqxButton>
+            <JqxButton
+              class="inline-block"
+              theme="office"
+              tag
+              section
+              onclick="Generate(this)"
+              >Generate</JqxButton
+            >
             <JqxButton
               ref="btnPreview"
               class="inline-block"
@@ -174,19 +185,16 @@
               Gen ID
             </JqxButton>
           </div>
-          <div class="flex" style="gap: 0.3rem">
-            <JqxButton class="inline-block" theme="office">Gen MORN</JqxButton>
-            <JqxButton class="inline-block" theme="office">Gen TOCOM</JqxButton>
-            <JqxButton class="inline-block" theme="office"
-              >Gen EVENING</JqxButton
-            >
-            <JqxButton class="inline-block" theme="office">Gen END</JqxButton>
-          </div>
+          <div
+            :id="`${account}-config-tags-button-container`"
+            class="flex"
+            style="gap: 0.3rem"
+          ></div>
         </div>
       </div>
       <div
-        ref="treeGridContainer"
         :id="'tree-grid-container-' + account.toLowerCase()"
+        ref="treeGridContainer"
         class="tree-grid-container"
       >
         <!-- <JqxGrid
@@ -260,8 +268,8 @@ import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
-
-let lastExecuteRInterval
+import PageControls from '../helpers/PageControls'
+import axios from 'axios'
 
 export default {
   name: 'MainPanel',
@@ -313,9 +321,6 @@ export default {
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
-      label: {
-        calculateBook: 'Calculate',
-      },
     }
   },
 
@@ -328,6 +333,8 @@ export default {
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
     this.$el.querySelector('.main-panel').style.width = null
+
+    accountsVar[this.account].vue = this
 
     currentAccountVar.tradeDate = utils.getDateFromISO(
       this.bookDate.toISOString()
@@ -362,7 +369,9 @@ export default {
       }
 
       this.loadNav()
-      this.loadCommoIndicatorLevel().then(() => this.loadBooks())
+      this.loadCommoIndicatorLevel()
+        .then(() => this.loadConfigTags())
+        .then(() => this.loadBooks())
     },
 
     loadStrategies() {
@@ -370,6 +379,18 @@ export default {
         data.unshift('CHECK')
         strategies = data
       })
+    },
+
+    loadConfigTags() {
+      return httpService
+        .get(`get_configtags/${this.account}`)
+        .then(({ data }) => {
+          const currentAccount = accountsVar[this.account]
+          currentAccount.configTags = data
+        })
+        .catch((error) => {
+          console.error('Failed to fetch config tags', error)
+        })
     },
 
     loadNav() {
@@ -408,6 +429,8 @@ export default {
       if (existingGridEl?.length) {
         existingGridEl.jqxTreeGrid('destroy')
       }
+
+      PageControls.CreateGenerateButtons()
 
       // Create new grid element for attach the new tree grid
       const newGrid = document.createElement('div')
@@ -688,38 +711,6 @@ export default {
       currentAccountVar.tradeDate = utils.getDateFromISO(
         this.bookDate.toISOString()
       )
-    },
-
-    calculate() {
-      this.label.calculateBook = 'Processing'
-      $(this.$refs.btnCalculate.$el).jqxButton({ disabled: true })
-
-      const excecuteR = currentAccountVar.excecuteR
-      excecuteR.connect(
-        'calculate',
-        `iRMS.createBook(iRMS(account='${currentAccount}'),TRUE,FALSE)`
-      )
-
-      lastExecuteRInterval = setInterval(() => {
-        if (excecuteR.scripts['calculate'] == null) {
-          this.label.calculateBook = 'Queued.'
-        } else if (parseFloat(excecuteR.scripts['calculate'].data) == 1) {
-          excecuteR.scripts['calculate'] = null
-          this.label.calculateBook = 'Done.'
-          //Reload();
-          $(this.$refs.btnCalculate.$el).jqxButton({ disabled: false })
-          clearInterval(lastExecuteRInterval)
-          this.label.calculateBook = 'Calculate'
-          this.loadIRMS()
-        } else if (excecuteR.scripts['calculate'].data == 'fail') {
-          this.label.calculateBook = 'Error'
-          // Reload()
-          excecuteR.scripts['calculate'] = null
-          this.label.calculateBook = 'Calculate'
-          $('#btn-calculate-book').jqxButton({ disabled: false })
-          clearInterval(lastExecuteRInterval)
-        }
-      }, 1000)
     },
   },
 }

@@ -30,6 +30,7 @@ declare global {
     spdRisks: any
     tradeDate: Date | string
     treeGridID: string
+    vue: any
   }
 
   interface IAccountsVarMap {

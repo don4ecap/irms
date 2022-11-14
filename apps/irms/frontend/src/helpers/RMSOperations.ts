@@ -1,3 +1,4 @@
+import helpers from '.'
 import http from '../services/http'
 import Risks from './Risks'
 
@@ -162,84 +163,88 @@ import Risks from './Risks'
 //   //   })
 // }
 
-// function Generate(btn) {
-//   a = $(btn).text()
-//   $(btn).text('Processing')
-//   console.log('Generating for sector: ' + $(btn).attr('tag'))
-//   key = 'generateSector' + $(btn).attr('tag')
+function Generate(btn) {
+  const prevText = $(btn).text()
+  $(btn).text('Processing')
 
-//   section = '"' + $(btn).attr('section') + '"'
-//   if ($(btn).attr('section') == '') section = 'NULL'
-//   connect(
-//     key,
-//     'generateIRMSOrders("' +
-//       td +
-//       '","' +
-//       account +
-//       '","' +
-//       $(btn).attr('tag') +
-//       '",' +
-//       section +
-//       ',TRUE)'
-//   )
-//   xx = setInterval(function myfunction() {
-//     if (scripts[key] == null) $(btn).text('Queued.')
-//     else if (parseFloat(scripts[key].data) == 1) {
-//       scripts[key] = null
-//       $(btn).text('Done.')
-//       SoftReload()
-//       clearInterval(xx)
-//     } else if (scripts[key].data == 'fail') {
-//       $(btn).text(a)
-//       SoftReload()
-//       scripts[key] = null
-//       clearInterval(xx)
-//     }
-//   }, 1000)
-//   $(btn).text(a)
-// }
+  let tag = $(btn).attr('tag')
+
+  console.log(`Generating for sector: ${tag}`)
+  const key = `generateSector${tag}`
+
+  tag = helpers.quoteStringOrNullString(tag)
+
+  const account = currentAccount
+  const accountVar = accountsVar[account]
+  const tradeDate = accountVar.tradeDate
+  const excecuteR = accountVar.excecuteR
+
+  const section = helpers.quoteStringOrNullString($(btn).attr('section'))
+
+  const code = `generateIRMSOrders('${tradeDate}', '${account}', ${tag}, ${section}, TRUE)`
+  console.log(`Sending: ${code}`)
+  excecuteR.connect(key, code)
+  excecuteR.intervals.set(
+    key,
+    setInterval(function () {
+      console.log('Checking status for', code)
+      if (excecuteR.scripts[key] == null) {
+        $(btn).text('Queued.')
+      } else if (parseFloat(excecuteR.scripts[key].data) == 1) {
+        excecuteR.scripts[key] = null
+        $(btn).text('Done.')
+        SoftReload()
+        clearInterval(excecuteR.intervals.get(key))
+      } else if (excecuteR.scripts[key].data == 'fail') {
+        $(btn).text(prevText)
+        SoftReload()
+        excecuteR.scripts[key] = null
+        clearInterval(excecuteR.intervals.get(key))
+      }
+    }, 1000)
+  )
+  $(btn).text(prevText)
+}
 
 function GenerateID(btn) {
-  const a = $(btn).text()
+  const prevText = $(btn).text()
   $(btn).text('Processing')
 
   const tag = $(btn).attr('tag')
 
-  let sector = tag
-  let section = $(btn).attr('section')
-
-  if (section == '' || section == null) {
-    section = 'NULL'
-  }
-  if (tag == '' || tag == null) {
-    sector = 'NULL'
-  }
+  const sector = helpers.quoteStringOrNullString(tag)
+  // const section = helpers.quoteStringOrNullString($(btn).attr('section'))
 
   console.log(`Generating ID for sector: ${sector}`)
   const key = `generateSectorID${sector}`
 
-  const code = `generateIDOrders("${currentAccount}","irms",' ${sector})`
-  currentAccountVar.excecuteR.connect(key, code)
+  const account = currentAccount
+  const accountVar = accountsVar[account]
+  const excecuteR = accountVar.excecuteR
+
+  const code = `generateIDOrders('${account}','irms',' ${sector})`
+  excecuteR.connect(key, code)
   console.log(`Sending: ${code}`)
-  currentAccountVar.excecuteR.intervals.set(
-    code,
+  excecuteR.intervals.set(
+    key,
     setInterval(function () {
-      if (currentAccountVar.excecuteR.scripts[key] == null)
+      console.log('Checking status for', code)
+      if (excecuteR.scripts[key] == null) {
         $(btn).text('Queued.')
-      else if (parseFloat(currentAccountVar.excecuteR.scripts[key].data) == 1) {
-        currentAccountVar.excecuteR.scripts[key] = null
+      } else if (parseFloat(excecuteR.scripts[key].data) == 1) {
+        excecuteR.scripts[key] = null
         $(btn).text('Done.')
-        // SoftReload()
-        clearInterval(currentAccountVar.excecuteR.intervals.get(code))
-      } else if (currentAccountVar.excecuteR.scripts[key].data == 'fail') {
-        $(btn).text(a)
-        // SoftReload()
-        currentAccountVar.excecuteR.scripts[key] = null
-        clearInterval(currentAccountVar.excecuteR.intervals.get(code))
+        SoftReload()
+        clearInterval(excecuteR.intervals.get(key))
+      } else if (excecuteR.scripts[key].data == 'fail') {
+        $(btn).text(prevText)
+        SoftReload()
+        excecuteR.scripts[key] = null
+        clearInterval(excecuteR.intervals.get(key))
       }
     }, 1000)
   )
-  $(btn).text(a)
+  $(btn).text(prevText)
 }
 
 // function Delete(btn) {
@@ -472,82 +477,90 @@ async function BuildPreview(sector) {
 }
 
 function SoftReload() {
-  http
-    .get(`get_book/${currentAccount}/${currentAccountVar.tradeDate}`)
-    .then(async ({ data: books }) => {
-      currentAccountVar.books = books
+  const account = currentAccount
+  const accountVar = accountsVar[account]
 
-      currentAccountVar.portfolio = await http
-        .get(`get_portfolio/${this.account}/${currentAccountVar.tradeDate}`)
+  http
+    .get(`get_book/${account}/${accountVar.tradeDate}`)
+    .then(async ({ data: books }) => {
+      accountVar.books = books
+
+      accountVar.portfolio = await http
+        .get(`get_portfolio/${this.account}/${accountVar.tradeDate}`)
         .then(({ data }) => data)
         .catch((error) => console.error('Failed to get portfolio:', error))
 
-      currentAccountVar.portfolio.display = 'PORTFOLIO'
-      currentAccountVar.portfolio.rowType = 'sector'
-      currentAccountVar.portfolio.parent = null
+      accountVar.portfolio.display = 'PORTFOLIO'
+      accountVar.portfolio.rowType = 'sector'
+      accountVar.portfolio.parent = null
 
-      currentAccountVar.books.unshift(currentAccountVar.portfolio)
-      for (let i = 0; i < currentAccountVar.books.length; i++) {
-        const book = currentAccountVar.books[i]
+      accountVar.books.unshift(accountVar.portfolio)
+      for (let i = 0; i < accountVar.books.length; i++) {
+        const book = accountVar.books[i]
         book.expanded = true
         book.order_size = null
       }
 
       Risks.ComputeRisks()
-      currentAccountVar.spdRisks = Risks.SpreadRisks()
+      accountVar.spdRisks = Risks.SpreadRisks()
 
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
     })
     .catch((error) => {
-      console.error(`Failed to fetch books of ${this.account} account\n`, error)
+      console.error(`Failed to fetch books of ${account} account\n`, error)
     })
 }
-// function Reload() {
-//   api.getbook(td, account, function (response) {
-//     //        book = JSON.parse(response.result);
-//     //        source.localdata = book
-//     //        for (i = 0; i < book.length; i++) { book[i].expanded = true; book[i].order_size = null; }
-//     //        ComputeRisks();
-//     //spdRisks = SpreadRisks();
-//     $('#myButton').click()
-//     //$('#treeGrid').jqxTreeGrid('updateBoundData');
-//   })
-// }
 
-// function Calculate(btn) {
-//   a = $(btn).val()
-//   $(btn).val('Processing')
-//   $('#calculate').jqxButton({
-//     disabled: true,
-//   })
-//   connect(
-//     'calculate',
-//     'iRMS.createBook(iRMS(account="' + $('#accounts').val() + '"),TRUE,FALSE)'
-//   )
-//   xx = setInterval(function myfunction() {
-//     if (scripts['calculate'] == null) $(btn).val('Queued.')
-//     else if (parseFloat(scripts['calculate'].data) == 1) {
-//       scripts['calculate'] = null
-//       $(btn).text('Done.')
-//       //Reload();
-//       $(btn).val(a)
-//       $('#calculate').jqxButton({
-//         disabled: false,
-//       })
-//       clearInterval(xx)
-//       $('#myButton').click()
-//     } else if (scripts['calculate'].data == 'fail') {
-//       $(btn).text('Error')
-//       Reload()
-//       scripts['calculate'] = null
-//       $(btn).val(a)
-//       $('#calculate').jqxButton({
-//         disabled: false,
-//       })
-//       clearInterval(xx)
-//     }
-//   }, 1000)
-// }
+function Reload() {
+  // api.getbook(td, account, function (response) {
+  //        book = JSON.parse(response.result);
+  //        source.localdata = book
+  //        for (i = 0; i < book.length; i++) { book[i].expanded = true; book[i].order_size = null; }
+  //        ComputeRisks();
+  //spdRisks = SpreadRisks();
+  // $('#myButton').click()
+  currentAccountVar.vue.loadIRMS()
+  //$('#treeGrid').jqxTreeGrid('updateBoundData');
+  // })
+}
+
+function Calculate(btn) {
+  const prevText = $(btn).val()
+  $(btn).val('Processing')
+  $(btn).jqxButton({ disabled: true })
+
+  const account = currentAccount
+  const accountVar = accountsVar[account]
+  const excecuteR = accountVar.excecuteR
+
+  const key = 'calculate'
+  const code = `iRMS.createBook(iRMS(account='${account}'),TRUE,FALSE)`
+  excecuteR.connect(key, code)
+  console.log(`Sending: ${code}`)
+  excecuteR.intervals.set(
+    key,
+    setInterval(function () {
+      console.log('Checking status for', code)
+      if (excecuteR.scripts[key] == null) {
+        $(btn).val('Queued.')
+      } else if (parseFloat(excecuteR.scripts[key].data) == 1) {
+        excecuteR.scripts[key] = null
+        $(btn).val('Done.')
+        //Reload();
+        $(btn).jqxButton({ disabled: false })
+        clearInterval(excecuteR.intervals.get(key))
+        $(btn).val(prevText)
+      } else if (excecuteR.scripts[key].data == 'fail') {
+        $(btn).val('Error')
+        Reload()
+        excecuteR.scripts[key] = null
+        $(btn).val(prevText)
+        $(btn).jqxButton({ disabled: false })
+        clearInterval(excecuteR.intervals.get(key))
+      }
+    }, 1000)
+  )
+}
 
 // function SendCustomScript(btn) {
 //   a = $(btn).val()
@@ -722,9 +735,11 @@ function openPreviewAllOrdersWindow(sector: string) {
 // }
 
 export default {
+  Calculate,
   DeleteCommodity,
   DeleteSector,
   DeleteSingle,
+  Generate,
   GenerateID,
   openPreviewAllOrdersWindow,
   openPreviewSingleOrderWindow,

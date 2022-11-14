@@ -36,6 +36,7 @@ const accountProperties: IAccountVar = {
   spdRisks: {},
   tradeDate: '',
   treeGridID: '',
+  vue: {},
 }
 
 const accounts = ['EE02', 'EE04', 'FIXUAT', 'JCMA', 'KRIBMA', 'KRMA']
