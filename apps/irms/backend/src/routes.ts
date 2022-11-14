@@ -9,6 +9,7 @@ import type {
 } from './types'
 import db from './db'
 import schemas from './schemas'
+import axios from 'axios'
 
 const prefix = '/api'
 
@@ -420,6 +421,26 @@ const routes: Array<RouteOptions> = [
       }
     },
   },
+
+  {
+    method: 'GET',
+    url: `${prefix}/get_configtags/:account`,
+    handler(req, res) {
+      const { account } = req.params as AccountOnlyParams
+      axios
+        .get(
+          `http://10.153.64.37:8080/bldb/schedulerAPI?method=strategyXML&strategy=${account}_DIR&contract=`
+        )
+        .then(({ data: configString }) => {
+          const result = configString
+            .match(/\*\*\*\s=\s(\w*)/gs)
+            .map((tag: string) => tag.split('=')[1].trim())
+          return res.send(result)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
   // {
   //   method: 'GET',
   //   url: `${prefix}/test`,
