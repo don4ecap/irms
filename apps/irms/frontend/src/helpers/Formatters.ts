@@ -11,7 +11,7 @@ function filterNonNull(/* datum, action */) {
     if (data.rowType == 'sector' && data.id) {
       const cell = TreeGridUtils.getCell2(data.id, 16)
       // @ts-ignore
-      cell.style.textAlign === 'right'
+      cell.style.textAlign = 'right'
       setTimeout(createSectorToolTip, 500, data)
     }
 
