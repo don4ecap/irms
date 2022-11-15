@@ -486,7 +486,7 @@ function SoftReload() {
       accountVar.books = books
 
       accountVar.portfolio = await http
-        .get(`get_portfolio/${this.account}/${accountVar.tradeDate}`)
+        .get(`get_portfolio/${account}/${accountVar.tradeDate}`)
         .then(({ data }) => data)
         .catch((error) => console.error('Failed to get portfolio:', error))
 
