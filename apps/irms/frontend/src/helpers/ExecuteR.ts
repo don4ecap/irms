@@ -49,6 +49,8 @@ export default class ExecuteR {
       this.scripts[id] = 'fail'
       PageControls.error(`Script ${id} failed`)
       clearInterval(this.intervals.get(id))
+      const error = xmlDoc.querySelector('output > error')
+      console.error('Failed to excecute R script:\n', error.textContent)
       return
     }
     const result =
