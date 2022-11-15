@@ -91,6 +91,7 @@ import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import helpers from '../helpers'
 import Risks from '../helpers/Risks'
 import http from '../services/http'
+import PageControls from '../helpers/PageControls'
 
 const newOrder = {
   qty: '',
@@ -185,8 +186,7 @@ export default {
           Risks.ComputeRisks()
           $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
           console.timeEnd('Saving data')
-          // TODO: Show success notification
-          //  success('Risks Updated')
+          PageControls.success('Risks updated')
           this.close()
         })
         .catch((error) => {

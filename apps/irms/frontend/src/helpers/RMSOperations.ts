@@ -1,5 +1,6 @@
 import helpers from '.'
 import http from '../services/http'
+import PageControls from './PageControls'
 import Risks from './Risks'
 
 // function preview(event) {
@@ -273,7 +274,7 @@ function DeleteSector(sector: string) {
       }
       Risks.ComputeRisks()
       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-      // TODO: Success notification
+      PageControls.success(`Deleted orders for: ${sector}`)
     })
     .catch((error) => {
       console.error(error)
@@ -306,8 +307,7 @@ function DeleteCommodity(
       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       // TODO: what the code below do?
       // treeGrid.jqxTreeGrid('selectRow', row.id)
-      // TODO: success notification
-      // success('Deleted orders for: ' + commodity)
+      PageControls.success(`Deleted orders for: ${commodity}`)
     })
     .catch((error) => {
       console.error(error)
@@ -326,8 +326,7 @@ function DeleteSingle(contract: string, extension: string, id: string) {
       book.orderP = null
       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('selectRow', book.id)
-      // TODO: Success notification
-      // success('Deleted orders for: ' + contract)
+      PageControls.success(`Deleted orders for: ${contract}`)
     })
     .catch((error) => {
       console.error('Failed to delete single', error)
