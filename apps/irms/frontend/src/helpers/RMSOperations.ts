@@ -194,11 +194,11 @@ function Generate(btn) {
       } else if (parseFloat(excecuteR.scripts[key].data) == 1) {
         excecuteR.scripts[key] = null
         $(btn).text('Done.')
-        SoftReload()
+        SoftReload(account)
         clearInterval(excecuteR.intervals.get(key))
       } else if (excecuteR.scripts[key].data == 'fail') {
         $(btn).text(prevText)
-        SoftReload()
+        SoftReload(account)
         excecuteR.scripts[key] = null
         clearInterval(excecuteR.intervals.get(key))
       }
@@ -235,11 +235,11 @@ function GenerateID(btn) {
       } else if (parseFloat(excecuteR.scripts[key].data) == 1) {
         excecuteR.scripts[key] = null
         $(btn).text('Done.')
-        SoftReload()
+        SoftReload(account)
         clearInterval(excecuteR.intervals.get(key))
       } else if (excecuteR.scripts[key].data == 'fail') {
         $(btn).text(prevText)
-        SoftReload()
+        SoftReload(account)
         excecuteR.scripts[key] = null
         clearInterval(excecuteR.intervals.get(key))
       }
@@ -254,15 +254,17 @@ function GenerateID(btn) {
 // }
 
 function DeleteSector(sector: string) {
+  const account = currentAccount
+  const accountVar = helpers.getAccountVar(account)
   return http
     .delete(
-      `delete_all_orders/${currentAccount}/${currentAccountVar.tradeDate}`,
+      `delete_all_orders/${account}/${accountVar.tradeDate}`,
       //  @ts-ignore
       { sector }
     )
     .then((/* { data } */) => {
-      for (let i = 0; i < currentAccountVar.books.length; i++) {
-        const book = currentAccountVar.books[i]
+      for (let i = 0; i < accountVar.books.length; i++) {
+        const book = accountVar.books[i]
         if (book.sector == sector && book.rowType == 'contract') {
           book.orderQ = null
           book.orderP = null
@@ -273,7 +275,7 @@ function DeleteSector(sector: string) {
         }
       }
       Risks.ComputeRisks()
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       PageControls.success(`Deleted orders for: ${sector}`)
     })
     .catch((error) => {
@@ -286,13 +288,15 @@ function DeleteCommodity(
   extension: string
   // instrument: string
 ) {
+  const account = currentAccount
+  const accountVar = helpers.getAccountVar(account)
   http
     .delete(
-      `delete_commodity/${currentAccount}/${currentAccountVar.tradeDate}/${commodity}/${extension}`
+      `delete_commodity/${account}/${accountVar.tradeDate}/${commodity}/${extension}`
     )
     .then((/* {data} */) => {
-      for (let i = 0; i < currentAccountVar.books.length; i++) {
-        const book = currentAccountVar.books[i]
+      for (let i = 0; i < accountVar.books.length; i++) {
+        const book = accountVar.books[i]
         if (
           book.commo == commodity &&
           book.extension == extension &&
@@ -304,7 +308,7 @@ function DeleteCommodity(
         }
       }
       Risks.ComputeRisks()
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       // TODO: what the code below do?
       // treeGrid.jqxTreeGrid('selectRow', row.id)
       PageControls.success(`Deleted orders for: ${commodity}`)
@@ -315,17 +319,19 @@ function DeleteCommodity(
 }
 
 function DeleteSingle(contract: string, extension: string, id: string) {
+  const account = currentAccount
+  const accountVar = helpers.getAccountVar(account)
   http
     .delete(
-      `delete_single/${currentAccount}/${currentAccountVar.tradeDate}/${contract}/${extension}`
+      `delete_single/${account}/${accountVar.tradeDate}/${contract}/${extension}`
     )
     .then((/* { data } */) => {
       const index = Risks.GetBookIndexByID(id)
-      const book = currentAccountVar.books[index]
+      const book = accountVar.books[index]
       book.orderQ = null
       book.orderP = null
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('selectRow', book.id)
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('selectRow', book.id)
       PageControls.success(`Deleted orders for: ${contract}`)
     })
     .catch((error) => {
@@ -475,9 +481,8 @@ function DeleteSingle(contract: string, extension: string, id: string) {
 //   return orders
 // }
 
-function SoftReload() {
-  const account = currentAccount
-  const accountVar = accountsVar[account]
+function SoftReload(account: string) {
+  const accountVar = helpers.getAccountVar(account)
 
   http
     .get(`get_book/${account}/${accountVar.tradeDate}`)
@@ -510,7 +515,7 @@ function SoftReload() {
     })
 }
 
-function Reload() {
+function Reload(account: string) {
   // api.getbook(td, account, function (response) {
   //        book = JSON.parse(response.result);
   //        source.localdata = book
@@ -518,7 +523,8 @@ function Reload() {
   //        ComputeRisks();
   //spdRisks = SpreadRisks();
   // $('#myButton').click()
-  currentAccountVar.vue.loadIRMS()
+  const accountVar = helpers.getAccountVar(account)
+  accountVar.vue.loadIRMS()
   //$('#treeGrid').jqxTreeGrid('updateBoundData');
   // })
 }
@@ -529,7 +535,7 @@ function Calculate(btn) {
   $(btn).jqxButton({ disabled: true })
 
   const account = currentAccount
-  const accountVar = accountsVar[account]
+  const accountVar = helpers.getAccountVar(account)
   const excecuteR = accountVar.excecuteR
 
   const key = 'calculate'
@@ -551,7 +557,7 @@ function Calculate(btn) {
         $(btn).val(prevText)
       } else if (excecuteR.scripts[key].data == 'fail') {
         $(btn).val('Error')
-        Reload()
+        Reload(account)
         excecuteR.scripts[key] = null
         $(btn).val(prevText)
         $(btn).jqxButton({ disabled: false })

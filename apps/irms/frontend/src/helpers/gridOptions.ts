@@ -1,3 +1,4 @@
+import helpers from '.'
 import cellRenderers from './CellRenderers'
 
 const gridColumns = [
@@ -187,9 +188,10 @@ const gridColumns = [
     cellClassName: cellRenderers.colorType,
     columnType: 'template',
     createEditor(row, cellvalue, editor, cellText, width, height) {
-      currentAccountVar.inputEl = $('<input />')
+      const accountVar = helpers.getAccountVar(currentAccount)
+      accountVar.inputEl = $('<input />')
       // @ts-ignore
-      currentAccountVar.inputEl.prependTo(editor).jqxInput({
+      accountVar.inputEl.prependTo(editor).jqxInput({
         placeHolder: 'Strategy',
         theme: 'office',
         height: '100%',
@@ -200,11 +202,11 @@ const gridColumns = [
           if (item.indexOf('#') != -1) {
             const a = item.indexOf('#')
             // @ts-ignore
-            currentAccountVar.inputEl.jqxInput({ query: item.substr(a + 1) })
+            accountVar.inputEl.jqxInput({ query: item.substr(a + 1) })
             const arr = []
             let j = 0
-            for (let i = 0; i < currentAccountVar.books.length; i++) {
-              const book = currentAccountVar.books[i]
+            for (let i = 0; i < accountVar.books.length; i++) {
+              const book = accountVar.books[i]
               if (book.rowType == 'contract') {
                 const contract = book.contract
                 arr[j] = item.substr(0, a + 1) + contract
@@ -214,7 +216,7 @@ const gridColumns = [
             response(arr)
           } else {
             // @ts-ignore
-            currentAccountVar.inputEl.jqxInput({ query: item })
+            accountVar.inputEl.jqxInput({ query: item })
             response(strategies)
           }
         },

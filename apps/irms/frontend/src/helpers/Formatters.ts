@@ -5,8 +5,9 @@ function filterNonNull(/* datum, action */) {
   // console.log('Filter Non Null Called')
   console.time('filterNonNull')
   // console.log('caller is ' + arguments.callee.caller.toString())
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
-    const data = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  for (let i = 0; i < accountVar.books.length; i++) {
+    const data = accountVar.books[i]
     if (data.rowType == 'sector' && data.id) {
       const cell = TreeGridUtils.getCell2(data.id, 16)
       // @ts-ignore
@@ -16,7 +17,7 @@ function filterNonNull(/* datum, action */) {
 
     if (data.rowType == 'contract') {
       const row = TreeGridUtils.getRow2(data.id)
-      if (currentAccountVar.showNonNull) {
+      if (accountVar.showNonNull) {
         if (
           helpers.isNullOrEmpty(data.qty) &&
           helpers.isNullOrEmpty(data.current_allocation_lots) &&
@@ -50,8 +51,9 @@ function filterNonNull(/* datum, action */) {
 }
 
 async function filterNonNullCommo(commo, extension, instrument, expandEl) {
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
-    const book = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  for (let i = 0; i < accountVar.books.length; i++) {
+    const book = accountVar.books[i]
     if (
       book.rowType == 'contract' &&
       book.commo == commo &&
@@ -92,9 +94,10 @@ async function filterNonNullCommo(commo, extension, instrument, expandEl) {
 }
 
 function render() {
-  if (!currentAccountVar.forceRenderedOnce && !currentAccountVar.showNonNull) {
-    currentAccountVar.forceRenderedOnce = true
-    $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('render')
+  const accountVar = helpers.getAccountVar(currentAccount)
+  if (!accountVar.forceRenderedOnce && !accountVar.showNonNull) {
+    accountVar.forceRenderedOnce = true
+    $(`#${accountVar.treeGridID}`).jqxTreeGrid('render')
   }
 }
 
@@ -111,8 +114,9 @@ function render() {
 
 function colorExpiries(row) {
   // const a = moment(row.notice4E)
+  const accountVar = helpers.getAccountVar(currentAccount)
   const b = moment(row.expiry4E)
-  const c = moment(currentAccountVar.tradeDate)
+  const c = moment(accountVar.tradeDate)
 
   let cell
   if (c - b == 0) {

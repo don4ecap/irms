@@ -5,7 +5,7 @@ module.exports = {
     accountsVar: true,
     alertify: true,
     currentAccount: true,
-    currentAccountVar: true,
+    // currentAccountVar: true,
     moment: true,
     previewAllOrdersWindow: true,
     previewSingleOrderWindow: true,

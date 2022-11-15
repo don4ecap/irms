@@ -76,7 +76,6 @@ export default {
       // this.$refs.previewAllOrdersWindow.initialize()
 
       currentAccount = this.currentAccount
-      currentAccountVar = accountsVar[this.currentAccount]
     },
 
     openPreviewWindow() {

@@ -1,14 +1,16 @@
+import helpers from '.'
 import TreeGridUtils from './TreeGridUtils'
 
 function GetOrderSize(i: number) {
-  const row = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  const row = accountVar.books[i]
 
   if (row.rowType == 'contract') {
     let value: number, valueSector: number
     const orderSize = row.orderQ
     if (
       (orderSize == null || orderSize == '') &&
-      currentAccountVar.spdRiskOffsets[row.contract] == null
+      accountVar.spdRiskOffsets[row.contract] == null
     ) {
       row.current_risks_post = row.current_risks_pre
       row.target_risks_post = row.target_risks_pre
@@ -17,8 +19,8 @@ function GetOrderSize(i: number) {
       row.order_size = 0
     } else {
       let totalQ = 0
-      if (currentAccountVar.spdRiskOffsets[row.contract] != null) {
-        totalQ += currentAccountVar.spdRiskOffsets[row.contract]
+      if (accountVar.spdRiskOffsets[row.contract] != null) {
+        totalQ += accountVar.spdRiskOffsets[row.contract]
         TreeGridUtils.getCell(row.id, 14).addClass('spreadadjustment')
       }
       if (orderSize != null && orderSize != '') {
@@ -50,21 +52,21 @@ function GetOrderSize(i: number) {
 
     //update commo
     let parent_index = GetParent(row.parent)
-    currentAccountVar.books[parent_index].current_risks_post =
-      currentAccountVar.books[parent_index].current_risks_pre + value
-    currentAccountVar.books[parent_index].target_risks_post =
-      currentAccountVar.books[parent_index].target_risks_pre + value
-    currentAccountVar.books[parent_index].order_size =
-      currentAccountVar.books[parent_index].order_size + value
+    accountVar.books[parent_index].current_risks_post =
+      accountVar.books[parent_index].current_risks_pre + value
+    accountVar.books[parent_index].target_risks_post =
+      accountVar.books[parent_index].target_risks_pre + value
+    accountVar.books[parent_index].order_size =
+      accountVar.books[parent_index].order_size + value
 
     //update sector
-    parent_index = GetParent(currentAccountVar.books[parent_index].parent)
-    currentAccountVar.books[parent_index].current_risks_post =
-      currentAccountVar.books[parent_index].current_risks_pre + valueSector
-    currentAccountVar.books[parent_index].target_risks_post =
-      currentAccountVar.books[parent_index].target_risks_pre + valueSector
-    currentAccountVar.books[parent_index].order_size =
-      currentAccountVar.books[parent_index].order_size + valueSector
+    parent_index = GetParent(accountVar.books[parent_index].parent)
+    accountVar.books[parent_index].current_risks_post =
+      accountVar.books[parent_index].current_risks_pre + valueSector
+    accountVar.books[parent_index].target_risks_post =
+      accountVar.books[parent_index].target_risks_pre + valueSector
+    accountVar.books[parent_index].order_size =
+      accountVar.books[parent_index].order_size + valueSector
   } else if (row.rowType == 'commodity') {
     if (row.order_size == null) {
       row.current_risks_post = row.current_risks_pre
@@ -83,7 +85,7 @@ function GetOrderSize(i: number) {
     }
   }
 
-  // currentAccountVar.books[i] = row
+  // accountVar.books[i] = row
 }
 
 function UpdateOrderSize(index) {
@@ -160,8 +162,9 @@ function UpdateOrderCommoditySector(contractID, contractIndex) {
 
 function GetUnderlyingLastPrice(row) {
   const { /* mont, year, */ commo, extension } = row
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
-    const book = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  for (let i = 0; i < accountVar.books.length; i++) {
+    const book = accountVar.books[i]
     const { commo: bookCommo, rowType } = book
     if (rowType === 'contract' && bookCommo === commo) {
       const { contract_twodigit, extension: bookExtension } = book
@@ -185,9 +188,10 @@ function CR() {
 
 function ComputeRisks() {
   console.log('Compute Risks Called')
-  currentAccountVar.spdRiskOffsets = {}
-  $.each(currentAccountVar.books, function (i, e) {
-    const book = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  accountVar.spdRiskOffsets = {}
+  $.each(accountVar.books, function (i, e) {
+    const book = accountVar.books[i]
     if (book.rowType == 'commodity' || book.rowType == 'sector') {
       book.order_size = null
     } else {
@@ -204,11 +208,11 @@ function ComputeRisks() {
                   cont2 = cont2.split('@')[0]
                 }
                 const qty2 = -parseInt(q[i])
-                if (currentAccountVar.spdRiskOffsets[cont2] == null) {
-                  currentAccountVar.spdRiskOffsets[cont2] = qty2
+                if (accountVar.spdRiskOffsets[cont2] == null) {
+                  accountVar.spdRiskOffsets[cont2] = qty2
                 } else {
-                  currentAccountVar.spdRiskOffsets[cont2] =
-                    qty2 + currentAccountVar.spdRiskOffsets[cont2]
+                  accountVar.spdRiskOffsets[cont2] =
+                    qty2 + accountVar.spdRiskOffsets[cont2]
                 }
               }
             }
@@ -217,34 +221,35 @@ function ComputeRisks() {
   })
   let total_post_current_risk = 0
   let total_post_target_risk = 0
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
+  for (let i = 0; i < accountVar.books.length; i++) {
     GetOrderSize(i)
-    const book = currentAccountVar.books[i]
+    const book = accountVar.books[i]
     if (book.rowType == 'sector' && book.display != 'PORTFOLIO') {
       total_post_current_risk += book.order_size
       total_post_target_risk += book.order_size
     }
 
-    const firstBook = currentAccountVar.books[0]
+    const firstBook = accountVar.books[0]
     firstBook.target_risks_post =
       firstBook.target_risks_pre + total_post_target_risk
     firstBook.current_risks_post =
       firstBook.current_risks_pre + total_post_current_risk
   }
 
-  currentAccountVar.spdRisks = SpreadRisks()
+  accountVar.spdRisks = SpreadRisks()
 }
 
 function ComputeRisksRow(id) {
-  var row = $('#treeGrid').jqxTreeGrid('getRow', id)
-  var commodityRow = $('#treeGrid').jqxTreeGrid('getRow', row.parent)
-  var sectorRow = $('#treeGrid').jqxTreeGrid('getRow', commodityRow.parent)
+  const row = $('#treeGrid').jqxTreeGrid('getRow', id)
+  const commodityRow = $('#treeGrid').jqxTreeGrid('getRow', row.parent)
+  const sectorRow = $('#treeGrid').jqxTreeGrid('getRow', commodityRow.parent)
 }
 
 function SpreadRisks() {
   const a = []
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
-    const row = currentAccountVar.books[i]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  for (let i = 0; i < accountVar.books.length; i++) {
+    const row = accountVar.books[i]
     if (row.rowType == 'contract') {
       const commo = row.commo
       if (a[commo] == null) {
@@ -274,15 +279,17 @@ function SpreadRisks() {
 }
 
 function GetParent(id: number) {
-  for (let i = 0; i < currentAccountVar.books.length; i++) {
-    if (currentAccountVar.books[i].id == id) {
+  const accountVar = helpers.getAccountVar(currentAccount)
+  for (let i = 0; i < accountVar.books.length; i++) {
+    if (accountVar.books[i].id == id) {
       return i
     }
   }
 }
 
 function GetBookIndexByID(id: number | string) {
-  return currentAccountVar.bookIDMapRev[id]
+  const accountVar = helpers.getAccountVar(currentAccount)
+  return accountVar.bookIDMapRev[id]
   //    for (var i = 0; i < book.length; i++) {
   //        if (book[i].id == id) {
   //            return i;

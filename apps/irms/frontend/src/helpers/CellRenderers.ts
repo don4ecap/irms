@@ -1,3 +1,4 @@
+import helpers from '.'
 import PageControls from './PageControls'
 
 const isEmpty = (val: string) =>
@@ -148,8 +149,9 @@ const contractRenderer: RendererCallback = function (
     let nonNullText = ''
 
     if (dataField == 'display') {
-      const key = currentAccountVar.bookIDMapRev[row]
-      const r = currentAccountVar.books[key]
+      const accountVar = helpers.getAccountVar(currentAccount)
+      const key = accountVar.bookIDMapRev[row]
+      const r = accountVar.books[key]
 
       const pnl = null
 
@@ -289,10 +291,12 @@ const pRenderer: RendererCallback = function (
     return cellValue
   }
 
+  const accountVar = helpers.getAccountVar(currentAccount)
+
   if (rowData.rowType === 'sector' && rowData.display !== 'PORTFOLIO') {
     let generateButtons = ''
-    for (let i = 0; i < currentAccountVar.configTags.length; i++) {
-      const configTag = currentAccountVar.configTags[i]
+    for (let i = 0; i < accountVar.configTags.length; i++) {
+      const configTag = accountVar.configTags[i]
       const generateButton = document.createElement('button')
       generateButton.classList.add('custombutton')
       generateButton.setAttribute('name', 'generate')
@@ -432,13 +436,15 @@ const cellClass: RendererCallback = function (
   cellText,
   rowData
 ) {
+  const accountVar = helpers.getAccountVar(currentAccount)
+
   if (rowData.rowType === 'sector' || rowData.rowType === 'commodity') {
     const cellValue = Math.abs(rowData[dataField] * 100)
     return getCommoRisksColor(cellValue)
   }
   if (rowData.rowType === 'contract') {
     return getSpreadRisksColor(
-      currentAccountVar.spdRisks[rowData.commo][dataField] * 100
+      accountVar.spdRisks[rowData.commo][dataField] * 100
     )
   }
 }
@@ -449,6 +455,8 @@ const colorType: RendererCallback = function (
   cellText,
   rowData
 ) {
+  const accountVar = helpers.getAccountVar(currentAccount)
+
   if (dataField == 'target_allocation_delta') {
     if (rowData.rowType == 'contract') return 'commo'
   }
@@ -462,8 +470,8 @@ const colorType: RendererCallback = function (
       return getDeltaColor(Math.abs(parseFloat(cellText)))
     }
     if (dataField.indexOf('display') != -1) {
-      const key = currentAccountVar.bookIDMapRev[rowData.id]
-      const row = currentAccountVar.books[key]
+      const key = accountVar.bookIDMapRev[rowData.id]
+      const row = accountVar.books[key]
       if (row.marketStatus == 'FALSE') return 'marketclosed'
     }
     return 'commo'
@@ -474,7 +482,7 @@ const colorType: RendererCallback = function (
     let commo = ''
 
     if (dataField == 'display') {
-      const level = currentAccountVar.indLevel.find(
+      const level = accountVar.indLevel.find(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         (item) => item.contract == rowData.contract

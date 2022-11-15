@@ -123,7 +123,10 @@ function getOrderStrategyString(orders: Array<any>) {
 const quoteStringOrNullString = (str: string) =>
   str != null && str.length ? `'${str}'` : 'NULL'
 
+const getAccountVar = (account: string) => accountsVar[account]
+
 export default {
+  getAccountVar,
   formatNavData,
   getDateFromISO,
   isNullOrEmpty,

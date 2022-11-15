@@ -137,11 +137,11 @@ export default {
     open(rowID: number) {
       this.$refs.currentWindow.open()
       this.rowID = rowID
-      if (!currentAccountVar.books.length) return
+      const accountVar = helpers.getAccountVar(currentAccount)
 
-      const currentBook = currentAccountVar.books.find(
-        (book) => book.id === rowID
-      )
+      if (!accountVar.books.length) return
+
+      const currentBook = accountVar.books.find((book) => book.id === rowID)
 
       this.origin.quantity = currentBook.orderQ
       this.origin.strategy = currentBook.orderP
@@ -157,8 +157,9 @@ export default {
 
     save() {
       this.loading.update = true
+      const accountVar = helpers.getAccountVar(currentAccount)
       const bookIndex = Risks.GetBookIndexByID(this.rowID)
-      const book = currentAccountVar.books[bookIndex]
+      const book = accountVar.books[bookIndex]
 
       const cellData = {
         id: book.id,
@@ -169,10 +170,7 @@ export default {
       }
 
       http
-        .post(
-          `save_cell/${currentAccount}/${currentAccountVar.tradeDate}`,
-          cellData
-        )
+        .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
         .then(({ data }) => {
           if (parseInt(data.id) == -1) {
             // TODO: Notify failure
@@ -184,7 +182,7 @@ export default {
           //ComputeRisksRow(bookIndex);
           console.time('Saving data')
           Risks.ComputeRisks()
-          $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+          $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
           console.timeEnd('Saving data')
           PageControls.success('Risks updated')
           this.close()

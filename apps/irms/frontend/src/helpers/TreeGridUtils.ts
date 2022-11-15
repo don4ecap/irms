@@ -1,3 +1,5 @@
+import helpers from '.'
+
 // Traverse tree grid to do a full "expand" or "collapse"
 // function traverseTreeGrid(treeGrid, action) {
 //   function traverseRows(rows) {
@@ -47,19 +49,22 @@ function getCell2(key: string, cellNum: number) {
 }
 
 function getCell(key: string, cellNum: number) {
-  const a = $(`#${currentAccountVar.treeGridID} tr`)
+  const accountVar = helpers.getAccountVar(currentAccount)
+  const a = $(`#${accountVar.treeGridID} tr`)
   const b = a.filter(`tr[data-key=${key}]`)
   return $($(b).children()[cellNum])
 }
 
 function getRow(key: string) {
-  const a = $(`#${currentAccountVar.treeGridID} tr[data-key='${key}']`)
+  const accountVar = helpers.getAccountVar(currentAccount)
+  const a = $(`#${accountVar.treeGridID} tr[data-key='${key}']`)
   return $(a[0])
 }
 
 function getRow2(key: string) {
+  const accountVar = helpers.getAccountVar(currentAccount)
   return document.body.querySelector(
-    `#${currentAccountVar.treeGridID} tr[data-key='${key}']`
+    `#${accountVar.treeGridID} tr[data-key='${key}']`
   )
 }
 

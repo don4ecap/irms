@@ -341,11 +341,10 @@ export default {
     // Remove each main panel element width assigned by jqwidgets
     this.$el.querySelector('.main-panel').style.width = null
 
-    accountsVar[this.account].vue = this
+    const accountVar = utils.getAccountVar(this.account)
+    accountVar.vue = this
 
-    currentAccountVar.tradeDate = utils.getDateFromISO(
-      this.bookDate.toISOString()
-    )
+    accountVar.tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
 
     // Prevent right click
     this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
@@ -392,8 +391,8 @@ export default {
       return httpService
         .get(`get_configtags/${this.account}`)
         .then(({ data }) => {
-          const currentAccount = accountsVar[this.account]
-          currentAccount.configTags = data
+          const accountVar = utils.getAccountVar(this.account)
+          accountVar.configTags = data
         })
         .catch((error) => {
           console.error('Failed to fetch config tags', error)
@@ -402,10 +401,9 @@ export default {
 
     loadNav() {
       console.time(`Load ${this.account} nav`)
-      const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
-      currentAccountVar.tradeDate = tradeDate
+      const accountVar = utils.getAccountVar(this.account)
       return httpService
-        .get(`get_nav/${this.account}/${tradeDate}`)
+        .get(`get_nav/${this.account}/${accountVar.tradeDate}`)
         .then(({ data }) => {
           this.nav = utils.formatNavData(data, this.account)
 
@@ -431,7 +429,8 @@ export default {
       const containerSelector = `#tree-grid-container-${lowerAccountName}`
       const gridContainer = document.querySelector(containerSelector)
       const existingGridEl = $(`#${currentTreeGridID}`)
-      currentAccountVar.treeGridID = currentTreeGridID
+      const accountVar = utils.getAccountVar(this.account)
+      accountVar.treeGridID = currentTreeGridID
 
       if (existingGridEl?.length) {
         existingGridEl.jqxTreeGrid('destroy')
@@ -448,32 +447,32 @@ export default {
       return httpService
         .get(`get_book/${this.account}/${tradeDate}`)
         .then(async ({ data: books }) => {
-          currentAccountVar.books = books
-          currentAccountVar.bookIDMap = []
-          currentAccountVar.bookIDMapRev = []
+          accountVar.books = books
+          accountVar.bookIDMap = []
+          accountVar.bookIDMapRev = []
 
-          currentAccountVar.portfolio = await httpService
+          accountVar.portfolio = await httpService
             .get(`get_portfolio/${this.account}/${tradeDate}`)
             .then(({ data }) => data)
             .catch((error) => console.error('Failed to get portfolio:', error))
 
-          currentAccountVar.portfolio.display = 'PORTFOLIO'
-          currentAccountVar.portfolio.rowType = 'sector'
-          currentAccountVar.portfolio.parent = null
+          accountVar.portfolio.display = 'PORTFOLIO'
+          accountVar.portfolio.rowType = 'sector'
+          accountVar.portfolio.parent = null
 
-          currentAccountVar.books.unshift(currentAccountVar.portfolio)
-          for (let i = 0; i < currentAccountVar.books.length; i++) {
-            const book = currentAccountVar.books[i]
+          accountVar.books.unshift(accountVar.portfolio)
+          for (let i = 0; i < accountVar.books.length; i++) {
+            const book = accountVar.books[i]
             book.expanded = true
             book.order_size = null
             book.action = ''
-            currentAccountVar.bookIDMap[i] = parseInt(book.id)
-            currentAccountVar.bookIDMapRev[book.id] = i
+            accountVar.bookIDMap[i] = parseInt(book.id)
+            accountVar.bookIDMapRev[book.id] = i
             book.style = 'background-color:red'
           }
 
           Risks.ComputeRisks()
-          currentAccountVar.spdRisks = Risks.SpreadRisks()
+          accountVar.spdRisks = Risks.SpreadRisks()
 
           const dataAdapter = new $.jqx.dataAdapter({
             dataType: 'json',
@@ -524,7 +523,7 @@ export default {
               parentDataField: { name: 'parent' },
             },
             id: 'id',
-            localData: currentAccountVar.books,
+            localData: accountVar.books,
           })
 
           $(`#${currentTreeGridID}`).jqxTreeGrid({
@@ -543,11 +542,11 @@ export default {
             },
             enableHover: false,
             ready: () => {
-              currentAccountVar.forceRenderedOnce = false
+              accountVar.forceRenderedOnce = false
               //alert("ready");
             },
             rendered: () => {
-              if (currentAccountVar.calculateRisksLive) {
+              if (accountVar.calculateRisksLive) {
                 //@ts-ignore
                 Formatters.filterNonNull()
               }
@@ -595,7 +594,7 @@ export default {
           })
 
           // Reset editingRowID
-          currentAccountVar.editingRowID = -1
+          accountVar.editingRowID = -1
 
           // Attach event listeners
           $(`#${currentTreeGridID}`).on('rowClick', EventHandlers.onRowClick)
@@ -616,14 +615,15 @@ export default {
     },
 
     loadCommoIndicatorLevel() {
+      const accountVar = utils.getAccountVar(this.account)
       return httpService
         .get('get_commo_indicator_level')
-        .then(({ data }) => (currentAccountVar.indLevel = data))
+        .then(({ data }) => (accountVar.indLevel = data))
     },
 
     buildGrid() {
       // const a = new Date()
-      if (currentAccountVar.calculateRisksLive) {
+      if (utils.getAccountVar(this.account).calculateRisksLive) {
         Formatters.filterNonNull()
       }
       // const b = new Date()
@@ -636,50 +636,54 @@ export default {
 
     onShowNonNullClicked() {
       //@ts-ignore
-      this.showNonNull = currentAccountVar.showNonNull = !this.showNonNull
+      this.showNonNull = utils.getAccountVar(this.account).showNonNull =
+        !this.showNonNull
       this.buildGrid()
     },
 
     showContract() {
-      if (!currentAccountVar.treeGridID.length) {
+      const accountVar = utils.getAccountVar(this.account)
+      if (!accountVar.treeGridID.length) {
         const msg = 'There is no data yet. Please Load iRMS data first'
         alert(msg)
         throw SyntaxError(msg)
       }
 
       setTimeout(function () {
-        for (let i = 0; i < currentAccountVar.books.length; i++) {
-          const book = currentAccountVar.books[i]
+        for (let i = 0; i < accountVar.books.length; i++) {
+          const book = accountVar.books[i]
           if (book.rowType == 'sector') book.expanded = true
           if (book.rowType == 'commodity') book.expanded = true
         }
-        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       }, 500)
     },
 
     showSector() {
+      const accountVar = utils.getAccountVar(this.account)
       Promise.resolve().then(() => {
-        for (let i = 0; i < currentAccountVar.books.length; i++) {
-          const book = currentAccountVar.books[i]
+        for (let i = 0; i < accountVar.books.length; i++) {
+          const book = accountVar.books[i]
           if (book.rowType == 'sector') {
             book.expanded = false
           }
         }
-        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       })
     },
 
     showCommodity() {
+      const accountVar = utils.getAccountVar(this.account)
       Promise.resolve().then(() => {
-        for (let i = 0; i < currentAccountVar.books.length; i++) {
-          const book = currentAccountVar.books[i]
+        for (let i = 0; i < accountVar.books.length; i++) {
+          const book = accountVar.books[i]
           if (book.rowType == 'sector') {
             book.expanded = true
           } else if (book.rowType == 'commodity') {
             book.expanded = false
           }
         }
-        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       })
     },
 
@@ -703,15 +707,16 @@ export default {
     },
 
     checkLiveRisks() {
-      currentAccountVar.calculateRisksLive = this.calculateRisksLive
+      const accountVar = utils.getAccountVar(this.account)
+      accountVar.calculateRisksLive = this.calculateRisksLive
       if (this.calculateRisksLive) {
         Risks.ComputeRisks()
-        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       }
     },
 
     updateTradeDate() {
-      currentAccountVar.tradeDate = utils.getDateFromISO(
+      utils.getAccountVar(this.account).tradeDate = utils.getDateFromISO(
         this.bookDate.toISOString()
       )
     },

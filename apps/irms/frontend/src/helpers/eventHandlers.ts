@@ -1,3 +1,4 @@
+import helpers from '.'
 import http from '../services/http'
 import Risks from './Risks'
 
@@ -18,6 +19,7 @@ function onRowClick(event) {
     return false
   }
 
+  const accountVar = helpers.getAccountVar(currentAccount)
   if (clickEvent.ctrlKey) {
     // TODO:
     // console.log(`Chart for ${row.contract} ${row.extension}`)
@@ -36,16 +38,13 @@ function onRowClick(event) {
     if (
       clickEvent.target.classList.contains('editable')
       // &&
-      // currentAccountVar.editingRowID === -1
+      // accountVar.editingRowID === -1
     ) {
       if (args.row.rowType != 'contract') return
-      currentAccountVar.isEdited = true
-      currentAccountVar.editingRowQty = args.row.orderQ
-      currentAccountVar.editingRowID = args.row.id
-      $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid(
-        'beginRowEdit',
-        args.row.id
-      )
+      accountVar.isEdited = true
+      accountVar.editingRowQty = args.row.orderQ
+      accountVar.editingRowID = args.row.id
+      $(`#${accountVar.treeGridID}`).jqxTreeGrid('beginRowEdit', args.row.id)
       console.log(`Editing row id: ${args.row.id}`)
     }
   }
@@ -54,9 +53,10 @@ function onRowClick(event) {
 function onRowEndEdit(event) {
   const { args } = event
   const { key } = args
-  const row = $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('getRow', key)
+  const accountVar = helpers.getAccountVar(currentAccount)
+  const row = $(`#${accountVar.treeGridID}`).jqxTreeGrid('getRow', key)
   const indexOfBookDataBeforeChange = Risks.GetBookIndexByID(row.id)
-  const bookToUpdate = currentAccountVar.books[indexOfBookDataBeforeChange]
+  const bookToUpdate = accountVar.books[indexOfBookDataBeforeChange]
 
   if (row.orderP) {
     row.orderP = row.orderP.trim()
@@ -114,10 +114,7 @@ function onRowEndEdit(event) {
 
   // Send request to server for save cell
   http
-    .post(
-      `save_cell/${currentAccount}/${currentAccountVar.tradeDate}`,
-      cellData
-    )
+    .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
     .then(({ data }) => {
       if (parseInt(data.id) == -1) {
         // TODO: Notify failure
@@ -127,13 +124,13 @@ function onRowEndEdit(event) {
       bookToUpdate.orderQ = row.orderQ
       bookToUpdate.orderP = row.orderP
       //ComputeRisksRow(index);
-      if (currentAccountVar.calculateRisksLive) {
+      if (accountVar.calculateRisksLive) {
         console.time('Saving data')
         Risks.ComputeRisks()
-        $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
         console.timeEnd('Saving data')
       }
-      currentAccountVar.editingRowID = -1
+      accountVar.editingRowID = -1
       // TODO: Show success notification
       //  success('Risks Updated')
     })

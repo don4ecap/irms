@@ -28,6 +28,7 @@
 <script lang="ts">
 import http from '../services/http'
 import API from '../services/api'
+import helpers from '../helpers'
 
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
@@ -53,10 +54,12 @@ export default {
 
   methods: {
     initialize() {
-      if (!currentAccountVar.books.length) return
+      const accountVar = helpers.getAccountVar(currentAccount)
+
+      if (!accountVar.books.length) return
       this.loading.get = true
       http
-        .get(`get_working/${currentAccount}/${currentAccountVar.tradeDate}`)
+        .get(`get_working/${currentAccount}/${accountVar.tradeDate}`)
         .then(async ({ data }) => {
           const orders = await this.buildPreview(this.sector || '', data)
 
@@ -163,13 +166,12 @@ export default {
 
     async buildPreview(sector: string, existingOrders: Array<any>) {
       let sectorRows
+      const accountVar = helpers.getAccountVar(currentAccount)
 
       if (sector === '') {
-        sectorRows = currentAccountVar.books
+        sectorRows = accountVar.books
       } else {
-        sectorRows = currentAccountVar.books.filter(
-          (book) => book.sector === sector
-        )
+        sectorRows = accountVar.books.filter((book) => book.sector === sector)
       }
 
       let ignoreStrategies = 'CHECK'

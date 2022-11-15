@@ -52,8 +52,6 @@ for (const account of accounts) {
   }
 }
 
-// Initialize currentAccountVar with first account
-window.currentAccountVar = window.accountsVar[accounts[0]]
 // Initialize strategies
 window.strategies = []
 // Initialize context menu

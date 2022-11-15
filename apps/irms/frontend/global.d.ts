@@ -43,7 +43,7 @@ declare global {
   var alertify: any
   var contextMenu: any
   var currentAccount: string
-  var currentAccountVar: IAccountVar
+  // var currentAccountVar: IAccountVar
   var ignoreStrategies: string
   var moment: any
   var previewAllOrdersWindow: any
