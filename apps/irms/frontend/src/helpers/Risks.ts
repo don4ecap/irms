@@ -278,7 +278,7 @@ function SpreadRisks() {
   return a
 }
 
-function GetParent(id: number) {
+function GetParent(id: string) {
   const accountVar = helpers.getAccountVar(currentAccount)
   for (let i = 0; i < accountVar.books.length; i++) {
     if (accountVar.books[i].id == id) {
@@ -287,7 +287,7 @@ function GetParent(id: number) {
   }
 }
 
-function GetBookIndexByID(id: number | string) {
+function GetBookIndexByID(id: string | string) {
   const accountVar = helpers.getAccountVar(currentAccount)
   return accountVar.bookIDMapRev[id]
   //    for (var i = 0; i < book.length; i++) {

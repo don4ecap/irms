@@ -129,13 +129,13 @@ function log(text: string) {
   alertify.log(text)
 }
 
-function success(text) {
+function success(text: string) {
   // alertify.set({ delay: 2000 })
   //alertify.success(text);
   small_success(text, 10000)
 }
 
-function error(text) {
+function error(text: string) {
   alertify.set({ delay: 5000 })
   alertify.error(text)
 }

@@ -141,7 +141,9 @@ export default {
 
       if (!accountVar.books.length) return
 
-      const currentBook = accountVar.books.find((book) => book.id === rowID)
+      const currentBook = accountVar.books.find(
+        (book) => book.id === rowID.toString()
+      )
 
       this.origin.quantity = currentBook.orderQ
       this.origin.strategy = currentBook.orderP

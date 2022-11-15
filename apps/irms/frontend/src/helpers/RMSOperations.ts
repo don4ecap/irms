@@ -164,7 +164,7 @@ import Risks from './Risks'
 //   //   })
 // }
 
-function Generate(btn) {
+function Generate(btn: HTMLElement) {
   const prevText = $(btn).text()
   $(btn).text('Processing')
 
@@ -207,7 +207,7 @@ function Generate(btn) {
   $(btn).text(prevText)
 }
 
-function GenerateID(btn) {
+function GenerateID(btn: HTMLElement) {
   const prevText = $(btn).text()
   $(btn).text('Processing')
 
@@ -248,7 +248,7 @@ function GenerateID(btn) {
   $(btn).text(prevText)
 }
 
-// function Delete(btn) {
+// function Delete(btn: HTMLElement) {
 //   sector = $(btn).attr('tag')
 //   DeleteSector(sector)
 // }
@@ -501,7 +501,9 @@ function SoftReload(account: string) {
       accountVar.books.unshift(accountVar.portfolio)
       for (let i = 0; i < accountVar.books.length; i++) {
         const book = accountVar.books[i]
+        // @ts-ignore
         book.expanded = true
+        // @ts-ignore
         book.order_size = null
       }
 
@@ -529,7 +531,7 @@ function Reload(account: string) {
   // })
 }
 
-function Calculate(btn) {
+function Calculate(btn: HTMLElement) {
   const prevText = $(btn).val()
   $(btn).val('Processing')
   $(btn).jqxButton({ disabled: true })
@@ -567,7 +569,7 @@ function Calculate(btn) {
   )
 }
 
-// function SendCustomScript(btn) {
+// function SendCustomScript(btn: HTMLElement) {
 //   a = $(btn).val()
 //   scri = $(btn).attr('script')
 //   $(btn).val('Processing')

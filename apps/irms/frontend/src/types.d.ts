@@ -24,16 +24,18 @@ declare interface IRMSBook {
   expiry4E: string
   extension: string
   first_notice_date: string
+  contract_twodigit: string
   gamma: number
   gl_factor: number
   hedge_ratio: number
-  id: string | number
+  id: string
   instrument: string
   last_fx: number
   last_nav: number
   last_price: number
   last_trade_date: string
   live_fx: number
+  order_size: number
   live_nav: number
   marketStatus: string
   month: string
@@ -41,7 +43,7 @@ declare interface IRMSBook {
   orderNo: number
   orderP: string
   orderQ: string
-  parent: string | number
+  parent: string
   positions_pct_current: number
   positions_pct_target_notional: number
   positions_pct_target: number
@@ -62,7 +64,7 @@ declare interface IRMSBook {
   ticker: string
   underlying: string
   valid: boolean
-  valuept: string
+  valuept: number
   vega: number
   year: number
 }

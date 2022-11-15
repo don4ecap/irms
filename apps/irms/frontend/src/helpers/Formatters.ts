@@ -50,7 +50,12 @@ function filterNonNull(/* datum, action */) {
   console.timeEnd('filterNonNull')
 }
 
-async function filterNonNullCommo(commo, extension, instrument, expandEl) {
+async function filterNonNullCommo(
+  commo: string,
+  extension: string,
+  instrument: string,
+  expandEl
+) {
   const accountVar = helpers.getAccountVar(currentAccount)
   for (let i = 0; i < accountVar.books.length; i++) {
     const book = accountVar.books[i]
@@ -112,7 +117,7 @@ function render() {
 //   }
 // }
 
-function colorExpiries(row) {
+function colorExpiries(row: IRMSBook) {
   // const a = moment(row.notice4E)
   const accountVar = helpers.getAccountVar(currentAccount)
   const b = moment(row.expiry4E)
@@ -161,7 +166,7 @@ function colorExpiries(row) {
   }
 }
 
-function createSectorToolTip(row) {
+function createSectorToolTip(row: IRMSBook) {
   if (!('id' in row)) return
 
   const cell = TreeGridUtils.getCell2(row.id, 4)
@@ -179,7 +184,7 @@ function createSectorToolTip(row) {
   })
 }
 
-function createToolTip(row) {
+function createToolTip(row: IRMSBook) {
   const cell = TreeGridUtils.getCell2(row.id, 0)
   if (!cell) return
   let comment = ''
