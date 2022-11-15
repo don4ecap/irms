@@ -173,7 +173,7 @@
             <JqxButton
               class="inline-block"
               theme="office"
-              @click="deleteAllSector"
+              onclick="DeleteSector('')"
             >
               Delete
             </JqxButton>
@@ -700,10 +700,6 @@ export default {
       this.getLastBookCalculation().then((date) => {
         this.lastBookCalculationScheduler = moment(date).format('LLL')
       })
-    },
-
-    deleteAllSector() {
-      window.DeleteSector('')
     },
 
     checkLiveRisks() {
