@@ -139,6 +139,17 @@ body {
   font-size: 1rem;
 }
 
+.small-success {
+  align-items: center;
+  background-color: #4caf50;
+  color: #fff;
+  display: flex;
+  font-weight: bold;
+  height: 100%;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }

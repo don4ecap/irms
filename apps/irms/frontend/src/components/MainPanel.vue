@@ -230,6 +230,12 @@
           </label>
         </div>
 
+        <div>
+          <span ref="smallSuccess" class="small-success" style="display: none">
+            Risk Updated
+          </span>
+        </div>
+
         <!-- DATES -->
         <div
           class="ml-auto flex wrap items-center"
@@ -269,7 +275,8 @@ import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import PageControls from '../helpers/PageControls'
-import axios from 'axios'
+
+let smallSuccessTimeout
 
 export default {
   name: 'MainPanel',
@@ -710,6 +717,16 @@ export default {
     updateTradeDate() {
       currentAccountVar.tradeDate = utils.getDateFromISO(
         this.bookDate.toISOString()
+      )
+    },
+
+    showSmallSuccess(text: string, timeout: number) {
+      clearTimeout(smallSuccessTimeout)
+      this.$refs.smallSuccess.textContent = text
+      this.$refs.smallSuccess.style.display = 'flex'
+      smallSuccessTimeout = setTimeout(
+        () => (this.$refs.smallSuccess.style.display = 'none'),
+        timeout
       )
     },
   },

@@ -130,9 +130,9 @@ function log(text: string) {
 }
 
 function success(text) {
-  alertify.set({ delay: 2000 })
+  // alertify.set({ delay: 2000 })
   //alertify.success(text);
-  small_success(text, 2000)
+  small_success(text, 10000)
 }
 
 function error(text) {
@@ -140,12 +140,9 @@ function error(text) {
   alertify.error(text)
 }
 
-function small_success(text, timeout) {
-  // $('#small_success').text(text)
-  // $('#small_success').fadeIn(1000)
-  // setTimeout(function () {
-  //   $('#small_success').fadeOut(1000)
-  // }, timeout)
+function small_success(text: string, timeout: number) {
+  const accountVar = accountsVar[currentAccount]
+  accountVar.vue.showSmallSuccess(text, timeout)
 }
 
 export default {
