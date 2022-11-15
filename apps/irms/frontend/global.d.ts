@@ -12,7 +12,7 @@ declare global {
   interface IAccountVar {
     bookIDMap: Array<number>
     bookIDMapRev: Array<number>
-    books: Array<any>
+    books: Array<IRMSBook>
     calculateRisksLive: boolean
     configTags: []
     editingRowID: number
@@ -48,6 +48,8 @@ declare global {
   var moment: any
   var previewAllOrdersWindow: any
   var previewSingleOrderWindow: any
+  var cutOrderQ: string
+  var cutOrderP: string
 
   // Global functions
   function DeleteSector(sector: string)
