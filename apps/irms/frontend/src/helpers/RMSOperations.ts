@@ -334,147 +334,147 @@ function DeleteSingle(contract: string, extension: string, id: string) {
     })
 }
 
-async function BuildPreview(sector) {
-  let sectorRows = $.grep(
-    currentAccountVar.books,
-    (element) => element.sector == sector
-  )
-  if (sector == '') {
-    sectorRows = currentAccountVar.books
-  }
-  // ignoreStrategies = 'CHECK'
-  let excluded = 0
-  let excludedStrategy = 0
-  const existingOrders = await http.get(
-    `get_working/${currentAccount}/${currentAccountVar.tradeDate}`
-  )
-  const orders = []
-  let j = 0
-  for (let i = 0; i < sectorRows.length; i++) {
-    const sectorRow = sectorRows[i]
-    let quantities = sectorRow.orderQ
+// async function BuildPreview(sector) {
+//   let sectorRows = $.grep(
+//     currentAccountVar.books,
+//     (element) => element.sector == sector
+//   )
+//   if (sector == '') {
+//     sectorRows = currentAccountVar.books
+//   }
+//   // ignoreStrategies = 'CHECK'
+//   let excluded = 0
+//   let excludedStrategy = 0
+//   const existingOrders = await http.get(
+//     `get_working/${currentAccount}/${currentAccountVar.tradeDate}`
+//   )
+//   const orders = []
+//   let j = 0
+//   for (let i = 0; i < sectorRows.length; i++) {
+//     const sectorRow = sectorRows[i]
+//     let quantities = sectorRow.orderQ
 
-    if (quantities == '' || quantities == null) {
-      continue
-    }
+//     if (quantities == '' || quantities == null) {
+//       continue
+//     }
 
-    quantities = quantities.split(';')
-    const strategies = sectorRow.orderP.split(';')
+//     quantities = quantities.split(';')
+//     const strategies = sectorRow.orderP.split(';')
 
-    if (quantities.length > strategies.length) {
-      const msg = `You have more quantities than strategies for ${sectorRow.contract} ${sectorRow.extension}`
-      alert(msg)
-      console.log(msg)
-      return
-    }
+//     if (quantities.length > strategies.length) {
+//       const msg = `You have more quantities than strategies for ${sectorRow.contract} ${sectorRow.extension}`
+//       alert(msg)
+//       console.log(msg)
+//       return
+//     }
 
-    if (quantities.length < strategies.length) {
-      const msg = `You have more strategies than quantities for ${sectorRow.contract} ${sectorRow.extension}`
-      alert(msg)
-      console.log(msg)
-      return
-    }
+//     if (quantities.length < strategies.length) {
+//       const msg = `You have more strategies than quantities for ${sectorRow.contract} ${sectorRow.extension}`
+//       alert(msg)
+//       console.log(msg)
+//       return
+//     }
 
-    for (let k = 0; k < quantities.length; k++) {
-      const account = currentAccount
-      const { commo, extension, instrument } = sectorRow
-      let contract = sectorRow.contract
-      let contract_twodigit = sectorRow.contract_twodigit
+//     for (let k = 0; k < quantities.length; k++) {
+//       const account = currentAccount
+//       const { commo, extension, instrument } = sectorRow
+//       let contract = sectorRow.contract
+//       let contract_twodigit = sectorRow.contract_twodigit
 
-      const q = quantities[k]
-      let strat, price
+//       const q = quantities[k]
+//       let strat, price
 
-      if (strategies[k].indexOf('@') != -1) {
-        strat = strategies[k].split('@')[0]
-        price = strategies[k].split('@')[1]
-      } else {
-        strat = strategies[k]
-        price = '0'
-      }
+//       if (strategies[k].indexOf('@') != -1) {
+//         strat = strategies[k].split('@')[0]
+//         price = strategies[k].split('@')[1]
+//       } else {
+//         strat = strategies[k]
+//         price = '0'
+//       }
 
-      let freetext
-      if (price.indexOf('/') != -1) {
-        freetext = price.split('/')[1]
-        price = price.split('/')[0]
-      } else {
-        freetext = ''
-      }
+//       let freetext
+//       if (price.indexOf('/') != -1) {
+//         freetext = price.split('/')[1]
+//         price = price.split('/')[0]
+//       } else {
+//         freetext = ''
+//       }
 
-      if (isNaN(parseFloat(price))) {
-        freetext = price
-        price = '0'
-      }
+//       if (isNaN(parseFloat(price))) {
+//         freetext = price
+//         price = '0'
+//       }
 
-      let ordered
-      if (strat.indexOf('#') != -1) {
-        //contract = sectorRow.contract + "-" + strat.split('#')[1];
-        if (strat.split('#')[1] == '')
-          contract = sectorRow.contract + '-' + strat.split('#')[1]
-        else {
-          ordered = []
-          // ordered = JSON.parse(
-          //   api.ordercontracts(sectorRow.contract, strat.split('#')[1]),
-          //   extension
-          // )
-          contract =
-            ordered[0].contract_onedigit + '-' + ordered[1].contract_onedigit
-          contract_twodigit =
-            ordered[0].contract_twodigit + '-' + ordered[1].contract_twodigit
-        }
-        strat = strat.replace('#' + strat.split('#')[1], '')
-      }
-      const a: any = {}
-      if (strat === ignoreStrategies) continue
-      let flag = false
-      // @ts-ignore
-      for (let l = 0; l < existingOrders.length; l++) {
-        if (
-          existingOrders[l].contract == contract &&
-          existingOrders[l].extension == extension &&
-          existingOrders[l].price == price &&
-          existingOrders[l].strategy == strat
-        ) {
-          flag = true
-          break
-        }
-      }
+//       let ordered
+//       if (strat.indexOf('#') != -1) {
+//         //contract = sectorRow.contract + "-" + strat.split('#')[1];
+//         if (strat.split('#')[1] == '')
+//           contract = sectorRow.contract + '-' + strat.split('#')[1]
+//         else {
+//           ordered = []
+//           // ordered = JSON.parse(
+//           //   api.ordercontracts(sectorRow.contract, strat.split('#')[1]),
+//           //   extension
+//           // )
+//           contract =
+//             ordered[0].contract_onedigit + '-' + ordered[1].contract_onedigit
+//           contract_twodigit =
+//             ordered[0].contract_twodigit + '-' + ordered[1].contract_twodigit
+//         }
+//         strat = strat.replace('#' + strat.split('#')[1], '')
+//       }
+//       const a: any = {}
+//       if (strat === ignoreStrategies) continue
+//       let flag = false
+//       // @ts-ignore
+//       for (let l = 0; l < existingOrders.length; l++) {
+//         if (
+//           existingOrders[l].contract == contract &&
+//           existingOrders[l].extension == extension &&
+//           existingOrders[l].price == price &&
+//           existingOrders[l].strategy == strat
+//         ) {
+//           flag = true
+//           break
+//         }
+//       }
 
-      if (flag) {
-        excluded++
-        continue
-      }
+//       if (flag) {
+//         excluded++
+//         continue
+//       }
 
-      if (strategies.indexOf(strat) == -1) {
-        excludedStrategy++
-        continue
-      }
+//       if (strategies.indexOf(strat) == -1) {
+//         excludedStrategy++
+//         continue
+//       }
 
-      a.contract = contract
-      a.extension = extension
-      a.account = account
-      a.qty = q
-      a.strategy = strat
-      a.price = price
-      a.freetext = freetext
-      a.contract_twodigit = contract_twodigit
-      a.commo = commo
-      a.instrument = instrument
-      orders[j] = a
-      j = j + 1
-    }
-  }
+//       a.contract = contract
+//       a.extension = extension
+//       a.account = account
+//       a.qty = q
+//       a.strategy = strat
+//       a.price = price
+//       a.freetext = freetext
+//       a.contract_twodigit = contract_twodigit
+//       a.commo = commo
+//       a.instrument = instrument
+//       orders[j] = a
+//       j = j + 1
+//     }
+//   }
 
-  if (excluded > 0) {
-    alert(
-      excluded + ' orders have been excluded as they are already in iTrade.'
-    )
-  }
-  //    if(excludedStrategy>0)
-  //    {
-  //        alert(excluded+" orders have been excluded as they have invalid strategies.");
-  //    }
-  return orders
-}
+//   if (excluded > 0) {
+//     alert(
+//       excluded + ' orders have been excluded as they are already in iTrade.'
+//     )
+//   }
+//   //    if(excludedStrategy>0)
+//   //    {
+//   //        alert(excluded+" orders have been excluded as they have invalid strategies.");
+//   //    }
+//   return orders
+// }
 
 function SoftReload() {
   const account = currentAccount
