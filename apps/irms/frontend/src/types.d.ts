@@ -11,6 +11,7 @@ declare interface IRMSBook {
   ccy: string
   comment: string
   commo: string
+  contract_twodigit: string
   contract: string
   current_allocation_delta: number
   current_allocation_lots: number
@@ -21,10 +22,10 @@ declare interface IRMSBook {
   current_risks_pre: number
   current_sigma: number
   display: string
+  expanded?: boolean
   expiry4E: string
   extension: string
   first_notice_date: string
-  contract_twodigit: string
   gamma: number
   gl_factor: number
   hedge_ratio: number
@@ -35,11 +36,11 @@ declare interface IRMSBook {
   last_price: number
   last_trade_date: string
   live_fx: number
-  order_size: number
   live_nav: number
   marketStatus: string
   month: string
   notice4E: string
+  order_size: number
   orderNo: number
   orderP: string
   orderQ: string
