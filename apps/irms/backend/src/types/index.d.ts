@@ -1,14 +1,14 @@
-export interface GetNavRequestParams {
+export interface CommonRequestParams {
   account: string
   trade_date: string
 }
 
-export interface DeleteSingleParams extends GetNavRequestParams {
+export interface DeleteSingleParams extends CommonRequestParams {
   contract: string
   extension: string
 }
 
-export interface DeleteCommodityParams extends GetNavRequestParams {
+export interface DeleteCommodityParams extends CommonRequestParams {
   commodity: string
   extension: string
 }

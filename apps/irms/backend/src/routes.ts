@@ -3,7 +3,7 @@ import type {
   AccountOnlyParams,
   DeleteCommodityParams,
   DeleteSingleParams,
-  GetNavRequestParams,
+  CommonRequestParams,
   OrderContractsBody,
   SaveCellBody,
 } from './types'
@@ -26,7 +26,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.getConnection()
         .then((connection) => {
-          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          const params: CommonRequestParams = req.params as CommonRequestParams
           connection
             .query(
               'SELECT * FROM trading.tblfonav WHERE account=? AND td <= ? ORDER BY TIMESTAMP DESC LIMIT 1',
@@ -50,7 +50,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.getConnection()
         .then((connection) => {
-          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          const params: CommonRequestParams = req.params as CommonRequestParams
           connection
             .query(
               'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',
@@ -74,7 +74,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.getConnection()
         .then((connection) => {
-          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          const params: CommonRequestParams = req.params as CommonRequestParams
           connection
             .query(
               `SELECT 
@@ -180,7 +180,7 @@ const routes: Array<RouteOptions> = [
     url: `${prefix}/save_cell/:account/:trade_date`,
     schema: schemas.saveCell,
     handler(req, res) {
-      const params: GetNavRequestParams = req.params as GetNavRequestParams
+      const params: CommonRequestParams = req.params as CommonRequestParams
       const body: SaveCellBody = req.body as SaveCellBody
 
       const validateBodyRequest = req.compileValidationSchema(
@@ -232,7 +232,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.getConnection()
         .then((connection) => {
-          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          const params: CommonRequestParams = req.params as CommonRequestParams
           connection
             .query(
               `SELECT
@@ -269,7 +269,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.getConnection()
         .then((connection) => {
-          const params: GetNavRequestParams = req.params as GetNavRequestParams
+          const params: CommonRequestParams = req.params as CommonRequestParams
 
           let query = `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=?`
           // @ts-ignore
