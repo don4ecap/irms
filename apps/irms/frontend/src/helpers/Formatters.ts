@@ -127,7 +127,7 @@ function colorExpiries(row: IRMSBook) {
   if (c - b == 0) {
     for (let i = 0; i < 17; i++) {
       cell = TreeGridUtils.getCell2(row.id, i)
-      if (cell.style.backgroundColor !== 'purple') {
+      if (cell && cell.style.backgroundColor !== 'purple') {
         cell.style.backgroundColor = 'purple'
         cell.style.color = 'white'
       }
@@ -136,7 +136,7 @@ function colorExpiries(row: IRMSBook) {
     //Expiry4E
     for (let i = 0; i < 17; i++) {
       cell = TreeGridUtils.getCell2(row.id, i)
-      if (cell.style.backgroundColor !== 'purple') {
+      if (cell && cell.style.backgroundColor !== 'purple') {
         cell.style.backgroundColor = 'red'
         cell.style.color = 'white'
         // cell.css('background-color', 'red')
