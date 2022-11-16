@@ -64,7 +64,9 @@
           class="col-3 flex flex-column"
           style="min-width: 8.3rem; gap: 0.3rem"
         >
-          <JqxButton theme="office" @click="loadIRMS">Load iRMS</JqxButton>
+          <JqxButton ref="loadButton" theme="office" @click="loadIRMS">
+            {{ labels.loadBooks }}
+          </JqxButton>
           <JqxButton
             ref="btnCalculate"
             theme="office"
@@ -316,6 +318,7 @@ export default {
       },
       labels: {
         riskRate: 'Risk Rate',
+        loadBooks: 'Load iRMS',
       },
       panels: [
         { size: 90, min: 90, max: 90, collapsible: true },
@@ -359,6 +362,9 @@ export default {
 
   methods: {
     async loadIRMS() {
+      this.labels.loadBooks = 'Loading...'
+      // @ts-ignore
+      $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
       this.bookLoadedDate = moment().format('LLL')
       this.getLastBookCalculation().then((date) => {
         this.lastBookCalculation = moment(date).format('LLL')
@@ -610,6 +616,9 @@ export default {
           )
         })
         .finally(() => {
+          this.labels.loadBooks = 'Load iRMS'
+          // @ts-ignore
+          $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
           console.timeEnd(`Load ${this.account} books`)
         })
     },
