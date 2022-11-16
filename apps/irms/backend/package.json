@@ -8,6 +8,7 @@
     "js:watch": "nodemon -e 'ts, js' build/index.js",
     "start": "npm run build && node build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src",
     "ts:check": "tsc --noEmit",
     "ts:watch": "tsc --watch",
     "clean": "rm -rf build"
