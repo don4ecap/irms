@@ -49,7 +49,7 @@ declare interface IRMSBook {
   positions_pct_target_notional: number
   positions_pct_target: number
   qty: number
-  rowType: string
+  rowType: 'sector' | 'contract' | 'commodity'
   sector: string
   settlement_available: string
   settlement: number
