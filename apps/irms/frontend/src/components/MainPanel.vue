@@ -266,7 +266,7 @@
 import httpService from '../services/http'
 import gridColumns from '../helpers/gridOptions'
 import Risks from '../helpers/Risks'
-import utils from '../helpers'
+import helpers from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
 
@@ -341,10 +341,10 @@ export default {
     // Remove each main panel element width assigned by jqwidgets
     this.$el.querySelector('.main-panel').style.width = null
 
-    const accountVar = utils.getAccountVar(this.account)
+    const accountVar = helpers.getAccountVar(this.account)
     accountVar.vue = this
 
-    accountVar.tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
+    accountVar.tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
 
     // Prevent right click
     this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
@@ -391,7 +391,7 @@ export default {
       return httpService
         .get(`get_configtags/${this.account}`)
         .then(({ data }) => {
-          const accountVar = utils.getAccountVar(this.account)
+          const accountVar = helpers.getAccountVar(this.account)
           accountVar.configTags = data
         })
         .catch((error) => {
@@ -401,11 +401,11 @@ export default {
 
     loadNav() {
       console.time(`Load ${this.account} nav`)
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       return httpService
         .get(`get_nav/${this.account}/${accountVar.tradeDate}`)
         .then(({ data }) => {
-          this.nav = utils.formatNavData(data, this.account)
+          this.nav = helpers.formatNavData(data, this.account)
 
           if (this.account !== 'EE04') {
             this.labels.riskRate = 'Risk Ratio'
@@ -429,7 +429,7 @@ export default {
       const containerSelector = `#tree-grid-container-${lowerAccountName}`
       const gridContainer = document.querySelector(containerSelector)
       const existingGridEl = $(`#${currentTreeGridID}`)
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       accountVar.treeGridID = currentTreeGridID
 
       if (existingGridEl?.length) {
@@ -443,7 +443,7 @@ export default {
       newGrid.setAttribute('id', `${currentTreeGridID}`)
       gridContainer?.appendChild(newGrid)
 
-      const tradeDate = utils.getDateFromISO(this.bookDate.toISOString())
+      const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
       return httpService
         .get(`get_book/${this.account}/${tradeDate}`)
         .then(async ({ data: books }) => {
@@ -615,7 +615,7 @@ export default {
     },
 
     loadCommoIndicatorLevel() {
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       return httpService
         .get('get_commo_indicator_level')
         .then(({ data }) => (accountVar.indLevel = data))
@@ -623,7 +623,7 @@ export default {
 
     buildGrid() {
       // const a = new Date()
-      if (utils.getAccountVar(this.account).calculateRisksLive) {
+      if (helpers.getAccountVar(this.account).calculateRisksLive) {
         Formatters.filterNonNull()
       }
       // const b = new Date()
@@ -636,13 +636,13 @@ export default {
 
     onShowNonNullClicked() {
       //@ts-ignore
-      this.showNonNull = utils.getAccountVar(this.account).showNonNull =
+      this.showNonNull = helpers.getAccountVar(this.account).showNonNull =
         !this.showNonNull
       this.buildGrid()
     },
 
     showContract() {
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       if (!accountVar.treeGridID.length) {
         const msg = 'There is no data yet. Please Load iRMS data first'
         alert(msg)
@@ -660,7 +660,7 @@ export default {
     },
 
     showSector() {
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       Promise.resolve().then(() => {
         for (let i = 0; i < accountVar.books.length; i++) {
           const book = accountVar.books[i]
@@ -673,7 +673,7 @@ export default {
     },
 
     showCommodity() {
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       Promise.resolve().then(() => {
         for (let i = 0; i < accountVar.books.length; i++) {
           const book = accountVar.books[i]
@@ -707,7 +707,7 @@ export default {
     },
 
     checkLiveRisks() {
-      const accountVar = utils.getAccountVar(this.account)
+      const accountVar = helpers.getAccountVar(this.account)
       accountVar.calculateRisksLive = this.calculateRisksLive
       if (this.calculateRisksLive) {
         Risks.ComputeRisks()
@@ -716,7 +716,7 @@ export default {
     },
 
     updateTradeDate() {
-      utils.getAccountVar(this.account).tradeDate = utils.getDateFromISO(
+      helpers.getAccountVar(this.account).tradeDate = helpers.getDateFromISO(
         this.bookDate.toISOString()
       )
     },
