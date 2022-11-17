@@ -116,11 +116,10 @@ const routes: Array<RouteOptions> = [
           const params: AccountOnlyParams = req.params as AccountOnlyParams
           connection
             .query(
-              'SELECT value FROM cacheDB.cache2 WHERE name LIKE ? LIMIT 1',
-              [`irms_calculated_${params.account}`]
+              `SELECT value FROM cacheDB.cache2 WHERE Name LIKE 'irms_calculate_${params.account}' LIMIT 1`
             )
             .then((rows) => {
-              return res.send(rows[0] || [])
+              return res.send(rows[0] || { value: '' })
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
