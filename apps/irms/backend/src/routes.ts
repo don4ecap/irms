@@ -33,7 +33,7 @@ const routes: Array<RouteOptions> = [
               [params.account, params.trade_date]
             )
             .then((rows) => {
-              return res.send(rows[0] || [])
+              return res.send(rows[0] || {})
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
@@ -96,7 +96,7 @@ const routes: Array<RouteOptions> = [
               [params.account, params.trade_date]
             )
             .then((rows) => {
-              return res.send(rows[0] || [])
+              return res.send(rows[0] || {})
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
@@ -160,7 +160,7 @@ const routes: Array<RouteOptions> = [
         .then((connection) => {
           connection
             .query('SELECT strategy_name FROM trading.ie_strategy')
-            .then((strategies) => {
+            .then((strategies = []) => {
               return res.send(
                 strategies.map((strategy: any) => strategy.strategy_name)
               )
