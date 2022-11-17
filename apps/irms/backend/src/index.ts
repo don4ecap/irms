@@ -1,8 +1,10 @@
-import fastify from 'fastify'
+import fastify, { FastifyServerOptions } from 'fastify'
 import routes from './routes'
 import cors from '@fastify/cors'
 
-const server = fastify({
+const createServer = (opts: FastifyServerOptions) => fastify(opts)
+
+const server = createServer({
   logger: true,
 })
 
@@ -28,3 +30,5 @@ server.listen(
     server.log.info(`server listening on ${address}`)
   }
 )
+
+export default createServer
