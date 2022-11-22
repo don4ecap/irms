@@ -17,6 +17,10 @@ export interface AccountOnlyParams {
   account: string
 }
 
+export interface GetConfigField {
+  config_field_name: string
+}
+
 export interface SaveCellBody {
   id: number
   contract: string

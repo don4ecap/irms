@@ -6,10 +6,12 @@ import type {
   CommonRequestParams,
   OrderContractsBody,
   SaveCellBody,
+  GetConfigField,
 } from './types'
 import db from './db'
 import schemas from './schemas'
 import axios from 'axios'
+import config from './config'
 
 const prefix = '/api'
 
@@ -437,6 +439,27 @@ const routes: Array<RouteOptions> = [
           return res.send(result)
         })
         .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ----------------------------- GET IRMS CONFIG ---------------------------- */
+  {
+    method: 'GET',
+    url: `${prefix}/get_irms_config/:config_field_name`,
+    handler(req, res) {
+      const { config_field_name } = req.params as GetConfigField
+
+      if (config_field_name === 'IRMS_DB_CONNECTIONSTRING') {
+        return res.code(404).send({ message: 'Internal server error' })
+      }
+
+      try {
+        const configField =
+          config.getConfig(config_field_name).replace(/'|"/g, '') || ''
+        return res.send({ content: configField })
+      } catch (error) {
+        return res.status(500).send({ message: 'Internal server error' })
+      }
     },
   },
 

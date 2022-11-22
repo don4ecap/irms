@@ -114,6 +114,48 @@ async function main() {
     })
   }
 
+  /* -------------------------- TEST GET CONFIG FIELD ------------------------- */
+  /* ------------------------ TEST VALID CONFIG FIELDS ------------------------ */
+  const validConfigFields = ['ORDER_GENERATION_CODE']
+  for (const configField of validConfigFields) {
+    const url = `/api/get_irms_config/${configField}`
+    await test(`Test '${url}'`, async function (t) {
+      const resp = await server.inject({
+        method: 'GET',
+        url,
+      })
+      const responseBody = JSON.parse(resp.body)
+      // console.log(responseBody)
+
+      t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      t.type(
+        responseBody,
+        'Object',
+        'returns correct response body type (object)'
+      )
+      t.hasProp(responseBody, 'content', 'should have the `content` property')
+    })
+  }
+
+  const invalidConfigFields = ['IRMS_DB_CONNECTIONSTRING']
+  for (const configField of invalidConfigFields) {
+    const url = `/api/get_irms_config/${configField}`
+    await test(`Test '${url}'`, async function (t) {
+      const resp = await server.inject({
+        method: 'GET',
+        url,
+      })
+      const responseBody = JSON.parse(resp.body)
+      t.equal(resp.statusCode, 404, 'returns a status code of 404')
+      t.type(
+        responseBody,
+        'Object',
+        'returns correct response body type (object)'
+      )
+      t.hasProp(responseBody, 'message', 'should have the `message` property')
+    })
+  }
+
   await server.close().then(() => {
     process.exit(0)
   })
