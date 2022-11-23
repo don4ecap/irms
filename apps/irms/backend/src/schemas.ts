@@ -29,6 +29,35 @@ const schemas: ValidationSchemas = {
       },
     },
   },
+  sendToItrade: {
+    body: {
+      type: 'object',
+      required: [
+        'index',
+        'commo',
+        'contract_twodigit',
+        'contract',
+        'extension',
+        'freetext',
+        'instrument',
+        'price',
+        'qty',
+        'strategy',
+      ],
+      properties: {
+        index: { type: 'number' },
+        commo: { type: 'string' },
+        contract_twodigit: { type: 'string' },
+        contract: { type: 'string' },
+        extension: { type: 'string' },
+        freetext: { type: 'string' },
+        instrument: { type: 'string' },
+        price: { type: 'string' },
+        qty: { type: 'number' },
+        strategy: { type: 'string' },
+      },
+    },
+  },
 }
 
 export default schemas

@@ -34,3 +34,16 @@ export interface OrderContractsBody {
   contract2: string
   extension: string
 }
+
+export interface SendToITradeBody {
+  index: number
+  commo: string
+  contract_twodigit: string
+  contract: string
+  extension: string
+  freetext: string
+  instrument: string
+  price: string
+  qty: number
+  strategy: string
+}

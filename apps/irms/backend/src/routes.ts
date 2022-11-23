@@ -7,11 +7,13 @@ import type {
   OrderContractsBody,
   SaveCellBody,
   GetConfigField,
+  SendToITradeBody,
 } from './types'
 import db from './db'
 import schemas from './schemas'
 import axios from 'axios'
 import config from './config'
+import helpers from './helpers'
 
 const prefix = '/api'
 
@@ -439,6 +441,96 @@ const routes: Array<RouteOptions> = [
           return res.send(result)
         })
         .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ----------------------------- SEND TO ITRADE ----------------------------- */
+  // TODO: AUTOMATED TESTING
+  {
+    method: 'POST',
+    url: `${prefix}/send_to_itrade/:account/:trade_date`,
+    schema: schemas.sendToItrade,
+    handler(req, res) {
+      const params: CommonRequestParams = req.params as CommonRequestParams
+      const body: SendToITradeBody = req.body as SendToITradeBody
+
+      const validateBodyRequest = req.compileValidationSchema(
+        schemas.sendToItrade.body as FastifySchema
+      )
+
+      if (validateBodyRequest(req.body)) {
+        db.getConnection()
+          .then((connection) => {
+            const { account, trade_date } = params
+            const {
+              index,
+              commo,
+              contract_twodigit,
+              contract,
+              extension,
+              freetext,
+              instrument,
+              price,
+              qty,
+              strategy,
+            } = body
+            const tradeID = helpers.createUUID()
+
+            connection
+              .query(
+                `INSERT INTO
+                    trading.tbltrading (
+                      tradeID,
+                      cdate,
+                      qty,
+                      contract,
+                      price,
+                      account,
+                      source,
+                      status,
+                      sendToBO,
+                      expiry,
+                      birth,
+                      freetext,
+                      strategy,
+                      contract_twodigit,
+                      commo,
+                      extension,
+                      instrument
+                    )
+                    VALUES(?, ?, ?, ?, ?, ?, 'ORDERS', 'NEW', 0, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  tradeID,
+                  trade_date,
+                  qty,
+                  contract,
+                  price,
+                  account,
+                  // ,
+                  // ,
+                  // ,
+                  helpers.getCurrentDate(),
+                  helpers.getCurrentDate(),
+                  freetext,
+                  strategy,
+                  contract_twodigit,
+                  commo,
+                  extension,
+                  instrument,
+                ]
+              )
+              .then((/* result */) => {
+                return res.send({
+                  result: index,
+                })
+              })
+              .catch(internalServerErrorHandler(res))
+              .finally(() => {
+                connection.end()
+              })
+          })
+          .catch(internalServerErrorHandler(res))
+      }
     },
   },
 
