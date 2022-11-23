@@ -16,8 +16,9 @@
           <JqxButton theme="office" @click="selectAllRows">
             Select All
           </JqxButton>
-          <!-- TODO -->
-          <JqxButton theme="office">Send to iTrade</JqxButton>
+          <JqxButton theme="office" @click="sendToItrade">
+            Send to iTrade
+          </JqxButton>
         </div>
         <div id="preview-orders-grid"></div>
       </div>
@@ -309,6 +310,31 @@ export default {
 
     selectAllRows() {
       $('#preview-orders-grid').jqxGrid('selectallrows')
+    },
+
+    sendToItrade() {
+      const account = currentAccount
+      const accountVar = accountsVar[account]
+      const selected = $('#preview-orders-grid').jqxGrid(
+        'getselectedrowindexes'
+      )
+      const rows = $('#preview-orders-grid').jqxGrid('getrows')
+      for (let i = 0; i < selected.length; i++) {
+        const index = selected[i]
+        const dataToSend = {
+          index,
+          ...rows[index],
+        }
+        http
+          .post(`send_to_itrade/${account}/${accountVar.tradeDate}`, dataToSend)
+          .then(({ data }) => {
+            $('#preview-orders-grid').jqxGrid('unselectrow', data.result)
+            $('#preview-orders-grid').jqxGrid('deleterow', data.result)
+          })
+          .catch((error) => {
+            console.error('Failed to send order to itrade', rows[index], error)
+          })
+      }
     },
 
     open(sector: string) {
