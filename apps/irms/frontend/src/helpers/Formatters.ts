@@ -172,16 +172,6 @@ function createSectorToolTip(row: IRMSBook) {
   const cell = TreeGridUtils.getCell2(row.id, 4)
   if (!cell) return
 
-  const tooltipContent = document.querySelector(
-    `#tooltip2-${currentAccount}-${row.id}`
-  )
-  if (tooltipContent) {
-    const closest = tooltipContent.closest('.jqx-tooltip')
-    if (closest) {
-      tooltipContent.closest('.jqx-tooltip').remove()
-    }
-  }
-
   $(cell).jqxTooltip({
     content:
       `<div id="tooltip2-${currentAccount}-${row.id}" style="text-align:left;background-color:black;color:yellow">` +
@@ -198,16 +188,6 @@ function createSectorToolTip(row: IRMSBook) {
 function createToolTip(row: IRMSBook) {
   const cell = TreeGridUtils.getCell2(row.id, 0)
   if (!cell) return
-
-  const tooltipContent = document.querySelector(
-    `#tooltip-${currentAccount}-${row.id}`
-  )
-  if (tooltipContent) {
-    const closest = tooltipContent.closest('.jqx-tooltip')
-    if (closest) {
-      tooltipContent.closest('.jqx-tooltip').remove()
-    }
-  }
 
   let comment = ''
   if (row.comment != null && row.comment != '') {
