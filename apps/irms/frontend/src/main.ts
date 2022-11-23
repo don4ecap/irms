@@ -50,7 +50,9 @@ window.accountsVar = {}
 window.currentAccount = accounts[0]
 
 // Global string variables
-;['cutOrderP', 'cutOrderQ'].forEach((_var) => (window[_var] = ''))
+;['cutOrderP', 'cutOrderQ', 'ORDER_GENERATION_CODE'].forEach(
+  (_var) => (window[_var] = '')
+)
 
 // Populate accountsVar
 for (const account of accounts) {
@@ -140,3 +142,12 @@ window.filterNonNullCommo = Formatters.filterNonNullCommo
 new Vue({
   render: (h) => h(App),
 }).$mount('#app')
+
+http
+  .get('get_irms_config/ORDER_GENERATION_CODE')
+  .then(({ data }) => {
+    ORDER_GENERATION_CODE = data.content
+  })
+  .catch((error) => {
+    console.error('Failed to fetch ORDER_GENERATION_CODE config', error)
+  })

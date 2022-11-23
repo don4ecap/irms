@@ -50,6 +50,7 @@ declare global {
   var previewSingleOrderWindow: any
   var cutOrderQ: string
   var cutOrderP: string
+  var ORDER_GENERATION_CODE: string
 
   // Global functions
   function DeleteSector(sector: string)

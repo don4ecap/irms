@@ -168,21 +168,25 @@ function Generate(btn: HTMLElement) {
   const prevText = $(btn).text()
   $(btn).text('Processing')
 
-  let tag = $(btn).attr('tag')
+  const tag = $(btn).attr('tag')
 
   console.log(`Generating for sector: ${tag}`)
   const key = `generateSector${tag}`
-
-  tag = helpers.quoteStringOrNullString(tag)
 
   const account = currentAccount
   const accountVar = accountsVar[account]
   const tradeDate = accountVar.tradeDate
   const excecuteR = accountVar.excecuteR
 
-  const section = helpers.quoteStringOrNullString($(btn).attr('section'))
+  const section = $(btn).attr('section')
 
-  const code = `generateIRMSOrders('${tradeDate}', '${account}', ${tag}, ${section}, TRUE)`
+  const code = helpers.compileTemplate(ORDER_GENERATION_CODE, {
+    trade_date: `'${tradeDate}'`,
+    account: `'${account}'`,
+    tag: `'${tag}'`,
+    sector: helpers.quoteStringOrNullString(section),
+  })
+
   console.log(`Sending: ${code}`)
   excecuteR.connect(key, code)
   excecuteR.intervals.set(
@@ -213,11 +217,11 @@ function GenerateID(btn: HTMLElement) {
 
   const tag = $(btn).attr('tag')
 
-  const sector = helpers.quoteStringOrNullString(tag)
   // const section = helpers.quoteStringOrNullString($(btn).attr('section'))
 
-  console.log(`Generating ID for sector: ${sector}`)
-  const key = `generateSectorID${sector}`
+  console.log(`Generating ID for sector: ${tag}`)
+  const key = `generateSectorID${tag}`
+  const sector = helpers.quoteStringOrNullString(tag)
 
   const account = currentAccount
   const accountVar = accountsVar[account]

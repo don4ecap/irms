@@ -10,6 +10,7 @@ module.exports = {
     previewAllOrdersWindow: true,
     previewSingleOrderWindow: true,
     strategies: true,
+    ORDER_GENERATION_CODE: true,
 
     // Global helper functions
     DeleteSector: true,

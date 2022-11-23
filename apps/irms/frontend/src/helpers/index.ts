@@ -120,12 +120,22 @@ function getOrderStrategyString(orders: Array<any>) {
   }
 }
 
+function compileTemplate(template: string, data: any) {
+  let ret = template
+  for (let [key, value] of Object.entries(data)) {
+    const reg = new RegExp(`<(${key})>`)
+    ret = ret.replace(reg, value as string)
+  }
+  return ret
+}
+
 const quoteStringOrNullString = (str: string) =>
   str != null && str.length ? `'${str}'` : 'NULL'
 
 const getAccountVar = (account: string) => accountsVar[account]
 
 export default {
+  compileTemplate,
   getAccountVar,
   formatNavData,
   getDateFromISO,
