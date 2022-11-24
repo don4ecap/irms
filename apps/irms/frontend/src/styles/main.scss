@@ -132,6 +132,13 @@ body {
   }
 }
 
+.jqx-grid-table
+  tr:hover
+  td:not(.highspdrisk, .sector, .veryhighdelta, .lowcommorisk, .veryhighcommorisk, .portfolio, .commo, .lowdelta) {
+  background-color: #d3f0e0be;
+  transition: background-color 0.08s linear;
+}
+
 .order-details {
   display: flex;
   flex-direction: column;

@@ -543,6 +543,7 @@ export default {
               cancelOnEsc: true,
               saveOnEnter: true,
               editSingleCell: false,
+              enableHover: true,
               editOnDoubleClick: false,
               editOnF2: true,
             },
