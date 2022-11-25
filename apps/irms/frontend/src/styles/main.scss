@@ -134,7 +134,7 @@ body {
 
 .jqx-grid-table
   tr:hover
-  td:not(.highspdrisk, .sector, .veryhighdelta, .lowcommorisk, .veryhighcommorisk, .portfolio, .commo, .lowdelta) {
+  td:not(.highspdrisk, .sector, .veryhighdelta, .lowcommorisk, .veryhighcommorisk, .portfolio, .commo, .lowdelta, .medcommorisk, .marketclosed) {
   background-color: #d3f0e0be;
   transition: background-color 0.08s linear;
 }
