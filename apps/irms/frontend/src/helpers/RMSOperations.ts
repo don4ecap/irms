@@ -605,39 +605,50 @@ function Calculate(btn: HTMLElement) {
 //   }, 1000)
 // }
 
-// function LoadConfig(type, what) {
-//   if (account == null) {
-//     alert('Please load the book first')
-//     return
-//   }
-//   $('#configWindow').html(
-//     '<div id="configWin" style="width:1300px"><div id="windowHeader2"><span><h2>' +
-//       what +
-//       ' - ' +
-//       account +
-//       '</h2></span></div><div style="overflow: hidden;" id="windowContent2"></div></div>'
-//   )
-//   $('#configWin').jqxWindow({
-//     minHeight: '730px',
-//     minWidth: '1200px',
-//     autoOpen: true,
-//     isModal: true,
-//     animationType: 'slide',
-//     initContent: function () {
-//       $('#windowContent2').html(
-//         "<textarea spellcheck='false' style='width:1300px;font-family: 'Open Sans', sans-serif;' id='ta' rows='35' cols=500 autofocus></textarea><input type='button' id='saveConfig' onclick=\"SaveConfig('" +
-//           type +
-//           "')\" value='Save " +
-//           what +
-//           "'/>"
-//       )
-//       $('#ta').val(api.getconfig(account, type))
-//     },
-//   })
-//   $('#configWin').on('close', function (event) {
-//     $('#configWin').jqxWindow('destroy')
-//   })
-// }
+function LoadConfig(type: string, what: string) {
+  const account = currentAccount
+  const accountVar = accountsVar[currentAccount]
+  if (accountVar.books.length < 1) {
+    alert('Please load the book first')
+    return
+  }
+
+  $('#config-window').html(
+    `<div id="configWin" style="width:1300px">
+        <div id="windowHeader2">
+          <span>
+            <h2>${what} ${type}  - ${account}</h2>
+          </span>
+        </div>
+        <div style="overflow: hidden;" id="window-content-2"></div>
+    </div>`
+  )
+
+  $('#configWin').jqxWindow({
+    minHeight: '730px',
+    minWidth: '1200px',
+    autoOpen: true,
+    isModal: true,
+    animationType: 'slide',
+    initContent: function () {
+      $('#window-content-2').html(
+        `<textarea spellcheck='false' readonly style='width:100%' id='ta' rows='35' cols=500 autofocus></textarea>
+          <input disabled type='button' id='saveConfig' onclick="SaveConfig('${type}', '${what}')" value='Save ${what}'/>`
+      )
+      http
+        .get(`get_raw_config/${account}/${type}`)
+        .then(({ data }) => {
+          $('#ta').val(data)
+        })
+        .catch((error) => {
+          console.error('Failed to get raw config', error)
+        })
+    },
+  })
+  $('#configWin').on('close', function (/* event */) {
+    $('#configWin').jqxWindow('destroy')
+  })
+}
 
 // function GetComments() {
 //   comm = api.getconfig(account, 'tradercomments')
@@ -752,6 +763,7 @@ export default {
   DeleteSingle,
   Generate,
   GenerateID,
+  LoadConfig,
   openPreviewAllOrdersWindow,
   openPreviewSingleOrderWindow,
 }

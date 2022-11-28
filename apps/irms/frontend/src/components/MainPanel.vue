@@ -213,10 +213,18 @@
         <!-- BUTTONS -->
         <div class="flex self-baseline wrap" style="gap: 0.3rem">
           <div class="permission bold text-center self-center">RWX</div>
-          <JqxButton class="inline-block" theme="office">
+          <JqxButton
+            class="inline-block"
+            theme="office"
+            onclick="LoadConfig('directional','Config')"
+          >
             Directional Config
           </JqxButton>
-          <JqxButton class="inline-block" theme="office">
+          <JqxButton
+            class="inline-block"
+            theme="office"
+            onclick="LoadConfig('intraday','Config')"
+          >
             Intraday Config
           </JqxButton>
           <label class="flex items-center">
@@ -277,8 +285,6 @@ import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import PageControls from '../helpers/PageControls'
-
-let smallSuccessTimeout
 
 export default {
   name: 'MainPanel',
