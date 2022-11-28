@@ -8,6 +8,7 @@ import type {
   SaveCellBody,
   GetConfigField,
   SendToITradeBody,
+  GetRawConfigParams,
 } from './types'
 import db from './db'
 import schemas from './schemas'
@@ -439,6 +440,25 @@ const routes: Array<RouteOptions> = [
             .match(/\*\*\*\s=\s(\w*)/gs)
             .map((tag: string) => tag.split('=')[1].trim())
           return res.send(result)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ----------------------------- GET CONFIG FILE ---------------------------- */
+  {
+    method: 'GET',
+    url: `${prefix}/get_raw_config/:account/:config_type`,
+    handler(req, res) {
+      const { account, config_type } = req.params as GetRawConfigParams
+      const config = config_type === 'directional' ? 'DIR' : 'ID'
+
+      axios
+        .get(
+          `http://10.153.64.37:8080/bldb/schedulerAPI?method=strategyXML&strategy=${account}_${config}&contract=`
+        )
+        .then(({ data: configString }) => {
+          return res.send(configString)
         })
         .catch(internalServerErrorHandler(res))
     },

@@ -136,7 +136,7 @@ async function main() {
       t.hasProp(responseBody, 'content', 'should have the `content` property')
     })
   }
-
+  /* ----------------------- TEST INVALID CONFIG FIELDS ----------------------- */
   const invalidConfigFields = ['IRMS_DB_CONNECTIONSTRING']
   for (const configField of invalidConfigFields) {
     const url = `/api/get_irms_config/${configField}`
@@ -154,6 +154,20 @@ async function main() {
       )
       t.hasProp(responseBody, 'message', 'should have the `message` property')
     })
+  }
+
+  /* --------------------------- TEST GET RAW CONFIG -------------------------- */
+  for (const account of accounts) {
+    for (const config of ['directional', 'intraday']) {
+      const url = `/api/get_raw_config/${account}/${config}`
+      await test(`Test '${url}'`, async function (t) {
+        const resp = await server.inject({
+          method: 'GET',
+          url,
+        })
+        t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      })
+    }
   }
 
   await server.close().then(() => {

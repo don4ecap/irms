@@ -47,3 +47,8 @@ export interface SendToITradeBody {
   qty: number
   strategy: string
 }
+
+export interface GetRawConfigParams {
+  account: string
+  config_type: 'intraday' | 'directional'
+}
