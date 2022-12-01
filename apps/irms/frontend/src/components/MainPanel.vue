@@ -286,6 +286,8 @@ import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimei
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import PageControls from '../helpers/PageControls'
 
+let smallSuccessTimeout = 0
+
 export default {
   name: 'MainPanel',
 
