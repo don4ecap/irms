@@ -88,55 +88,55 @@ function GetOrderSize(i: number) {
   // accountVar.books[i] = row
 }
 
-function UpdateOrderSize(index) {
-  if (book[index].rowType == 'contract') {
-    if (book[index].orderQ == '' || book[index].orderQ == null) {
-      book[index].current_risks_post = book[index].current_risks_pre
-      book[index].target_risks_post = book[index].target_risks_pre
-      book[index].order_size = 0
-    } else {
-      numLots = book[index].orderQ.toString().split(';')
-      var totalQ = 0
-      $.each(numLots, function () {
-        totalQ += parseFloat(this) || 0
-      })
+// function UpdateOrderSize(index) {
+//   if (book[index].rowType == 'contract') {
+//     if (book[index].orderQ == '' || book[index].orderQ == null) {
+//       book[index].current_risks_post = book[index].current_risks_pre
+//       book[index].target_risks_post = book[index].target_risks_pre
+//       book[index].order_size = 0
+//     } else {
+//       numLots = book[index].orderQ.toString().split(';')
+//       var totalQ = 0
+//       $.each(numLots, function () {
+//         totalQ += parseFloat(this) || 0
+//       })
 
-      value =
-        (totalQ * book[index].valuept * book[index].last_price) /
-        book[index].live_fx /
-        book[index].live_nav
-      book[index].current_risks_post = book[index].current_risks_pre + value
-      book[index].target_risks_post = book[index].target_risks_pre + value
-      book[index].order_size = value
-    }
-  } else if (book[index].rowType == 'commodity') {
-    book[index].current_risks_post = book[index].current_risks_pre
-    book[index].target_risks_post = book[index].target_risks_pre
-    book[index].order_size = 0
-  } else {
-    book[index].current_risks_post = book[index].current_risks_pre
-    book[index].target_risks_post = book[index].target_risks_pre
-    book[index].order_size = 0
-  }
-}
+//       value =
+//         (totalQ * book[index].valuept * book[index].last_price) /
+//         book[index].live_fx /
+//         book[index].live_nav
+//       book[index].current_risks_post = book[index].current_risks_pre + value
+//       book[index].target_risks_post = book[index].target_risks_pre + value
+//       book[index].order_size = value
+//     }
+//   } else if (book[index].rowType == 'commodity') {
+//     book[index].current_risks_post = book[index].current_risks_pre
+//     book[index].target_risks_post = book[index].target_risks_pre
+//     book[index].order_size = 0
+//   } else {
+//     book[index].current_risks_post = book[index].current_risks_pre
+//     book[index].target_risks_post = book[index].target_risks_pre
+//     book[index].order_size = 0
+//   }
+// }
 
-function UpdateOrderCommoditySector(contractID, contractIndex) {
-  parentIndex = GetParent(contractID)
-  book[parentIndex].order_size =
-    book[parentIndex].order_size + book[contractIndex].order_size
-  book[parentIndex].current_risks_post =
-    book[parentIndex].current_risks_pre + book[parentIndex].order_size
-  book[parentIndex].target_risks_post =
-    book[parentIndex].target_risks_pre + book[parentIndex].order_size
+// function UpdateOrderCommoditySector(contractID, contractIndex) {
+//   parentIndex = GetParent(contractID)
+//   book[parentIndex].order_size =
+//     book[parentIndex].order_size + book[contractIndex].order_size
+//   book[parentIndex].current_risks_post =
+//     book[parentIndex].current_risks_pre + book[parentIndex].order_size
+//   book[parentIndex].target_risks_post =
+//     book[parentIndex].target_risks_pre + book[parentIndex].order_size
 
-  sectorIndex = GetParent(book[parentIndex].id)
-  book[sectorIndex].order_size =
-    book[sectorIndex].order_size + book[parentIndex].order_size
-  book[sectorIndex].current_risks_post =
-    book[sectorIndex].current_risks_pre + book[sectorIndex].order_size
-  book[sectorIndex].target_risks_post =
-    book[sectorIndex].target_risks_pre + book[sectorIndex].order_size
-}
+//   sectorIndex = GetParent(book[parentIndex].id)
+//   book[sectorIndex].order_size =
+//     book[sectorIndex].order_size + book[parentIndex].order_size
+//   book[sectorIndex].current_risks_post =
+//     book[sectorIndex].current_risks_pre + book[sectorIndex].order_size
+//   book[sectorIndex].target_risks_post =
+//     book[sectorIndex].target_risks_pre + book[sectorIndex].order_size
+// }
 
 // function GetUnderlyingLastPrice(row) {
 //
@@ -175,16 +175,16 @@ function GetUnderlyingLastPrice(row) {
   return row.last_price - 0
 }
 
-function CR() {
-  for (var i = 0; i < book.length; i++) {
-    UpdateOrderSize(i)
-  }
-  $('#treeGrid').jqxTreeGrid('updateBoundData')
-  //    for (var i = 0; i < book.length; i++) {
-  //        if(book[i].rowType=="contract")
-  //            UpdateOrderCommoditySector(book[i].id,i);
-  //    }
-}
+// function CR() {
+//   for (var i = 0; i < book.length; i++) {
+//     UpdateOrderSize(i)
+//   }
+//   $('#treeGrid').jqxTreeGrid('updateBoundData')
+//   //    for (var i = 0; i < book.length; i++) {
+//   //        if(book[i].rowType=="contract")
+//   //            UpdateOrderCommoditySector(book[i].id,i);
+//   //    }
+// }
 
 function ComputeRisks() {
   console.log('Compute Risks Called')
@@ -299,10 +299,10 @@ function GetBookIndexByID(id: string | string) {
 
 export default {
   GetOrderSize,
-  UpdateOrderSize,
-  UpdateOrderCommoditySector,
+  // UpdateOrderSize,
+  // UpdateOrderCommoditySector,
   GetUnderlyingLastPrice,
-  CR,
+  // CR,
   ComputeRisks,
   ComputeRisksRow,
   SpreadRisks,
