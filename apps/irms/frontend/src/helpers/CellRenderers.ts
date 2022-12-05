@@ -366,24 +366,35 @@ const aRenderer: RendererCallback = function (
     const container = document.createElement('div')
     container.classList.add('flex')
     container.classList.add('justify-center')
-    container.style.gap = '0.3rem'
 
-    const previewButton = document.createElement('img')
-    previewButton.classList.add('cursor-pointer')
-    previewButton.setAttribute('src', 'img/glass.png')
+    const previewButton = document.createElement('button')
+    previewButton.classList.add('button-custom')
     previewButton.setAttribute(
       'onclick',
       `openPreviewSingleOrderWindow('${rowData.id}')`
     )
+    {
+      const icon = document.createElement('img')
+      icon.setAttribute('width', '20')
+      icon.setAttribute('height', '20')
+      icon.setAttribute('src', 'img/magnify.svg')
+      previewButton.appendChild(icon)
+    }
     container.appendChild(previewButton)
 
-    const deleteSingleButton = document.createElement('img')
-    deleteSingleButton.classList.add('cursor-pointer')
-    deleteSingleButton.setAttribute('src', 'img/trash.png')
+    const deleteSingleButton = document.createElement('button')
+    deleteSingleButton.classList.add('button-custom')
     deleteSingleButton.setAttribute(
       'onclick',
       `DeleteSingle('${rowData.contract}', '${rowData.extension}', '${rowData.id}')`
     )
+    {
+      const icon = document.createElement('img')
+      icon.setAttribute('width', '20')
+      icon.setAttribute('height', '20')
+      icon.setAttribute('src', 'img/trash-can.svg')
+      deleteSingleButton.appendChild(icon)
+    }
     container.appendChild(deleteSingleButton)
 
     return container.outerHTML

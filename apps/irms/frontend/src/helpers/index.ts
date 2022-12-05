@@ -122,7 +122,7 @@ function getOrderStrategyString(orders: Array<any>) {
 
 function compileTemplate(template: string, data: any) {
   let ret = template
-  for (let [key, value] of Object.entries(data)) {
+  for (const [key, value] of Object.entries(data)) {
     const reg = new RegExp(`<(${key})>`)
     ret = ret.replace(reg, value as string)
   }

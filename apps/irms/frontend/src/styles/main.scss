@@ -157,91 +157,21 @@ body {
   padding-right: 0.75rem;
 }
 
-.overflow-y-auto {
-  overflow-y: auto;
-}
-
-.flex {
-  display: flex;
-  &.wrap {
-    flex-wrap: wrap;
-  }
-}
-
-.flex-column {
-  flex-direction: column;
-}
-
-.flex-grow {
-  flex-grow: 1;
-}
-
-.items-start {
-  align-items: flex-start;
-}
-
-.items-center {
+.button-custom {
   align-items: center;
-}
-
-.self-center {
-  align-self: center;
-}
-
-.self-baseline {
-  align-self: baseline;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.ml-auto {
-  margin-left: auto;
-}
-
-.text-large {
-  font-size: large;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.oblique {
-  font-style: oblique;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.text-green {
-  color: green;
-}
-
-.text-red {
-  color: red;
-}
-
-.bg-green-1 {
-  background-color: #7cb342;
-}
-
-.bg-red-1 {
-  background-color: #ff1b1b;
-}
-
-.inline-block {
-  display: inline-block !important;
-}
-
-.cursor-pointer {
+  appearance: none;
+  background-color: transparent;
+  border: none;
   cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0.5em;
+  transition: transform 0.3 ease-in-out;
+}
+
+.button-custom:active {
+  transform: scale(1.12);
 }
 
 @import './risks.scss';
+@import './utilities.scss';
