@@ -4,6 +4,13 @@ import { test } from 'tap'
 
 // const _instanceOf = (val, type) => val?.constructor.name === type
 
+const COMMON_MESSAGES = {
+  RETURNS_200: 'returns a status code of 200',
+  RETURNS_404: 'returns a status code of 404',
+  RETURNS_BODY_TYPE_ARRAY: 'returns correct response body type (array)',
+  RETURNS_BODY_TYPE_OBJECT: 'returns correct response body type (object)',
+}
+
 async function main() {
   const server = await createServer({
     logger: false,
@@ -23,14 +30,10 @@ async function main() {
         method: 'GET',
         url,
       })
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       // @ts-ignore
       const responseBody = JSON.parse(resp.body)
-      t.type(
-        responseBody,
-        'Array',
-        'returns correct response body type (array)'
-      )
+      t.type(responseBody, 'Array', COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY)
     })
   }
 
@@ -43,13 +46,9 @@ async function main() {
         method: 'GET',
         url,
       })
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       const responseBody = JSON.parse(resp.body)
-      t.type(
-        responseBody,
-        'Object',
-        'returns correct response body type (object)'
-      )
+      t.type(responseBody, 'Object', COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT)
     })
   }
 
@@ -62,11 +61,11 @@ async function main() {
         method: 'GET',
         url,
       })
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       t.type(
         JSON.parse(resp.body),
         'Object',
-        'returns correct response body type (object)'
+        COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT
       )
     })
   }
@@ -81,17 +80,31 @@ async function main() {
         url,
       })
       const responseBody = JSON.parse(resp.body)
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
-      t.type(
-        responseBody,
-        'Object',
-        'returns correct response body type (object)'
-      )
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
+      t.type(responseBody, 'Object', COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT)
       t.hasProp(responseBody, 'value', 'should have the `value` property')
       t.type(
         new Date(responseBody.value),
         Date,
         '`value` is a valid `Date` type'
+      )
+    })
+  }
+
+  /* ------------------------ GET COMMO INDICATOR LEVEL ----------------------- */
+  {
+    const url = `/api/get_commo_indicator_level`
+    await test(`Test '${url}'`, async function (t) {
+      const resp = await server.inject({
+        method: 'GET',
+        url,
+      })
+      const responseBody = JSON.parse(resp.body)
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
+      t.equal(
+        responseBody.constructor.name,
+        'Array',
+        COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY
       )
     })
   }
@@ -105,11 +118,11 @@ async function main() {
         url,
       })
       const responseBody = JSON.parse(resp.body)
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       t.equal(
         responseBody.constructor.name,
         'Array',
-        'returns correct response body type (array)'
+        COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY
       )
     })
   }
@@ -127,12 +140,8 @@ async function main() {
       const responseBody = JSON.parse(resp.body)
       // console.log(responseBody)
 
-      t.equal(resp.statusCode, 200, 'returns a status code of 200')
-      t.type(
-        responseBody,
-        'Object',
-        'returns correct response body type (object)'
-      )
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
+      t.type(responseBody, 'Object', COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT)
       t.hasProp(responseBody, 'content', 'should have the `content` property')
     })
   }
@@ -146,12 +155,8 @@ async function main() {
         url,
       })
       const responseBody = JSON.parse(resp.body)
-      t.equal(resp.statusCode, 404, 'returns a status code of 404')
-      t.type(
-        responseBody,
-        'Object',
-        'returns correct response body type (object)'
-      )
+      t.equal(resp.statusCode, 404, COMMON_MESSAGES.RETURNS_404)
+      t.type(responseBody, 'Object', COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT)
       t.hasProp(responseBody, 'message', 'should have the `message` property')
     })
   }
@@ -165,10 +170,12 @@ async function main() {
           method: 'GET',
           url,
         })
-        t.equal(resp.statusCode, 200, 'returns a status code of 200')
+        t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       })
     }
   }
+
+  //
 
   await server.close().then(() => {
     process.exit(0)
