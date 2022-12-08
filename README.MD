@@ -1,21 +1,17 @@
-# ITOOLS
+# IRMS
 
 ## Overview
 
-This repository holds all [iTools](https://wiki.4ecap.com/4ECwiki/Category:ITools) applications, both backend and frontend. Mostly use NodeJS.
+This repository holds all iRMS applications, both backend and frontend.
 
 ## Project structure
 
 Because mostly using NodeJS, the project structure uses a monorepo structure with the help of [npm workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces).
 
-- iRMS
-  - [iRMS Backend](apps/irms/backend/)
-  - [iRMS Frontend](apps/irms/frontend/)
-- iTrade
-  - [iTrade Backend](apps/itrade/backend/)
-  - [iTrade Frontend](apps/itrade/frontend/)
+- [iRMS Backend](packages/backend/)
+- [iRMS Frontend](packages/frontend/)
 
-## Requirements
+## Minimum requirements
 
 The following general requirements must be provided to run iTools:
 
@@ -41,4 +37,70 @@ Because it uses monorepo. we have to install all dependencies from root director
 npm install
 ```
 
-For more details to setup iTools app, please check their respective readme in their folder. (See [Project structure](#project-structure) for the link)
+### IRMS Backend
+
+#### Build for production
+
+```sh
+# Build
+npm run build --workspace irms-backend
+# Run
+node backend/build
+```
+
+or
+
+```sh
+# Build and run
+npm run start --workspace irms-backend
+```
+
+#### Compiles and hot-reloads for development
+
+You need to run both command below at the same time
+
+```sh
+# To watch  and compile typescript files on demand
+npm run ts:watch --workspace irms-backend
+```
+
+and
+
+```sh
+# To run the compiled javascript
+npm run js:watch --workspace irms-backend
+```
+
+#### Testing
+
+```sh
+npm run test --workspace irms-backend
+```
+
+#### Docker
+
+```sh
+# Build docker image
+./build_docker_backend.sh
+# Create and run irms-backend container
+docker run -d --restart unless-stopped -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8000:8000 alphien/irms-backend node apps/irms/backend/build
+
+```
+
+### IRMS Frontend
+
+#### Build for production
+
+```sh
+# Build
+npm run build --workspace irms-frontend
+## Serve the build
+npx --workspace irms-frontend http-server build
+```
+
+#### Compiles and hot-reloads for development
+
+```sh
+# Run vite development server
+npx -w irms-frontend vite
+```

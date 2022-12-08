@@ -13,10 +13,5 @@ npm run lint -w $workspace_name --if-present &&
     npm run build -w $workspace_name --if-present &&
     # Run test
     npm run test -w $workspace_name --if-present &&
-    # Copy the dockerfile
-    cp -v apps/irms/backend/Dockerfile . &&
     # Build docker image
-    docker build --rm -t "alphien/$workspace_name" .
-
-# Remove the dockerfile
-rm -f Dockerfile
+    docker build -f ./backend.Dockerfile --rm -t "alphien/$workspace_name" .

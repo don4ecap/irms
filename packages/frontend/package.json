@@ -8,7 +8,7 @@
     "dev": "vite --force",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist node_modules",
-    "install": "sed -i 's/}(this));/}(this || self ||  globalThis));/g' ../../../node_modules/jqwidgets-framework/jqwidgets/globalization/globalize.js "
+    "install": "sed -i 's/}(this));/}(this || self ||  globalThis));/g' ../../node_modules/jqwidgets-framework/jqwidgets/globalization/globalize.js "
   },
   "author": "Alphien",
   "dependencies": {

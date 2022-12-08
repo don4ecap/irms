@@ -35,7 +35,7 @@ module.exports = {
   },
   rules: {
     'no-debugger': production ? ERROR : OFF,
-    'no-unused-vars': production ? ERROR : WARN,
+    'no-unused-vars': OFF,
     '@typescript-eslint/ban-ts-comment': OFF,
     '@typescript-eslint/no-explicit-any': OFF,
   },

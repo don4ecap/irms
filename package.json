@@ -1,20 +1,18 @@
 {
-  "name": "itools",
+  "name": "irms",
   "private": true,
   "engines": {
     "node": ">=16.16.0"
   },
   "workspaces": [
-    "apps/*/backend",
-    "apps/*/frontend",
-    "libs/*"
+    "packages/*"
   ],
   "scripts": {
-    "build": "npm run --workspaces build",
-    "lint": "eslint apps/**/backend/src/*.ts apps/**/frontend/src/*.ts  apps/**/frontend/src/*.vue",
-    "lint:fix": "eslint --fix apps/**/backend/src/*.ts apps/**/frontend/src/*.ts  apps/**/frontend/src/*.vue",
-    "test": "npm run --workspaces test",
-    "clean": "npm run --workspaces clean"
+    "build": "npm run --workspaces build --if-present",
+    "lint": "npm run --workspaces lint --if-present",
+    "lint:fix": "nmp run --workspaces lint:fix --if-present",
+    "test": "npm run --workspaces test --if-present",
+    "clean": "npm run --workspaces clean --if-present"
   },
   "devDependencies": {
     "@types/node": "18.8.0",
