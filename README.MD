@@ -79,11 +79,13 @@ npm run test --workspace irms-backend
 
 #### Docker
 
+> NOTE: Make sure you already mount public drive to your local machine. See [Mount the public folder](#mount-the-public-folder)
+
 ```sh
 # Build docker image
 ./build_docker_backend.sh
 # Create and run irms-backend container
-docker run -d --restart unless-stopped -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8000:8000 alphien/irms-backend node apps/irms/backend/build
+docker run -d --restart unless-stopped -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8000:8000 alphien/irms-backend node packages/backend/build
 
 ```
 
