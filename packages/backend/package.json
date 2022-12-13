@@ -1,6 +1,5 @@
 {
   "name": "irms-backend",
-  "version": "0.1.10",
   "description": "iRMS backend",
   "main": "build/index.js",
   "scripts": {

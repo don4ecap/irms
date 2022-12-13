@@ -1,6 +1,5 @@
 {
   "name": "irms-frontend",
-  "version": "0.1.0",
   "description": "iRMS frontend",
   "main": "index.js",
   "scripts": {
