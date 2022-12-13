@@ -1,7 +1,7 @@
 {
   "name": "irms-frontend",
-  "version": "0.1.0",
   "description": "iRMS frontend",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "build": "vite build --base ./",

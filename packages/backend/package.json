@@ -1,7 +1,7 @@
 {
   "name": "irms-backend",
-  "version": "0.1.10",
   "description": "iRMS backend",
+  "private": true,
   "main": "build/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
