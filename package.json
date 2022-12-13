@@ -2,6 +2,7 @@
   "name": "irms",
   "version": "1.0.0",
   "private": true,
+  "version": "1.0.0",
   "engines": {
     "node": ">=16.16.0"
   },
