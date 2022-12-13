@@ -373,7 +373,6 @@ export default {
     // this.$refs.btnPreview.$el.addEventListener('click', RMSOperations.preview)
 
     this.loadNav()
-    this.loadStrategies()
   },
 
   methods: {
@@ -397,8 +396,9 @@ export default {
       }
 
       this.loadNav()
-      this.loadCommoIndicatorLevel()
+        .then(() => this.loadCommoIndicatorLevel())
         .then(() => this.loadConfigTags())
+        .then(() => this.loadStrategies())
         .then(() => this.loadBooks())
     },
 
