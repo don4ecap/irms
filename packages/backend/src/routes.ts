@@ -570,7 +570,7 @@ const routes: Array<RouteOptions> = [
           config.getConfig(config_field_name).replace(/'|"/g, '') || ''
         return res.send({ content: configField })
       } catch (error) {
-        return res.status(500).send({ message: 'Internal server error' })
+        return internalServerErrorHandler(res)(error)
       }
     },
   },
