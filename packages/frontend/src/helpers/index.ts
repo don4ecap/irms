@@ -79,9 +79,9 @@ function parseOrder(quantity: string, strategy: string) {
       price = '0'
     }
 
-    if (strat.indexOf('#') != -1) {
-      strat = strat.replace('#' + strat.split('#')[1], '')
-    }
+    // if (strat.indexOf('#') != -1) {
+    //   strat = strat.replace('#' + strat.split('#')[1], '')
+    // }
 
     orders[j] = {
       qty,
