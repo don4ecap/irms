@@ -193,6 +193,12 @@
             style="gap: 0.3rem"
           ></div>
         </div>
+        <div
+          class="col-5 flex flex-column ml-auto"
+          style="gap: 0.3rem; margin-right: 1em"
+        >
+          <div>{{ version }}</div>
+        </div>
       </div>
       <div
         :id="'tree-grid-container-' + account.toLowerCase()"
@@ -339,6 +345,8 @@ export default {
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
+      // @ts-ignore
+      version: import.meta.env.VITE_IRMS_VERSION,
     }
   },
 
