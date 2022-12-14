@@ -334,6 +334,7 @@ function DeleteSingle(contract: string, extension: string, id: string) {
       const book = accountVar.books[index]
       book.orderQ = null
       book.orderP = null
+      Risks.ComputeRisks()
       $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
       $(`#${accountVar.treeGridID}`).jqxTreeGrid('selectRow', book.id)
       PageControls.success(`Deleted orders for: ${contract}`)
