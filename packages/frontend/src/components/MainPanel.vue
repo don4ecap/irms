@@ -87,7 +87,10 @@
                     {{ nav.last_nav }}
                   </span>
                   <span
-                    class="oblique bold"
+                    :class="{
+                      'oblique bold': true,
+                      'text-purple': nav.last_nav_estimated,
+                    }"
                     style="font-size: 0.7rem"
                     :title="nav.live_pnl_status_title"
                   >
