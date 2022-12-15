@@ -248,12 +248,12 @@ export default {
               contract =
                 ordered[0].contract_onedigit +
                 '-' +
-                ordered[1]?.contract_onedigit
+                ordered[1].contract_onedigit
 
               contract_twodigit =
                 ordered[0].contract_twodigit +
                 '-' +
-                ordered[1]?.contract_twodigit
+                ordered[1].contract_twodigit
             }
             strategy = strategy.replace('#' + strategy.split('#')[1], '')
           }
