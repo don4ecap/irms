@@ -1,14 +1,20 @@
 import createServer from './src'
 import routes from './src/routes'
 import { test } from 'tap'
+import axios from 'axios'
 
 // const _instanceOf = (val, type) => val?.constructor.name === type
+
+const oldIRMS = axios.create({
+  baseURL: 'http://10.153.64.31:8000/irms_compiled/DAL.ashx',
+})
 
 const COMMON_MESSAGES = {
   RETURNS_200: 'returns a status code of 200',
   RETURNS_404: 'returns a status code of 404',
   RETURNS_BODY_TYPE_ARRAY: 'returns correct response body type (array)',
   RETURNS_BODY_TYPE_OBJECT: 'returns correct response body type (object)',
+  EQUAL_WITH_OLD_IRMS_API: 'equal with the old iRMS API',
 }
 
 async function main() {
@@ -175,7 +181,35 @@ async function main() {
     }
   }
 
-  //
+  /* -------------------------- TEST GET CONFIG TAGS -------------------------- */
+  for (const account of accounts) {
+    const url = `/api/get_configtags/${account}`
+    await test(`Test '${url}'`, async function (t) {
+      const oldAPIResp = await oldIRMS.post('/', {
+        id: 55,
+        method: 'getconfigtags',
+        params: [account],
+      })
+      const resp = await server.inject({
+        method: 'GET',
+        url,
+      })
+
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
+      const responseBody = JSON.parse(resp.body)
+      t.type(
+        responseBody.constructor.name,
+        'Array',
+        COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY
+      )
+      t.equal(
+        responseBody.length,
+        oldAPIResp.data.result.length,
+        COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API + ' (data length)'
+      )
+      t.same(responseBody, oldAPIResp.data.result)
+    })
+  }
 
   await server.close().then(() => {
     process.exit(0)

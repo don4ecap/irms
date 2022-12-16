@@ -436,9 +436,9 @@ const routes: Array<RouteOptions> = [
           `http://10.153.64.37:8080/bldb/schedulerAPI?method=strategyXML&strategy=${account}_DIR&contract=`
         )
         .then(({ data: configString }) => {
-          const result = configString
-            .match(/\*\*\*\s=\s(\w*)/gs)
-            .map((tag: string) => tag.split('=')[1].trim())
+          const result = (configString.match(/\*\*\*\s?=\s?(\w*)/gs) || []).map(
+            (tag: string) => tag.split('=')[1].trim()
+          )
           return res.send(result)
         })
         .catch(internalServerErrorHandler(res))
