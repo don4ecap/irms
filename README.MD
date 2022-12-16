@@ -102,11 +102,14 @@ npm run test --workspace irms-backend
 > NOTE: Make sure you already mount the public drive to your local machine. See [Mount the public folder](#mount-the-public-drive)
 
 ```sh
-# Build docker image
-./build_docker_backend.sh
-# Create and run irms-backend container
-docker run -d --restart unless-stopped -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8000:8000 alphien/irms-backend node packages/backend/build
+# Build
+npm run build --workspace irms-backend
 
+# Build docker image
+docker build -f ./backend.Dockerfile --rm -t alphien/irms-backed .
+
+# Create and run irms-backend container
+docker run -d --restart unless-stopped -e IRMS_BACKEND_PORT=8000 -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8181:8000 alphien/irms-backend node packages/backend/build
 ```
 
 ### IRMS Frontend
@@ -122,8 +125,8 @@ Make sure the [`.env.production`](packages/frontend/.env.production) file alread
 npm run build --workspace irms-frontend
 # Serve the build to test
 npx --workspace irms-frontend http-server dist
-# Upload the build to .83 machine
-rsync -ra ./packages/frontend/dist/* username@10.153.64.83:/var/www/itools/irms-fe
+# Upload the build to .78 machine
+rsync -ra ./packages/frontend/dist/* username@10.153.64.78:/var/www/itools/irms-fe
 ```
 
 #### Compiles and hot-reloads for development
