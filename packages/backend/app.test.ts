@@ -86,6 +86,16 @@ async function main() {
         'Object',
         COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT
       )
+      const oldResp = await oldIRMS.post('', {
+        id: 15,
+        method: 'getportfolio',
+        params: [tradeDate, account],
+      })
+      t.same(
+        JSON.parse(oldResp.data.result)[0],
+        JSON.parse(resp.body),
+        COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
+      )
     })
   }
 
