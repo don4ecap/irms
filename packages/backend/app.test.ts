@@ -36,10 +36,23 @@ async function main() {
         method: 'GET',
         url,
       })
+
+      const oldAPIResponse = await oldIRMS.post('/', {
+        id: 57,
+        method: 'getbook',
+        params: [tradeDate, account],
+      })
+
       t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       // @ts-ignore
       const responseBody = JSON.parse(resp.body)
+      const oldAPIResponseBody = JSON.parse(oldAPIResponse.data.result)
       t.type(responseBody, 'Array', COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY)
+      t.equal(
+        oldAPIResponseBody.length,
+        responseBody.length,
+        COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API + '(data length)'
+      )
     })
   }
 
