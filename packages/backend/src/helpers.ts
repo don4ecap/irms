@@ -31,9 +31,17 @@ function toDateISOString(date: string) {
   return date.replace(' ', 'T')
 }
 
+function properRound(number: string): number {
+  // @ts-ignore
+  const a = (number / 1_0_0) * 1_0_0
+  // @ts-ignore
+  return Math.round(parseFloat(a))
+}
+
 export default {
   createUUID,
-  getCurrentDate,
-  toDateISOString,
   formatDate,
+  getCurrentDate,
+  properRound,
+  toDateISOString,
 }

@@ -73,6 +73,9 @@ const routes: Array<RouteOptions> = [
                   ),
                   expiry4E: helpers.toDateISOString(book.expiry4E),
                   notice4E: helpers.toDateISOString(book.notice4E),
+
+                  last_nav: helpers.properRound(book.last_nav),
+                  live_nav: helpers.properRound(book.live_nav),
                 }
               })
               return res.send(books)
