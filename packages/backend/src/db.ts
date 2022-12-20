@@ -34,6 +34,7 @@ const db = mariadb.createPool({
   port: parseInt(connectionStringFields.PORT),
   password: connectionStringFields.pwd,
   decimalAsNumber: true,
+  bigIntAsNumber: true,
   dateStrings: true,
   connectionLimit: 5,
 })
