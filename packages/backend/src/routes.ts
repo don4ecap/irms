@@ -61,8 +61,21 @@ const routes: Array<RouteOptions> = [
               'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',
               [params.account, params.trade_date]
             )
-            .then((rows) => {
-              return res.send(rows)
+            .then((books: Array<any>) => {
+              books = books.map((book) => {
+                return {
+                  ...book,
+                  first_notice_date: helpers.toDateISOString(
+                    book.first_notice_date
+                  ),
+                  last_trade_date: helpers.toDateISOString(
+                    book.last_trade_date
+                  ),
+                  expiry4E: helpers.toDateISOString(book.expiry4E),
+                  notice4E: helpers.toDateISOString(book.notice4E),
+                }
+              })
+              return res.send(books)
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {

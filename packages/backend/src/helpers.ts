@@ -9,7 +9,7 @@ function createUUID() {
 }
 
 function getCurrentDate() {
-  const now = new Date('2022-1-1')
+  const now = new Date()
   return [
     now.getFullYear(),
     prefixZero(now.getMonth() + 1),
@@ -17,7 +17,23 @@ function getCurrentDate() {
   ].join('-')
 }
 
+function formatDate(date: string) {
+  const _date = new Date(date)
+  return [
+    _date.getFullYear(),
+    prefixZero(_date.getMonth() + 1),
+    prefixZero(_date.getDate()),
+  ].join('-')
+}
+
+function toDateISOString(date: string) {
+  if (typeof date !== 'string') return date
+  return date.replace(' ', 'T')
+}
+
 export default {
   createUUID,
   getCurrentDate,
+  toDateISOString,
+  formatDate,
 }
