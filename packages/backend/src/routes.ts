@@ -24,7 +24,7 @@ const internalServerErrorHandler = (res: FastifyReply) => (error: any) => {
 }
 
 const routes: Array<RouteOptions> = [
-  // GET NAV
+  /* --------------------------------- GET NAV -------------------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_nav/:account/:trade_date`,
@@ -49,6 +49,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* -------------------------------- GET BOOK -------------------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_book/:account/:trade_date`,
@@ -89,6 +90,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ------------------------------ GET PORTFOLIO ----------------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_portfolio/:account/:trade_date`,
@@ -128,6 +130,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* -------------------------- CHECK LAST CALCULATED ------------------------- */
   {
     method: 'GET',
     url: `${prefix}/check_last_calculated/:account`,
@@ -151,6 +154,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ------------------------ GET COMMO INDICATOR LEVEL ----------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_commo_indicator_level`,
@@ -173,6 +177,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ----------------------------- GET STRATEGIES ----------------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_strategies`,
@@ -195,6 +200,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* -------------------------------- SAVE CELL ------------------------------- */
   {
     method: 'POST',
     url: `${prefix}/save_cell/:account/:trade_date`,
@@ -246,6 +252,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ------------------------------- GET WORKING ------------------------------ */
   {
     method: 'GET',
     url: `${prefix}/get_working/:account/:trade_date`,
@@ -283,6 +290,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ---------------------------- DELETE ALL ORDERS --------------------------- */
   {
     method: 'DELETE',
     url: `${prefix}/delete_all_orders/:account/:trade_date`,
@@ -318,6 +326,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* --------------------------- DELETE SINGLE ORDER -------------------------- */
   {
     method: 'DELETE',
     url: `${prefix}/delete_single/:account/:trade_date/:contract/:extension`,
@@ -350,6 +359,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ---------------------------- DELETE COMMODITY ---------------------------- */
   {
     method: 'DELETE',
     url: `${prefix}/delete_commodity/:account/:trade_date/:commodity/:extension`,
@@ -383,6 +393,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* --------------------------- GET ORDER CONTRACTS -------------------------- */
   {
     method: 'POST',
     url: `${prefix}/order_contracts`,
@@ -442,6 +453,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ----------------------------- GET CONFIG TAGS ---------------------------- */
   {
     method: 'GET',
     url: `${prefix}/get_configtags/:account`,
