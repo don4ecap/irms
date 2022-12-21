@@ -117,6 +117,7 @@ export default {
           $('#preview-orders-grid').jqxGrid({
             // width: 1150,
             autowidth: true,
+            height: 1000,
             theme: 'office',
             source: dataAdapter,
             columns: [
