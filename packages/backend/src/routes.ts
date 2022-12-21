@@ -188,7 +188,9 @@ const routes: Array<RouteOptions> = [
             .query('SELECT strategy_name FROM trading.ie_strategy')
             .then((strategies = []) => {
               return res.send(
-                strategies.map((strategy: any) => strategy.strategy_name)
+                strategies
+                  .map((strategy: any) => strategy.strategy_name)
+                  .concat(['MOC', 'CHECK', 'MOCPIT', 'MOCSPREAD'])
               )
             })
             .catch(internalServerErrorHandler(res))
