@@ -153,6 +153,32 @@ async function main() {
         'Array',
         COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY
       )
+
+      const oldAPIResp = await oldIRMS.post('', {
+        id: 4,
+        method: 'getstrategies',
+        params: [],
+      })
+
+      const oldStrategies = JSON.parse(oldAPIResp.data.result)
+      console.log('old strategies length:', oldStrategies.length)
+      console.log('new strategies length:', responseBody.length)
+      console.log(
+        'length diff:',
+        Math.max(oldStrategies.length, responseBody.length) -
+          Math.min(oldStrategies.length, responseBody.length)
+      )
+      oldStrategies.forEach((oldStrategy) => {
+        const exist = responseBody.indexOf(oldStrategy) > -1
+        if (!exist) {
+          console.log('Strategy', oldStrategy, "doesn't exist in the new iRMS")
+        }
+      })
+      // t.same(
+      //   responseBody,
+      //   oldResponseBody,
+      //   COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
+      // )
     })
   }
 
