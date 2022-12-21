@@ -276,6 +276,41 @@ async function main() {
     })
   }
 
+  /* ---------------------------- TEST GET WORKING ---------------------------- */
+  for (const account of accounts) {
+    const url = `/api/get_working/${account}/${tradeDate}`
+    await test(`Test '${url}'`, async function (t) {
+      // const oldAPIResp = await oldIRMS.post('/', {
+      //   id: 1,
+      //   method: 'getworking',
+      //   params: [account, tradeDate],
+      // })
+      const resp = await server.inject({
+        method: 'GET',
+        url,
+      })
+
+      t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
+      const responseBody = JSON.parse(resp.body)
+      // const oldResponseBody = JSON.parse(oldAPIResp.data.result)
+      t.type(
+        responseBody.constructor.name,
+        'Array',
+        COMMON_MESSAGES.RETURNS_BODY_TYPE_ARRAY
+      )
+      // t.equal(
+      //   responseBody.length,
+      //   oldResponseBody.length,
+      //   COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API + ' (data length)'
+      // )
+      // t.same(
+      //   responseBody,
+      //   oldResponseBody,
+      //   COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
+      // )
+    })
+  }
+
   await server.close().then(() => {
     process.exit(0)
   })
