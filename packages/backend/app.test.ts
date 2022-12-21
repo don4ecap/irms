@@ -256,7 +256,11 @@ async function main() {
         oldAPIResp.data.result.length,
         COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API + ' (data length)'
       )
-      t.same(responseBody, oldAPIResp.data.result)
+      t.same(
+        responseBody,
+        oldAPIResp.data.result,
+        COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
+      )
     })
   }
 
