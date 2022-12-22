@@ -14,11 +14,11 @@ function formatNavData(nav: any, account: string) {
     last_calculated: moment(nav.timestamp).format('LLL'),
 
     // Original data convert to int
-    live_pnl: parseInt(nav.live_pnl),
-    last_nav_estimated: parseInt(nav.last_nav_estimated),
+    // live_pnl: parseInt(nav.live_pnl),
+    // last_nav_estimated: parseInt(nav.last_nav_estimated),
 
     // New data
-    live_pnl_status: nav.last_nav_estimated == 0 ? 'reconciled' : 'estimated',
+    live_pnl_status: nav.last_nav_estimated ? 'reconciled' : 'estimated',
     live_pnl_status_title: `Last PNL: ${accounting.formatMoney(
       nav.last_pnl,
       symbol

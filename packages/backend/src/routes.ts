@@ -38,7 +38,9 @@ const routes: Array<RouteOptions> = [
               [params.account, params.trade_date]
             )
             .then((rows) => {
-              return res.send(rows[0] || {})
+              const nav = rows[0] || {}
+              nav.last_nav_estimated = Boolean(nav?.last_nav_estimated)
+              return res.send(nav)
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
