@@ -47,6 +47,13 @@
               height="28"
               @input="updateTradeDate"
             />
+            <JqxDropDownList
+              theme="office"
+              width="130"
+              :source="sessions"
+              :selected-index="0"
+              @change="onChangeSession"
+            />
             <input
               type="button"
               value="Non-Null"
@@ -295,6 +302,7 @@ import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
+import JqxDropDownList from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdropdownlist.vue'
 import PageControls from '../helpers/PageControls'
 
 let smallSuccessTimeout = 0
@@ -308,6 +316,7 @@ export default {
     JqxDateTimeInput,
     // eslint-disable-next-line vue/no-unused-components
     JqxTreeGrid,
+    JqxDropDownList,
   },
 
   props: {
@@ -339,8 +348,9 @@ export default {
         riskRate: 'Risk Rate',
         loadBooks: 'Load iRMS',
       },
+      sessions: ['EOD', 'MORNING', 'AFTERNOON', 'EVENING'],
       panels: [
-        { size: 90, min: 90, max: 90, collapsible: true },
+        { size: 100, min: 100, max: 100, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
       bookLoadedDate: '',
@@ -354,6 +364,7 @@ export default {
       version: import.meta.env.VITE_IRMS_VERSION,
       // @ts-ignore
       gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
+      selectedSessionIndex: 0,
     }
   },
 
@@ -472,9 +483,10 @@ export default {
       newGrid.setAttribute('id', `${currentTreeGridID}`)
       gridContainer?.appendChild(newGrid)
 
+      const session = this.sessions[this.selectedSessionIndex] || ''
       const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
       return httpService
-        .get(`get_book/${this.account}/${tradeDate}`)
+        .get(`get_book/${this.account}/${tradeDate}?session=${session}`)
         .then(async ({ data: books }) => {
           accountVar.books = books
           accountVar.bookIDMap = []
@@ -762,6 +774,10 @@ export default {
         () => (this.$refs.smallSuccess.style.display = 'none'),
         timeout
       )
+    },
+
+    onChangeSession(event) {
+      this.selectedSessionIndex = event.args.index || 0
     },
   },
 }

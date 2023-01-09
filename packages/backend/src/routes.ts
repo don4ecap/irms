@@ -9,6 +9,7 @@ import type {
   GetConfigField,
   SendToITradeBody,
   GetRawConfigParams,
+  GetBookQueries,
 } from './types'
 import db from './db'
 import schemas from './schemas'
@@ -17,6 +18,7 @@ import config from './config'
 import helpers from './helpers'
 
 const prefix = '/api'
+const VALID_SESSIONS = ['eod', 'morning', 'afternoon', 'evening']
 
 const internalServerErrorHandler = (res: FastifyReply) => (error: any) => {
   console.error(error)
@@ -59,6 +61,17 @@ const routes: Array<RouteOptions> = [
       db.getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
+          const queries = (req.query as GetBookQueries) || { session: '' }
+          queries.session = queries.session.toLowerCase()
+          if (!VALID_SESSIONS.includes(queries.session)) {
+            res.code(404).send({ message: 'invalid query value for `session`' })
+          }
+          if (queries.session === 'eod') {
+            queries.session = ''
+          }
+          if (queries.session.length) {
+            params.trade_date += '-' + queries.session
+          }
           connection
             .query(
               'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',

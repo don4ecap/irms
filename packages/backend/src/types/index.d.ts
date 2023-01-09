@@ -48,6 +48,10 @@ export interface SendToITradeBody {
   strategy: string
 }
 
+export interface GetBookQueries {
+  session: 'eod' | 'morning' | 'afternoon' | 'evening' | '' | string
+}
+
 export interface GetRawConfigParams {
   account: string
   config_type: 'intraday' | 'directional'
