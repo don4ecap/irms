@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "vite build --base ./",
+    "build-beta": "vite build --base ./ --mode beta",
     "dev": "vite --force",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist node_modules",

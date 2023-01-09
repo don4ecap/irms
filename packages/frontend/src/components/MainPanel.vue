@@ -200,7 +200,9 @@
           class="col-5 flex flex-column ml-auto"
           style="gap: 0.3rem; margin-right: 1em"
         >
-          <div>{{ version }}</div>
+          <div>
+            <a :href="gitBranchLink" target="_blank">{{ version }}</a>
+          </div>
         </div>
       </div>
       <div
@@ -350,6 +352,8 @@ export default {
       showNonNull: true,
       // @ts-ignore
       version: import.meta.env.VITE_IRMS_VERSION,
+      // @ts-ignore
+      gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
     }
   },
 
