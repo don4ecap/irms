@@ -25,7 +25,7 @@ async function main() {
 
   routes.forEach((route) => server.route(route))
   const tradeDate = new Date().toISOString().split('T').at(0)
-  const accounts = ['EE02', 'EE04', 'KRMS']
+  const accounts = ['EE02', 'EE04', 'KRMA']
 
   /* ------------------------------ TEST GET BOOK ----------------------------- */
   for (const i in accounts) {
@@ -68,6 +68,17 @@ async function main() {
       t.equal(resp.statusCode, 200, COMMON_MESSAGES.RETURNS_200)
       const responseBody = JSON.parse(resp.body)
       t.type(responseBody, 'Object', COMMON_MESSAGES.RETURNS_BODY_TYPE_OBJECT)
+
+      const oldResp = await oldIRMS.post('', {
+        id: 15,
+        method: 'getnav',
+        params: [tradeDate, account],
+      })
+      const oldResponseBody = oldResp.data.result
+      t.equal(
+        oldResponseBody.last_nav_estimated,
+        responseBody.last_nav_estimated
+      )
     })
   }
 
