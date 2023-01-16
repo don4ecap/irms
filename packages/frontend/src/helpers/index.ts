@@ -1,5 +1,10 @@
 function formatNavData(nav: any, account: string) {
   const symbol = account !== 'EE04' ? '$' : '€'
+  const livePNLMoney = accounting.formatMoney(nav.live_pnl, symbol)
+  let livePNLPercent = ((nav.live_pnl_pct || 0) * 100).toFixed(2)
+  if (Number(livePNLPercent) >= 0) {
+    livePNLPercent = '+' + livePNLPercent
+  }
 
   return {
     ...nav,
@@ -7,8 +12,7 @@ function formatNavData(nav: any, account: string) {
     // Formatted
     live_nav: accounting.formatMoney(parseFloat(nav.live_nav), symbol),
     subred: accounting.formatMoney(nav.subred, symbol),
-    live_pnl_decorated: `${accounting.formatMoney(nav.live_pnl, symbol)} 
-              (+${((nav.live_pnl_pct || 0) * 100).toFixed(2)}%)`,
+    live_pnl_decorated: `${livePNLMoney} (${livePNLPercent}%)`,
     last_nav: accounting.formatMoney(nav.last_nav, symbol),
     //@ts-ignore
     last_calculated: moment(nav.timestamp).format('LLL'),
