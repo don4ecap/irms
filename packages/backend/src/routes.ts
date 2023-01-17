@@ -63,7 +63,10 @@ const routes: Array<RouteOptions> = [
           const params: CommonRequestParams = req.params as CommonRequestParams
           const queries = (req.query as GetBookQueries) || { session: '' }
           queries.session = (queries.session || '').toLowerCase()
-          if (!VALID_SESSIONS.includes(queries.session)) {
+          if (
+            queries.session?.length &&
+            !VALID_SESSIONS.includes(queries.session)
+          ) {
             res.code(404).send({ message: 'invalid query value for `session`' })
           }
           if (queries.session === 'eod') {
