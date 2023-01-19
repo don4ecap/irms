@@ -116,6 +116,8 @@ body {
   border-width: thin;
   margin-top: 0.4rem;
   max-height: 5rem;
+  min-width: fit-content;
+  overflow-x: auto;
   padding: 0.3rem;
 }
 

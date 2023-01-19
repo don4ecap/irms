@@ -8,7 +8,7 @@
       theme="office"
       orientation="horizontal"
     >
-      <div class="main-panel-top">
+      <div class="main-panel-top" style="overflow-x: auto">
         <div class="col-1 flex-grow" style="max-width: 250px">
           <div class="flex" style="gap: 0.3rem">
             <JqxButton class="inline-block" theme="office" @click="showSector">
@@ -82,7 +82,7 @@
             Calculate
           </JqxButton>
         </div>
-        <div class="col-4 flex flex-column">
+        <div class="col-4 flex flex-column" style="min-width: 17rem">
           <table>
             <tbody>
               <tr width="200px">
@@ -127,7 +127,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-5 flex flex-column">
+        <div class="col-5 flex flex-column" style="min-width: 17rem">
           <table>
             <tbody>
               <tr width="200px">
@@ -164,7 +164,10 @@
             </tbody>
           </table>
         </div>
-        <div class="col-5 flex flex-column" style="gap: 0.3rem">
+        <div
+          class="col-5 flex flex-column min-w-fit-content"
+          style="gap: 0.3rem"
+        >
           <div class="flex" style="gap: 0.3rem">
             <JqxButton
               class="inline-block"
@@ -226,10 +229,13 @@
         /> -->
       </div>
     </JqxSplitter>
-    <div class="end-panel jqx-widget-content items-start overflow-y-auto">
-      <div class="flex wrap" style="gap: 0.3rem">
+    <div
+      class="end-panel jqx-widget-content items-start overflow-x-auto"
+      style="min-width: -webkit-fill-available"
+    >
+      <div class="flex min-w-max-content" style="gap: 0.3rem">
         <!-- BUTTONS -->
-        <div class="flex self-baseline wrap" style="gap: 0.3rem">
+        <div class="flex self-baseline" style="gap: 0.3rem">
           <div class="permission bold text-center self-center">RWX</div>
           <JqxButton
             class="inline-block"

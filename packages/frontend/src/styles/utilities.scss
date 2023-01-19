@@ -85,6 +85,14 @@
   display: inline-block !important;
 }
 
+.min-w-fit-content {
+  min-width: fit-content;
+}
+
+.min-w-max-content {
+  min-width: max-content;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
