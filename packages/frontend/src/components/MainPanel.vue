@@ -94,6 +94,7 @@
                     {{ nav.last_nav }}
                   </span>
                   <span
+                    v-show="!!nav.live_pnl_status"
                     :class="{
                       'oblique bold': true,
                       'text-purple': nav.last_nav_estimated,
@@ -140,6 +141,7 @@
                 <td>Live NAV:</td>
                 <td class="text-left">
                   <span
+                    v-show="!!nav.live_nav"
                     :class="
                       'text-large ' +
                       (nav.live_pnl > 0 ? 'bg-green-1' : 'bg-red-1')
@@ -227,6 +229,12 @@
           :column-groups="columnGroups"
           theme="office"
         /> -->
+        <div
+          v-show="bookIsError && !loadingBooks"
+          class="book-error-msg flex flex-column flex-grow items-center justify-center"
+        >
+          {{ bookErrorMsg }}
+        </div>
       </div>
     </JqxSplitter>
     <div
@@ -272,11 +280,12 @@
 
         <!-- DATES -->
         <div
+          v-show="!bookIsError"
           class="ml-auto flex wrap items-center"
           style="gap: 1rem; margin-right: 0.3rem"
         >
           <div v-show="lastBookCalculation?.length">
-            Last Book Calculated before loading:
+            Last Book Calculated before loadingBooks:
             <span>
               {{ lastBookCalculation }}
             </span>
@@ -287,7 +296,7 @@
               {{ lastBookCalculationScheduler }}
             </span>
           </div>
-          <div v-show="bookLoadedDate?.length">
+          <div v-show="bookLoadedDate?.length && !bookIsError">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
           </div>
         </div>
@@ -313,6 +322,21 @@ import PageControls from '../helpers/PageControls'
 
 let smallSuccessTimeout = 0
 
+const navInitialData = {
+  account: 'EE02',
+  td: '',
+  last_recon_date: '',
+  last_nav: '',
+  last_nav_estimated: '',
+  last_pnl: '',
+  last_subred: '',
+  last_pnl_pct: '',
+  live_nav: '',
+  live_pnl: '',
+  live_pnl_pct: '',
+  subred: '',
+}
+
 export default {
   name: 'MainPanel',
 
@@ -336,20 +360,7 @@ export default {
     return {
       bookDate: new Date(),
       ratioField: 'ratio',
-      nav: {
-        account: 'EE02',
-        td: '2022-10-09T16:00:00.000Z',
-        last_recon_date: '2022-10-06T16:00:00.000Z',
-        last_nav: 0,
-        last_nav_estimated: 0,
-        last_pnl: 0,
-        last_subred: 0,
-        last_pnl_pct: 0,
-        live_nav: 0,
-        live_pnl: 0,
-        live_pnl_pct: 0,
-        subred: 0,
-      },
+      nav: { ...navInitialData },
       labels: {
         riskRate: 'Risk Rate',
         loadBooks: 'Load iRMS',
@@ -371,6 +382,9 @@ export default {
       // @ts-ignore
       gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
       selectedSessionIndex: 0,
+      bookIsError: false,
+      bookErrorMsg: '',
+      loadingBooks: false,
     }
   },
 
@@ -401,29 +415,30 @@ export default {
 
   methods: {
     async loadIRMS() {
-      this.labels.loadBooks = 'Loading...'
-      // @ts-ignore
-      $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
+      this.showLoadingBooks()
       this.bookLoadedDate = moment().format('LLL')
-      this.getLastBookCalculation().then((date) => {
-        this.lastBookCalculation = moment(date).format('LLL')
-      })
 
-      // Attach last book calclulation scheduler, runs every one minute
-      this.updateLastBookCalculationScheduler()
-      if (this.lastBookCalculationSchedulerInterval) {
-        console.debug('Check last book calculation scheduler has been attached')
-        this.lastBookCalculationSchedulerInterval = setInterval(
-          this.updateLastBookCalculationScheduler,
-          60000
-        )
-      }
+      await this.loadCommoIndicatorLevel()
+      await this.loadStrategies()
 
-      this.loadNav()
-        .then(() => this.loadCommoIndicatorLevel())
-        .then(() => this.loadConfigTags())
-        .then(() => this.loadStrategies())
-        .then(() => this.loadBooks())
+      await this.loadBooks()
+        .then(this.loadNav)
+        .then(async () => {
+          this.loadConfigTags()
+          const date = await this.getLastBookCalculation()
+          this.lastBookCalculation = moment(date).format('LLL')
+          // Attach last book calclulation scheduler, runs every one minute
+          this.updateLastBookCalculationScheduler()
+          if (!this.lastBookCalculationSchedulerInterval) {
+            console.debug(
+              'Check last book calculation scheduler has been attached'
+            )
+            this.lastBookCalculationSchedulerInterval = setInterval(
+              this.updateLastBookCalculationScheduler,
+              60000
+            )
+          }
+        })
     },
 
     loadStrategies() {
@@ -439,6 +454,7 @@ export default {
         .then(({ data }) => {
           const accountVar = helpers.getAccountVar(this.account)
           accountVar.configTags = data
+          PageControls.CreateGenerateButtons()
         })
         .catch((error) => {
           console.error('Failed to fetch config tags', error)
@@ -491,12 +507,16 @@ export default {
 
       const session = this.sessions[this.selectedSessionIndex] || ''
       const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
+      this.showLoadingBooks()
+      this.loadingBooks = true
       return httpService
         .get(`get_book/${this.account}/${tradeDate}?session=${session}`)
         .then(async ({ data: books }) => {
           accountVar.books = books
           accountVar.bookIDMap = []
           accountVar.bookIDMapRev = []
+
+          this.bookIsError = false
 
           accountVar.portfolio = await httpService
             .get(`get_portfolio/${this.account}/${tradeDate}`)
@@ -656,11 +676,22 @@ export default {
             `Failed to fetch books of ${this.account} account\n`,
             error
           )
+          this.bookIsError = true
+          if (!error?.response?.data?.message) {
+            this.bookErrorMsg = `Failed to fetch books of ${
+              this.account
+            } account with ${this.sessions[this.selectedSessionIndex]} session`
+          } else {
+            this.bookErrorMsg = error.response.data.message
+          }
+          clearInterval(this.lastBookCalculationSchedulerInterval)
+          this.resetNavData()
+          this.resetConfigTagsButton()
+          return Promise.reject()
         })
         .finally(() => {
-          this.labels.loadBooks = 'Load iRMS'
-          // @ts-ignore
-          $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
+          this.loadingBooks = false
+          this.unshowLoadingBooks()
           console.timeEnd(`Load ${this.account} books`)
         })
     },
@@ -784,6 +815,31 @@ export default {
 
     onChangeSession(event) {
       this.selectedSessionIndex = event.args.index || 0
+    },
+
+    unshowLoadingBooks() {
+      this.labels.loadBooks = 'Load iRMS'
+      // @ts-ignore
+      $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
+    },
+
+    showLoadingBooks() {
+      this.labels.loadBooks = 'Loading...'
+      // @ts-ignore
+      $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
+    },
+
+    resetNavData() {
+      this.nav = { ...navInitialData }
+    },
+
+    resetConfigTagsButton() {
+      const configTagsButtonContainer = document.querySelector(
+        `#${this.account}-config-tags-button-container`
+      )
+      Array.from(configTagsButtonContainer.children || []).forEach((child) =>
+        child.remove()
+      )
     },
   },
 }

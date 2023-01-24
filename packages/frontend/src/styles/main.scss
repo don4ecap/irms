@@ -109,6 +109,7 @@ body {
 
 .tree-grid-container {
   overflow: auto;
+  display: flex;
 }
 
 .end-panel {
@@ -177,6 +178,12 @@ body {
 
 .button-custom:active {
   transform: scale(1.12);
+}
+
+.book-error-msg {
+  padding: 1rem;
+  font-size: 1rem;
+  color: #ff0000;
 }
 
 @import './risks.scss';

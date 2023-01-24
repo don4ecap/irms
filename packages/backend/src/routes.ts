@@ -81,23 +81,34 @@ const routes: Array<RouteOptions> = [
               [params.account, params.trade_date]
             )
             .then((books: Array<any>) => {
-              books = books.map((book) => {
-                return {
-                  ...book,
-                  first_notice_date: helpers.toDateISOString(
-                    book.first_notice_date
-                  ),
-                  last_trade_date: helpers.toDateISOString(
-                    book.last_trade_date
-                  ),
-                  expiry4E: helpers.toDateISOString(book.expiry4E),
-                  notice4E: helpers.toDateISOString(book.notice4E),
+              if (books.length) {
+                books = books.map((book) => {
+                  return {
+                    ...book,
+                    first_notice_date: helpers.toDateISOString(
+                      book.first_notice_date
+                    ),
+                    last_trade_date: helpers.toDateISOString(
+                      book.last_trade_date
+                    ),
+                    expiry4E: helpers.toDateISOString(book.expiry4E),
+                    notice4E: helpers.toDateISOString(book.notice4E),
 
-                  last_nav: helpers.properRound(book.last_nav),
-                  live_nav: helpers.properRound(book.live_nav),
+                    last_nav: helpers.properRound(book.last_nav),
+                    live_nav: helpers.properRound(book.live_nav),
+                  }
+                })
+                return res.send(books)
+              } else {
+                if (queries.session === '') {
+                  queries.session = 'eod'
                 }
-              })
-              return res.send(books)
+                return res.status(404).send({
+                  message: `account ${
+                    params.account
+                  } with ${queries.session.toUpperCase()} session has no books`,
+                })
+              }
             })
             .catch(internalServerErrorHandler(res))
             .finally(() => {
