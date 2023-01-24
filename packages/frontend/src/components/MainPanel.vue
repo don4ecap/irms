@@ -203,6 +203,7 @@
             </JqxButton>
           </div>
           <div
+            v-show="!loadingBooks"
             :id="`${account}-config-tags-button-container`"
             class="flex"
             style="gap: 0.3rem"
@@ -410,7 +411,7 @@ export default {
 
     // this.$refs.btnPreview.$el.addEventListener('click', RMSOperations.preview)
 
-    this.loadNav()
+    // this.loadNav()
   },
 
   methods: {
