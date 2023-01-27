@@ -106,7 +106,7 @@ npm run test --workspace irms-backend
 npm run build --workspace irms-backend
 
 # Build docker image
-docker build -f ./backend.Dockerfile --rm -t alphien/irms-backed .
+docker build -f ./backend.Dockerfile --rm -t alphien/irms-backend .
 
 # Create and run irms-backend container
 docker run -d --restart unless-stopped -e IRMS_BACKEND_PORT=8000 -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8181:8000 alphien/irms-backend node packages/backend/build
@@ -126,7 +126,19 @@ npm run build --workspace irms-frontend
 # Serve the build to test
 npx --workspace irms-frontend http-server dist
 # Upload the build to .78 machine
-rsync -ra ./packages/frontend/dist/* username@10.153.64.78:/var/www/itools/irms-fe
+rsync -ra ./packages/frontend/dist/* username@10.153.64.78:/var/www/itools/irms
+```
+
+### Build for UAT/beta testing
+
+Make sure the `.env.beta` file already configured correctly. Then build and deploy.
+
+```sh
+# Build
+npm run build-beta --workspace irms-frontend
+
+# Upload the build to .83 machine
+rsync -ra ./packages/frontend/dist/* username@10.153.64.83:/var/www/itools/irms-fe
 ```
 
 #### Compiles and hot-reloads for development
