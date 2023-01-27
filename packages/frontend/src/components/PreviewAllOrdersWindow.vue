@@ -34,6 +34,7 @@ import helpers from '../helpers'
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
+import PageControls from '../helpers/PageControls'
 
 export default {
   name: 'PreviewAllOrdersWindow',
@@ -246,6 +247,12 @@ export default {
                 strategy.split('#')[1],
                 extension
               )
+              if (ordered.length < 2) {
+                PageControls.error(
+                  `Post order contract of ${sectorRow.contract} failed, the data should have 2 rows but got ${ordered.length}`
+                )
+                continue
+              }
               contract =
                 ordered[0].contract_onedigit +
                 '-' +
