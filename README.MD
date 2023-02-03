@@ -23,17 +23,17 @@ iRMS application both [backend](packages/backend/) and [frontend](packages/front
 
 ## Project structure
 
-The project structure uses monorepo structure with the help of [npm workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces) to manage the development.
+The project uses a monorepo structure and utilizes [npm workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces) to simplify development.
 
-- [iRMS Backend](packages/backend/)
-- [iRMS Frontend](packages/frontend/)
+- iRMS Backend (located in the `packages/backend` folder)
+- iRMS Frontend (located in the `packages/frontend` folder)
 
 ## Minimum requirements
 
-The following general requirements must be provided to run iRMS:
+To run iRMS, the following minimum requirements must be met:
 
-1. NodeJS 16 and above
-2. NPM 7.24.2 and above
+1. NodeJS version 16 or higher
+2. NPM version 7.24.2 or higher
 
 ## Setup
 
@@ -42,13 +42,15 @@ The following general requirements must be provided to run iRMS:
 Before going to the installation step, make sure you have mounted the public drive to your local machine.
 
 ```sh
+# Create a directory for the public drive
 mkdir -p /mnt/public
+# Mount the drive
 mount -t cifs -o rw,user="guest",pass="",uid=91,gid=91 //10.153.64.10/Public /mnt/public/
 ```
 
 ### Install dependencies
 
-Because it uses monorepo. we have to install all dependencies for backend and frontend from the root directory of the project.
+To install the dependencies for the backend and frontend, run the following command from the root directory of the project:
 
 ```sh
 npm install
@@ -56,94 +58,124 @@ npm install
 
 ### IRMS Backend
 
-iRMS backend is using [Fastify](https://www.fastify.io/) as web server and [MariaDB Node.js connector](https://www.npmjs.com/package/mariadb) as database client.
+The iRMS backend uses [Fastify](https://www.fastify.io/) as the web server and [MariaDB Node.js connector](https://www.npmjs.com/package/mariadb) as the database client.
 
 #### Build for production
 
-```sh
-# Build
-npm run build --workspace irms-backend
-# Run
-node packages/backend/build
-```
+To build the iRMS backend for production, run either of the following commands:
 
-or
+- Build and then run:
 
-```sh
-# Build and run
-npm run start --workspace irms-backend
-```
+  ```sh
+  npm run build --workspace irms-backend
+  node packages/backend/build
+  ```
+
+- Build and run in one command:
+
+  ```sh
+  npm run start --workspace irms-backend
+  ```
 
 #### Compiles and hot-reloads for development
 
-You need to run both of the commands below at the same time.
+To compile and hot-reload the iRMS backend for development, run the following two commands simultaneously:
 
-```sh
-# To watch  and compile typescript files on demand
-npm run ts:watch --workspace irms-backend
-```
+- Watch and compile TypeScript files on demand:
 
-and
+  ```sh
+  npm run ts:watch --workspace irms-backend
+  ```
 
-```sh
-# To run the compiled javascript
-npm run js:watch --workspace irms-backend
-```
+- Run the compiled JavaScript:
+
+  ```sh
+  npm run js:watch --workspace irms-backend
+  ```
 
 #### Testing
 
+To run tests for the iRMS backend, use the following command:
+
 ```sh
-# Run test
 npm run test --workspace irms-backend
 ```
 
 #### Docker
 
-> NOTE: Make sure you already mount the public drive to your local machine. See [Mount the public folder](#mount-the-public-drive)
+To build and run the iRMS backend as a Docker container, follow these steps:
 
-```sh
-# Build
-npm run build --workspace irms-backend
+1. Make sure the public drive has been mounted to your local machine.
+2. Build the backend code:
 
-# Build docker image
-docker build -f ./backend.Dockerfile --rm -t alphien/irms-backend .
+   ```sh
+   npm run build --workspace irms-backend
+   ```
 
-# Create and run irms-backend container
-docker run -d --restart unless-stopped -e IRMS_BACKEND_PORT=8000 -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8181:8000 alphien/irms-backend node packages/backend/build
-```
+3. Build the Docker image:
+
+   ```sh
+   docker build -f ./backend.Dockerfile --rm -t alphien/irms-backend .
+   ```
+
+4. Create and run the iRMS backend container:
+
+   ```sh
+   docker run -d --restart unless-stopped -e IRMS_BACKEND_PORT=8000 -v /mnt/public/GLibs/FourElementsConfig/iRMS:/mnt/public/GLibs/FourElementsConfig/iRMS/ --name irms-backend -p 8181:8000 alphien/irms-backend node packages/backend/build
+   ```
 
 ### IRMS Frontend
 
-iRMS frontend is using [ViteJS](https://vitejs.dev/) as build tool, [VueJS](https://vuejs.org/) as framework and [JqxWidgets](https://www.jqwidgets.com/) as user interface library.
+The iRMS frontend uses the following technologies:
+
+- [ViteJS](https://vitejs.dev/): Build tool
+- [VueJS](https://vuejs.org/): JavaScript framework
+- [JqxWidgets](https://www.jqwidgets.com/): UI library
 
 #### Build for production
 
-Make sure the [`.env.production`](packages/frontend/.env.production) file already configured correctly. Then build and deploy.
+To build the iRMS frontend for production:
 
-```sh
-# Build
-npm run build --workspace irms-frontend
-# Serve the build to test
-npx --workspace irms-frontend http-server dist
-# Upload the build to .78 machine
-rsync -ra ./packages/frontend/dist/* username@10.153.64.78:/var/www/itools/irms
-```
+1. Configure the [`.env.production`](packages/frontend/.env.production) file.
+2. Build the frontend:
+
+   ```sh
+   npm run build --workspace irms-frontend
+   ```
+
+3. Test the build:
+
+   ```sh
+   npx --workspace irms-frontend http-server dist
+   ```
+
+4. Upload the build to the .78 machine:
+
+   ```sh
+   rsync -ra ./packages/frontend/dist/* username@10.153.64.78:/var/www/itools/irms
+   ```
 
 ### Build for UAT/beta testing
 
-Make sure the `.env.beta` file already configured correctly. Then build and deploy.
+To build the iRMS frontend for UAT/beta testing:
 
-```sh
-# Build
-npm run build-beta --workspace irms-frontend
+1. Ensure the [`.env.beta`](packages/frontend/.env.beta) file is correctly configured
+2. Run the following command to build the frontend:
 
-# Upload the build to .83 machine
-rsync -ra ./packages/frontend/dist/* username@10.153.64.83:/var/www/itools/irms-fe
-```
+   ```sh
+   npm run build-beta --workspace irms-frontend
+   ```
+
+3. Then, upload the build to the .83 machine using the following command:
+
+   ```sh
+   rsync -ra ./packages/frontend/dist/* username@10.153.64.83:/var/www/itools/irms-fe
+   ```
 
 #### Compiles and hot-reloads for development
 
+To start the development server for the iRMS frontend, use the following command:
+
 ```sh
-# Run development server
 npx --workspace irms-frontend vite
 ```
