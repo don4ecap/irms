@@ -6,7 +6,6 @@ const configFilePath =
   '/mnt/public/GLibs/FourElementsConfig/iRMS/config.cfg'
 
 function getConfig(fieldName: string): string {
-  console.log('Load config file from', configFilePath)
   const configContent = fs.readFileSync(configFilePath).toString('utf8')
 
   const parser = new ConfigIniParser()
@@ -17,4 +16,5 @@ function getConfig(fieldName: string): string {
 
 export default {
   getConfig,
+  configFilePath,
 }
