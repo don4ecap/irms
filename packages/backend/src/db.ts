@@ -30,7 +30,7 @@ const connectionStringFields = connectionString
 
 // console.log(config.getConfig('ORDER_GENERATION_CODE').replace(reQuotes, ''))
 
-const db = mariadb.createPool({
+const dbConfig = {
   host: connectionStringFields.SERVER,
   user: connectionStringFields.UID,
   port: parseInt(connectionStringFields.PORT),
@@ -39,6 +39,11 @@ const db = mariadb.createPool({
   bigIntAsNumber: true,
   dateStrings: true,
   connectionLimit: 5,
-})
+}
 
-export default db
+const pool = mariadb.createPool(dbConfig)
+
+export default {
+  pool,
+  config: dbConfig,
+}

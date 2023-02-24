@@ -1,4 +1,5 @@
 import ExecuteR from './src/helpers/ExecuteR'
+import * as Vue from 'vue/types/umd'
 
 /* eslint-disable no-var */
 declare global {
@@ -6,6 +7,13 @@ declare global {
   //   accountsVar: IAccountsVarMap
   //   currentAccountVar: IAccountVar
   // }
+
+  /** Vue instance of main app. Need to be exposed at
+   * the global object so easier to access from anywhere
+   */
+  var IRMS_APP: Vue
+
+  var autoScrollToFirstLine: boolean
 
   var strategies: Array<string>
 

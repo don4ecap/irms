@@ -480,9 +480,6 @@ export default {
           // TODO: GET RATIO
           // TODO: Getcurrencyhedging
         })
-        .finally(() => {
-          console.timeEnd(`Load ${this.account} nav`)
-        })
     },
 
     loadBooks() {
@@ -510,6 +507,7 @@ export default {
       const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
       this.showLoadingBooks()
       this.loadingBooks = true
+
       return httpService
         .get(`get_book/${this.account}/${tradeDate}?session=${session}`)
         .then(async ({ data: books }) => {
@@ -673,16 +671,19 @@ export default {
           )
         })
         .catch((error) => {
-          console.error(
-            `Failed to fetch books of ${this.account} account\n`,
-            error
-          )
+          if (error.response.status !== 404) {
+            console.error(
+              `Failed to fetch books of ${this.account} account\n`,
+              error
+            )
+          }
           this.bookIsError = true
           if (!error?.response?.data?.message) {
             this.bookErrorMsg = `Failed to fetch books of ${
               this.account
             } account with ${this.sessions[this.selectedSessionIndex]} session`
           } else {
+            console.error(error.response.data.message)
             this.bookErrorMsg = error.response.data.message
           }
           clearInterval(this.lastBookCalculationSchedulerInterval)
@@ -773,12 +774,15 @@ export default {
     getLastBookCalculation() {
       return httpService
         .get(`check_last_calculated/${this.account}`)
-        .then(({ data }) => data.value)
+        .then(({ data }) => {
+          return data.value
+        })
         .catch((error) => {
           console.error(
             `Failed to fetch last calculation date for ${this.account}`,
             error
           )
+
           return new Date()
         })
     },

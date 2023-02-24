@@ -20,6 +20,7 @@ import helpers from './helpers'
 const prefix = '/api'
 const VALID_SESSIONS = ['eod', 'morning', 'afternoon', 'evening']
 
+/** Function that takes a `FastifyReply` object and returns a function that handles internal server errors */
 const internalServerErrorHandler = (res: FastifyReply) => (error: any) => {
   console.error(error)
   return res.status(500).send({ message: 'Internal server error' })
@@ -31,23 +32,31 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_nav/:account/:trade_date`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
+
+          const query = {
+            sql: 'SELECT * FROM trading.tblfonav WHERE account=? AND td <= ? ORDER BY TIMESTAMP DESC LIMIT 1',
+            params: [params.account, params.trade_date],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              'SELECT * FROM trading.tblfonav WHERE account=? AND td <= ? ORDER BY TIMESTAMP DESC LIMIT 1',
-              [params.account, params.trade_date]
-            )
+            .query(query.sql, query.params)
             .then((rows) => {
               const nav = rows[0] || {}
               nav.last_nav_estimated = Boolean(nav?.last_nav_estimated)
               return res.send(nav)
             })
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -58,28 +67,40 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_book/:account/:trade_date`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
           const queries = (req.query as GetBookQueries) || { session: '' }
           queries.session = (queries.session || '').toLowerCase()
+
           if (
             queries.session?.length &&
             !VALID_SESSIONS.includes(queries.session)
           ) {
             res.code(404).send({ message: 'invalid query value for `session`' })
           }
+
           if (queries.session === 'eod') {
             queries.session = ''
           }
           if (queries.session.length) {
             params.trade_date += '-' + queries.session
           }
+
+          const query = {
+            sql: 'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',
+            params: [params.account, params.trade_date],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              'SELECT * FROM trading.irms WHERE irms.account=? AND irms.td=? ORDER BY irms.orderNo, irms.year ASC, irms.month ASC',
-              [params.account, params.trade_date]
-            )
+            .query(query.sql, query.params)
             .then((books: Array<any>) => {
               if (books.length) {
                 books = books.map((book) => {
@@ -111,9 +132,7 @@ const routes: Array<RouteOptions> = [
               }
             })
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -124,36 +143,25 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_portfolio/:account/:trade_date`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
+
+          const query = { sql: '', params: [params.account, params.trade_date] }
+          query.sql = `SELECT SUM(positions_pct_target) AS positions_pct_target, SUM(qty) AS qty, SUM(current_allocation_pct) AS current_allocation_pct, SUM(current_allocation_lots) AS current_allocation_lots, SUM(target_allocation_pct) AS target_allocation_pct, SUM(target_allocation_lots) AS target_allocation_lots, SUM(current_risks_pre) AS current_risks_pre, SUM(target_risks_pre) AS target_risks_pre FROM trading.irms WHERE account=? AND td=? AND rowtype='sector' AND instrument <> 'cash'`
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              `SELECT 
-              SUM(positions_pct_target) AS positions_pct_target, 
-              SUM(qty) AS qty, 
-              SUM(current_allocation_pct) AS current_allocation_pct, 
-              SUM(current_allocation_lots) AS current_allocation_lots, 
-              SUM(target_allocation_pct) AS target_allocation_pct, 
-              SUM(target_allocation_lots) AS target_allocation_lots, 
-              SUM(current_risks_pre) AS current_risks_pre, 
-              SUM(target_risks_pre) AS target_risks_pre 
-            FROM 
-              trading.irms 
-            WHERE 
-              account=? 
-              AND td=?
-              AND rowtype='sector' 
-              AND instrument <> 'cash'`,
-              [params.account, params.trade_date]
-            )
-            .then((rows) => {
-              return res.send(rows[0] || {})
-            })
+            .query(query.sql, query.params)
+            .then((rows) => res.send(rows[0] || {}))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -164,20 +172,21 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/check_last_calculated/:account`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: AccountOnlyParams = req.params as AccountOnlyParams
+
+          const sqlQuery = `SELECT value FROM cacheDB.cache2 WHERE Name LIKE 'irms_calculate_${params.account}' LIMIT 1`
+          res.header('X-IRMS-SQL-QUERY', sqlQuery)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              `SELECT value FROM cacheDB.cache2 WHERE Name LIKE 'irms_calculate_${params.account}' LIMIT 1`
-            )
-            .then((rows) => {
-              return res.send(rows[0] || { value: '' })
-            })
+            .query(sqlQuery)
+            .then((rows) => res.send(rows[0] || { value: '' }))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -188,19 +197,19 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_commo_indicator_level`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
+          const sqlQuery =
+            'SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live'
+          res.header('X-IRMS-SQL-QUERY', sqlQuery)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              'SELECT contract, maxLevel FROM customRef.execution_commoindicatormaxlevel_ees_live'
-            )
-            .then((rows) => {
-              return res.send(rows)
-            })
+            .query(sqlQuery)
+            .then((rows) => res.send(rows))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -211,21 +220,24 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_strategies`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
+          const sqlQuery = 'SELECT strategy_name FROM trading.ie_strategy'
+          res.header('X-IRMS-SQL-QUERY', sqlQuery)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query('SELECT strategy_name FROM trading.ie_strategy')
-            .then((strategies = []) => {
-              return res.send(
+            .query(sqlQuery)
+            .then((strategies = []) =>
+              res.send(
                 strategies
                   .map((strategy: any) => strategy.strategy_name)
                   .concat(['MOC', 'CHECK', 'MOCPIT', 'MOCSPREAD'])
               )
-            })
+            )
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -245,38 +257,39 @@ const routes: Array<RouteOptions> = [
       )
 
       if (validateBodyRequest(req.body)) {
-        db.getConnection()
+        db.pool
+          .getConnection()
           .then((connection) => {
             const { account, trade_date } = params
             const { order_qty, order_p, contract, extension } = body
+
+            const query = {
+              sql: 'UPDATE trading.irms SET orderQ=?, orderP=? WHERE irms.account=? AND irms.contract=? AND irms.extension=? AND irms.td=?',
+              params: [
+                order_qty,
+                order_p,
+                account,
+                contract,
+                extension,
+                trade_date,
+              ],
+            }
+            res.header(
+              'X-IRMS-SQL-QUERY',
+              helpers.queryString(query.sql, query.params)
+            )
+            res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
             connection
-              .query(
-                `UPDATE
-                    trading.irms
-                SET
-                    orderQ=?,
-                    orderP=?
-                WHERE
-                  irms.account=?
-                  AND
-                  irms.contract=?
-                  AND
-                  irms.extension=?
-                  AND
-                  irms.td=?
-                `,
-                [order_qty, order_p, account, contract, extension, trade_date]
-              )
-              .then((result) => {
-                return res.send({
+              .query(query.sql, query.params)
+              .then((result) =>
+                res.send({
                   id: result.affectedRows ? body.id : -1,
                   result: result.query,
                 })
-              })
+              )
               .catch(internalServerErrorHandler(res))
-              .finally(() => {
-                connection.end()
-              })
+              .finally(connection.end)
           })
           .catch(internalServerErrorHandler(res))
       }
@@ -288,34 +301,27 @@ const routes: Array<RouteOptions> = [
     method: 'GET',
     url: `${prefix}/get_working/:account/:trade_date`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
+
+          const query = {
+            sql: "SELECT contract, extension, instrument, strategy, price FROM trading.tbltrading WHERE tbltrading.account=? AND tbltrading.cdate=? AND tbltrading.status NOT LIKE 'EXPIR%'",
+            params: [params.account, params.trade_date],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              `SELECT
-                contract,
-                extension,
-                instrument,
-                strategy,
-                price
-              FROM
-                trading.tbltrading
-              WHERE
-                  tbltrading.account=?
-                AND
-                  tbltrading.cdate=?
-                AND
-                  tbltrading.status NOT LIKE 'EXPIR%'`,
-              [params.account, params.trade_date]
-            )
-            .then((rows) => {
-              return res.send(rows)
-            })
+            .query(query.sql, query.params)
+            .then((rows) => res.send(rows))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -326,32 +332,38 @@ const routes: Array<RouteOptions> = [
     method: 'DELETE',
     url: `${prefix}/delete_all_orders/:account/:trade_date`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
 
-          let query = `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=?`
-          // @ts-ignore
-          if (req?.body?.sector) {
-            query += 'AND irms.sector=?'
-          }
-
-          connection
-            .query(query, [
+          // let query = `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=?`
+          const query = {
+            sql: 'UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=?',
+            params: [
               params.account,
               params.trade_date,
               // @ts-ignore
               req?.body?.sector || '',
-            ])
-            .then((result) => {
-              return res.send({
-                updated: result.affectedRows >= 1,
-              })
-            })
+            ],
+          }
+
+          // @ts-ignore
+          if (req?.body?.sector) {
+            query.sql += 'AND irms.sector=?'
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql, query.params)
+            .then((result) => res.send({ updated: result.affectedRows >= 1 }))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -362,29 +374,32 @@ const routes: Array<RouteOptions> = [
     method: 'DELETE',
     url: `${prefix}/delete_single/:account/:trade_date/:contract/:extension`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: DeleteSingleParams = req.params as DeleteSingleParams
 
+          const query = {
+            sql: 'UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=? AND irms.contract=? AND irms.extension=?',
+            params: [
+              params.account,
+              params.trade_date,
+              params.contract,
+              params.extension,
+            ],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              `UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=? AND irms.contract=? AND irms.extension=?`,
-              [
-                params.account,
-                params.trade_date,
-                params.contract,
-                params.extension,
-              ]
-            )
-            .then((result) => {
-              return res.send({
-                updated: result.affectedRows >= 1,
-              })
-            })
+            .query(query.sql, query.params)
+            .then((result) => res.send({ updated: result.affectedRows >= 1 }))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -395,30 +410,33 @@ const routes: Array<RouteOptions> = [
     method: 'DELETE',
     url: `${prefix}/delete_commodity/:account/:trade_date/:commodity/:extension`,
     handler(req, res) {
-      db.getConnection()
+      db.pool
+        .getConnection()
         .then((connection) => {
           const params: DeleteCommodityParams =
             req.params as DeleteCommodityParams
 
+          const query = {
+            sql: 'UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=? AND irms.commo=? AND irms.extension=?',
+            params: [
+              params.account,
+              params.trade_date,
+              params.commodity,
+              params.extension,
+            ],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
           connection
-            .query(
-              'UPDATE trading.irms SET irms.orderQ=NULL, irms.orderP=NULL WHERE irms.account=? AND irms.td=? AND irms.commo=? AND irms.extension=?',
-              [
-                params.account,
-                params.trade_date,
-                params.commodity,
-                params.extension,
-              ]
-            )
-            .then((result) => {
-              return res.send({
-                deleted: result.affectedRows >= 1,
-              })
-            })
+            .query(query.sql, query.params)
+            .then((result) => res.send({ deleted: result.affectedRows >= 1 }))
             .catch(internalServerErrorHandler(res))
-            .finally(() => {
-              connection.end()
-            })
+            .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
     },
@@ -437,47 +455,35 @@ const routes: Array<RouteOptions> = [
       )
 
       if (validateBodyRequest(req.body)) {
-        db.getConnection()
+        db.pool
+          .getConnection()
           .then((connection) => {
             const { contract1, contract2, extension } = body
-            let query: string
+
+            const query = {
+              sql: '',
+              params: [contract1, contract2],
+            }
 
             if (extension !== 'Comdty') {
-              query = `SELECT
-                          contract_onedigit,
-                          contract_twodigit 
-                        FROM
-                          trading.tbltradinguniverse
-                        WHERE
-                          contract_onedigit=?
-                        UNION
-                          SELECT
-                            contract_onedigit,
-                            contract_twodigit
-                          FROM
-                            trading.tbltradinguniverse
-                          WHERE
-                            contract_onedigit=?`
+              query.sql =
+                'SELECT contract_onedigit, contract_twodigit FROM trading.tbltradinguniverse WHERE contract_onedigit=? UNION SELECT contract_onedigit, contract_twodigit FROM trading.tbltradinguniverse WHERE contract_onedigit=?'
             } else {
-              query = `SELECT
-                        contract_onedigit,
-                        contract_twodigit
-                      FROM 
-                        trading.tbltradinguniverse
-                      WHERE
-                        contract_onedigit IN (?, ?)
-                      ORDER BY
-                        year,month`
+              query.sql =
+                'SELECT contract_onedigit, contract_twodigit FROM trading.tbltradinguniverse WHERE contract_onedigit IN (?, ?) ORDER BY year,month'
             }
+
+            res.header(
+              'X-IRMS-SQL-QUERY',
+              helpers.queryString(query.sql, query.params)
+            )
+            res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
             connection
-              .query(query, [contract1, contract2])
-              .then((rows) => {
-                return res.send(rows || [])
-              })
+              .query(query, query.params)
+              .then((rows) => res.send(rows || []))
               .catch(internalServerErrorHandler(res))
-              .finally(() => {
-                connection.end()
-              })
+              .finally(connection.end)
           })
           .catch(internalServerErrorHandler(res))
       }
@@ -538,7 +544,8 @@ const routes: Array<RouteOptions> = [
       )
 
       if (validateBodyRequest(req.body)) {
-        db.getConnection()
+        db.pool
+          .getConnection()
           .then((connection) => {
             const { account, trade_date } = params
             const {
@@ -555,58 +562,40 @@ const routes: Array<RouteOptions> = [
             } = body
             const tradeID = helpers.createUUID()
 
+            const query = {
+              sql: "INSERT INTO trading.tbltrading (tradeID, cdate, qty, contract, price, account, source, status, sendToBO, expiry, birth, freetext, strategy, contract_twodigit, commo, extension, instrument ) VALUES(?, ?, ?, ?, ?, ?, 'ORDERS', 'NEW', 0, ?, ?, ?, ?, ?, ?, ?, ?)",
+              params: [
+                tradeID,
+                trade_date,
+                qty,
+                contract,
+                price,
+                account,
+                // ,
+                // ,
+                // ,
+                helpers.getCurrentDate(),
+                helpers.getCurrentDate(),
+                freetext,
+                strategy,
+                contract_twodigit,
+                commo,
+                extension,
+                instrument,
+              ],
+            }
+
+            res.header(
+              'X-IRMS-SQL-QUERY',
+              helpers.queryString(query.sql, query.params)
+            )
+            res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
             connection
-              .query(
-                `INSERT INTO
-                    trading.tbltrading (
-                      tradeID,
-                      cdate,
-                      qty,
-                      contract,
-                      price,
-                      account,
-                      source,
-                      status,
-                      sendToBO,
-                      expiry,
-                      birth,
-                      freetext,
-                      strategy,
-                      contract_twodigit,
-                      commo,
-                      extension,
-                      instrument
-                    )
-                    VALUES(?, ?, ?, ?, ?, ?, 'ORDERS', 'NEW', 0, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [
-                  tradeID,
-                  trade_date,
-                  qty,
-                  contract,
-                  price,
-                  account,
-                  // ,
-                  // ,
-                  // ,
-                  helpers.getCurrentDate(),
-                  helpers.getCurrentDate(),
-                  freetext,
-                  strategy,
-                  contract_twodigit,
-                  commo,
-                  extension,
-                  instrument,
-                ]
-              )
-              .then((/* result */) => {
-                return res.send({
-                  result: index,
-                })
-              })
+              .query(query.sql, query.params)
+              .then((/* result */) => res.send({ result: index }))
               .catch(internalServerErrorHandler(res))
-              .finally(() => {
-                connection.end()
-              })
+              .finally(connection.end)
           })
           .catch(internalServerErrorHandler(res))
       }
@@ -631,6 +620,18 @@ const routes: Array<RouteOptions> = [
       } catch (error) {
         return internalServerErrorHandler(res)(error)
       }
+    },
+  },
+
+  /* ---------------------------- GET DB HOST INFO ---------------------------- */
+  {
+    method: 'GET',
+    url: `${prefix}/get_db_info`,
+    handler(req, res) {
+      return res.send({
+        DB_HOST: db.config.host,
+        DB_PORT: db.config.port,
+      })
     },
   },
 

@@ -137,9 +137,10 @@ for (const [prop, val] of Object.entries(RMSOperations)) {
   window[prop] = val
 }
 
+window.autoScrollToFirstLine = true
 window.filterNonNullCommo = Formatters.filterNonNullCommo
 
-new Vue({
+window.IRMS_APP = new Vue({
   render: (h) => h(App),
 }).$mount('#app')
 
