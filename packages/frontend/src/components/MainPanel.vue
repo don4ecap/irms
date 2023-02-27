@@ -286,7 +286,7 @@
           style="gap: 1rem; margin-right: 0.3rem"
         >
           <div v-show="lastBookCalculation?.length">
-            Last Book Calculated before loadingBooks:
+            Last Book Calculated before loading:
             <span>
               {{ lastBookCalculation }}
             </span>
