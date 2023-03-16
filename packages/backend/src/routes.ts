@@ -563,7 +563,7 @@ const routes: Array<RouteOptions> = [
             const tradeID = helpers.createUUID()
 
             const query = {
-              sql: "INSERT INTO trading.tbltrading (tradeID, cdate, qty, contract, price, account, source, status, sendToBO, expiry, birth, freetext, strategy, contract_twodigit, commo, extension, instrument ) VALUES(?, ?, ?, ?, ?, ?, 'ORDERS', 'NEW', 0, ?, ?, ?, ?, ?, ?, ?, ?)",
+              sql: "INSERT INTO trading.tbltrading (tradeID, cdate, qty, contract, price, account, source, status, sendToBO, expiry, birth, freetext, strategy, contract_twodigit, commo, extension, instrument, via) VALUES(?, ?, ?, ?, ?, ?, 'ORDERS', 'NEW', 0, ?, ?, ?, ?, ?, ?, ?, ?, 'none')",
               params: [
                 tradeID,
                 trade_date,
