@@ -17,6 +17,7 @@
         v-model="alarmData.alertLow"
         :form="id"
         type="number"
+        step="any"
         placeholder="Click to edit"
       />
     </td>
@@ -26,6 +27,7 @@
         v-model="alarmData.alertHigh"
         :form="id"
         type="number"
+        step="any"
         placeholder="Click to edit"
       />
     </td>
