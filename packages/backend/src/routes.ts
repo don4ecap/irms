@@ -10,6 +10,10 @@ import type {
   SendToITradeBody,
   GetRawConfigParams,
   GetBookQueries,
+  GetAlarmsParams,
+  CommonAlertData,
+  UpdateAlertEnabledBody,
+  UpdateAlertBody,
 } from './types'
 import db from './db'
 import schemas from './schemas'
@@ -657,6 +661,285 @@ const routes: Array<RouteOptions> = [
       }
     },
   },
+
+  /* ----------------------------------- ### ---------------------------------- */
+  /* --------------------------------- ALARMS --------------------------------- */
+  /* ----------------------------------- ### ---------------------------------- */
+
+  {
+    method: 'GET',
+    url: `${prefix}/get_alarms`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then((connection) => {
+          const query = {
+            sql: `SELECT * FROM customRef.mktdata_marketdataalarms`,
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql)
+            .then((alarms) =>
+              res.send(
+                // @ts-ignore
+                alarms.map((alarm) => ({
+                  ...alarm,
+                  enabled: alarm.enabled.toLowerCase() === 'true',
+                }))
+              )
+            )
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ------------------------------- GET ALARMS ------------------------------- */
+  {
+    method: 'GET',
+    url: `${prefix}/get_alarms/:contract`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then((connection) => {
+          const params: GetAlarmsParams = req.params as GetAlarmsParams
+
+          const query = {
+            sql: `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract LIKE '${helpers.sqlEscape(
+              params.contract
+            )}%'`,
+            // params: [params.contract],
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql)
+            .then((alarms) =>
+              res.send(
+                // @ts-ignore
+                alarms.map((alarm) => ({
+                  ...alarm,
+                  enabled: alarm.enabled.toLowerCase() === 'true',
+                }))
+              )
+            )
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* -------------------------------- ADD ALARM ------------------------------- */
+  {
+    method: 'POST',
+    url: `${prefix}/add_alert`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then(async (connection) => {
+          const { contract, field } = req.body as CommonAlertData
+
+          const contractSplited = contract.split(' ')
+          if (contractSplited.length < 2) {
+            return res.code(422).send({
+              success: false,
+              message: 'Invalid contract',
+            })
+          }
+
+          const [contract_, extension] = contractSplited
+          const contracts = await db.contracts.getContract(contract_, extension)
+          if (contracts?.length < 1) {
+            return res.code(422).send({
+              success: false,
+              message: `Contract '${contract}' is not valid contract`,
+            })
+          }
+
+          const query = {
+            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames,contract,field,alertLow,alertHigh,enabled,lowDirty,highDirty,numTriggers,currentValue) VALUES (1,'${contract.toUpperCase()}','${field}','','','TRUE','FALSE','FALSE',0,0)`,
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          const isAlarmExist = await db.alarms.isExist(contract, field)
+          if (isAlarmExist) {
+            return res.code(409).send({
+              success: false,
+              message: 'Alarm already exist',
+            })
+          }
+
+          await connection
+            .query(query.sql)
+            .then(async () => {
+              const addedAlarm = await db.alarms.getAlarm(
+                contract.toUpperCase(),
+                field
+              )
+              addedAlarm.enabled = addedAlarm.enabled.toLowerCase() === 'true'
+              return res.send(addedAlarm)
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ------------------------------ DELETE ALARM ------------------------------ */
+  {
+    method: 'DELETE',
+    url: `${prefix}/delete_alert/:contract/:field`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then(async (connection) => {
+          const { contract, field } = req.params as CommonAlertData
+
+          const query = {
+            sql: `DELETE FROM customRef.mktdata_marketdataalarms WHERE contract='${contract.toUpperCase()}' AND field='${field}'`,
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql)
+            .then(async () => {
+              return res.send({
+                success: true,
+                message: 'Successfully delete alarm',
+              })
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'PUT',
+    url: `${prefix}/update_enabled/:contract/:field`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then(async (connection) => {
+          const { contract, field } = req.params as CommonAlertData
+          const { enabled, numTriggers } = req.body as UpdateAlertEnabledBody
+          const _enabled = enabled ? 'TRUE' : 'FALSE'
+
+          const query = {
+            sql: `UPDATE customRef.mktdata_marketdataalarms SET enabled='${_enabled}', numTriggers='${numTriggers}' WHERE contract='${contract}' AND field='${field}'`,
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          const isAlarmExist = await db.alarms.isExist(contract, field)
+          if (!isAlarmExist) {
+            return res.code(404).send({
+              success: false,
+              message: 'Alarm not exist',
+            })
+          }
+
+          connection
+            .query(query.sql)
+            .then(async () => {
+              return res.send({
+                success: true,
+                message: 'Successfully update enabled alarm',
+              })
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'PUT',
+    url: `${prefix}/update/:contract/:field`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then(async (connection) => {
+          const { contract, field } = req.params as CommonAlertData
+          const { alertLow, alertHigh } = req.body as UpdateAlertBody
+
+          const query = {
+            sql: `UPDATE customRef.mktdata_marketdataalarms SET alertLow='${alertLow}', alertHigh='${alertHigh}' WHERE contract='${contract}' AND field='${field}'`,
+          }
+
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          const isAlarmExist = await db.alarms.isExist(contract, field)
+          if (!isAlarmExist) {
+            return res.code(404).send({
+              success: false,
+              message: 'Alarm not exist',
+            })
+          }
+
+          connection
+            .query(query.sql)
+            .then(async () => {
+              return res.send({
+                success: true,
+                message: 'Successfully update alarm',
+              })
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* -------------------------- GET CONTRACTS -------------------------- */
+  // {
+  //   method: 'GET',
+  //   url: `${prefix}/get_contracts`,
+  //   handler(req, res) {
+  //     db.pool
+  //       .getConnection()
+  //       .then((connection) => {
+  //         const query = {
+  //           sql: 'SELECT contract_twodigit, extension FROM tradingDB.contracts',
+  //         }
+
+  //         res.header('X-IRMS-SQL-QUERY', query.sql)
+  //         res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+  //         connection
+  //           .query(query.sql)
+  //           .then((contracts) =>
+  //             res.send(
+  //               // @ts-ignore
+  //               contracts.map((contract) => ({
+  //                 ...contract,
+  //                 contract_extension: `${contract.contract_twodigit} ${contract.extension}`,
+  //               }))
+  //             )
+  //           )
+  //           .catch(internalServerErrorHandler(res))
+  //           .finally(connection.end)
+  //       })
+  //       .catch(internalServerErrorHandler(res))
+  //   },
+  // },
 
   // {
   //   method: 'GET',

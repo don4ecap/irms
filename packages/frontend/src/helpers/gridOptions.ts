@@ -241,7 +241,7 @@ const gridColumns = [
     text: '',
     dataField: 'action',
     cellsRenderer: cellRenderers.aRenderer,
-    width: 80,
+    width: 135,
     align: 'center',
     columnGroup: 'orders',
     cellClassName: cellRenderers.colorType,

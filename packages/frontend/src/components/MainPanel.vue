@@ -260,6 +260,13 @@
           >
             Intraday Config
           </JqxButton>
+          <JqxButton
+            class="inline-block"
+            theme="office"
+            onclick="openAlarmWindow(null, null)"
+          >
+            Working Alarms
+          </JqxButton>
           <label class="flex items-center">
             <input
               id="liverisks"
@@ -421,6 +428,8 @@ export default {
 
       await this.loadCommoIndicatorLevel()
       await this.loadStrategies()
+      await this.loadAlarms()
+      // this.loadContracts()
 
       await this.loadBooks()
         .then(this.loadNav)
@@ -439,6 +448,7 @@ export default {
               60000
             )
           }
+          return Promise.resolve()
         })
     },
 
@@ -846,6 +856,24 @@ export default {
         child.remove()
       )
     },
+
+    loadAlarms() {
+      return httpService
+        .get('get_alarms')
+        .then(({ data: alarms }) => {
+          window.alarms = alarms
+        })
+        .catch((error) => {
+          console.error('Failed to load alarms', error)
+        })
+    },
+
+    // loadContracts() {
+    //   window.contracts = []
+    //   return httpService.get('get_contracts').then(({ data: contracts }) => {
+    //     window.contracts = contracts
+    //   })
+    // },
   },
 }
 </script>

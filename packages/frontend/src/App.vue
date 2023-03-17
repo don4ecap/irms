@@ -58,6 +58,7 @@
     </div>
     <PreviewAllOrdersWindow ref="previewAllOrdersWindow" />
     <PreviewSingleOrderWindow ref="previewSingleOrderWindow" />
+    <AlarmWindow ref="alarmWindow" />
   </div>
 </template>
 
@@ -66,6 +67,7 @@ import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
 import MainPanel from './components/MainPanel.vue'
 import PreviewAllOrdersWindow from './components/PreviewAllOrdersWindow.vue'
 import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
+import AlarmWindow from './components/AlarmWindow.vue'
 import http from './services/http'
 
 export default {
@@ -76,6 +78,7 @@ export default {
     MainPanel,
     PreviewAllOrdersWindow,
     PreviewSingleOrderWindow,
+    AlarmWindow,
   },
 
   data() {
@@ -99,6 +102,7 @@ export default {
     window.previewAllOrdersWindow = this.$refs.previewAllOrdersWindow
     window.previewSingleOrderWindow = this.$refs.previewSingleOrderWindow
     window.autoScrollToFirstLine = this.autoScrollToFirstLine
+    window.alarmWindow = this.$refs.alarmWindow
 
     this.fetchDatabaseInfo()
   },

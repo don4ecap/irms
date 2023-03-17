@@ -2,6 +2,14 @@
   overflow-y: auto;
 }
 
+.block {
+  display: block;
+}
+
+.relative {
+  position: relative;
+}
+
 .flex {
   display: flex;
   &.wrap {
@@ -37,16 +45,47 @@
   justify-content: center;
 }
 
+/* ---------------------------- MARGIN & PADDING ---------------------------- */
+.m-0 {
+  margin: 0 !important;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .ml-auto {
   margin-left: auto;
 }
 
+.mr-auto {
+  margin-right: auto;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.pr-1 {
+  padding-right: 0.25rem;
+}
+
+/* ----------------------------- TEXT FORMATTING ---------------------------- */
 .text-large {
   font-size: large;
 }
 
 .text-left {
   text-align: left;
+}
+
+.text-right {
+  text-align: right;
 }
 
 .text-center {
@@ -95,4 +134,77 @@
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* ----------------------------- WIDTH & HEIGHT ----------------------------- */
+.w-0 {
+  width: 0;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-2 {
+  height: 0.5rem;
+}
+
+.h-2\.5 {
+  height: 0.625rem;
+}
+
+.h-3 {
+  height: 0.75rem;
+}
+
+.h-3\.5 {
+  height: 0.875rem;
+}
+
+/* ---------------------------- BACKGROUND COLORS --------------------------- */
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+}
+
+/* ----------------------------- TEXT FORMATING ----------------------------- */
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* ---------------------------------- MISC ---------------------------------- */
+.no-select {
+  user-select: none;
+}
+
+.not-visible {
+  visibility: hidden;
+}
+
+/* ------------------------------- ANIMATIONS ------------------------------- */
+.animate-pulse {
+  animation: pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.timer {
+  position: absolute;
+  animation: hurry 0.5s ease-in-out alternate infinite;
+  font-weight: bold;
+  right: 9rem;
+}
+
+@keyframes hurry {
+  0% {
+    transform: scale(1.25);
+  }
 }

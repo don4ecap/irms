@@ -21,6 +21,21 @@ export interface GetConfigField {
   config_field_name: string
 }
 
+export interface CommonAlertData {
+  contract: string
+  field: string
+}
+
+export interface UpdateAlertEnabledBody {
+  numTriggers: number
+  enabled: boolean
+}
+
+export interface UpdateAlertBody {
+  alertLow: string
+  alertHigh: string
+}
+
 export interface SaveCellBody {
   id: number
   contract: string
@@ -46,6 +61,10 @@ export interface SendToITradeBody {
   price: string
   qty: number
   strategy: string
+}
+
+export interface GetAlarmsParams {
+  contract: string
 }
 
 export interface GetBookQueries {

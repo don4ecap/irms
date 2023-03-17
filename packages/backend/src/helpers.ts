@@ -100,5 +100,6 @@ export default {
   getCurrentTimestamp,
   properRound,
   queryString,
+  sqlEscape,
   toDateISOString,
 }

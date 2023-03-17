@@ -691,6 +691,10 @@ function openPreviewAllOrdersWindow(sector: string) {
   window.previewAllOrdersWindow.open(sector)
 }
 
+function openAlarmWindow(contract: string, extension: string) {
+  window.alarmWindow.open(contract, extension)
+}
+
 // function saveod() {
 //   const qty = odIframe.contents().find('#odqty').text()
 //   const strat = odIframe.contents().find('#odstrat').text()
@@ -765,6 +769,7 @@ export default {
   Generate,
   GenerateID,
   LoadConfig,
+  openAlarmWindow,
   openPreviewAllOrdersWindow,
   openPreviewSingleOrderWindow,
 }

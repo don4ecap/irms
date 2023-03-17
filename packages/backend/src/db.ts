@@ -43,7 +43,58 @@ const dbConfig = {
 
 const pool = mariadb.createPool(dbConfig)
 
+/* ------------------------------ ALARMS MODELS ----------------------------- */
+const alarms = {
+  /** Check if an alarm exist */
+  async isExist(contract: string, field: string) {
+    let connection
+    try {
+      connection = await pool.getConnection()
+    } catch (error) {
+      console.error(error)
+    }
+    const result = await connection?.query(
+      `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract='${contract}' AND field='${field}'`
+    )
+    connection?.end()
+    return result.length > 0
+  },
+
+  /** Get alarm by `contract` and `field` */
+  async getAlarm(contract: string, field: string) {
+    let connection
+    try {
+      connection = await pool.getConnection()
+    } catch (error) {
+      console.error(error)
+    }
+    const result = await connection?.query(
+      `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract='${contract}' AND field='${field}'`
+    )
+    connection?.end()
+    return result[0]
+  },
+}
+
+const contracts = {
+  async getContract(contract: string, extension: string) {
+    let connection
+    try {
+      connection = await pool.getConnection()
+    } catch (error) {
+      console.error(error)
+    }
+    const result = await connection?.query(
+      `SELECT * FROM tradingDB.contracts WHERE contract_twodigit='${contract}' AND extension='${extension}'`
+    )
+    connection?.end()
+    return result || []
+  },
+}
+
 export default {
   pool,
   config: dbConfig,
+  alarms,
+  contracts,
 }

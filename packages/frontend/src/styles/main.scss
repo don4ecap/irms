@@ -245,5 +245,96 @@ body {
   }
 }
 
+.alarms-table {
+  border: 1px solid #d4d4d4;
+  border-collapse: collapse;
+
+  & tr,
+  & td {
+    border: 1px solid #d4d4d4;
+  }
+
+  & thead td {
+    padding: 0.5rem;
+  }
+
+  & tbody td:not(.field, .down, .enable) {
+    padding: 0.4rem;
+  }
+
+  & tbody td.field {
+    max-width: 0.5rem;
+    padding: 0;
+
+    & select {
+      background-color: #fff;
+      border-radius: 0;
+      border: none;
+      height: 2.11rem;
+      margin: 0;
+      padding: 0.2rem 0.3rem;
+      width: 100%;
+
+      &:focus {
+        outline: 1px solid #838181;
+      }
+    }
+  }
+
+  & tbody td:is(.down, .up, .delete) {
+    padding: 0;
+
+    & input {
+      margin: -1px;
+      appearance: none;
+      border: none;
+      display: block;
+      padding: 0.2rem 0.3rem;
+      width: 100%;
+      max-width: 95%;
+      height: 1.7rem;
+
+      &:focus {
+        outline: 1px solid #838181;
+      }
+    }
+  }
+
+  .enable-alarm-checkbox {
+    transform: scale(1.2);
+  }
+}
+
+.skeleton-loader {
+  gap: 0.8rem;
+  position: relative;
+
+  .caption {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    margin-top: 5%;
+  }
+}
+
+.input-contract {
+  max-width: 98% !important;
+}
+
+.alarm-button {
+  position: relative;
+
+  & .alarm-dot-green {
+    position: absolute;
+    background-color: #7cb342;
+    width: 0.65rem;
+    height: 0.65rem;
+    right: 1rem;
+    top: 0.3rem;
+    border: 1px solid #fff;
+    border-radius: 50%;
+  }
+}
+
 @import './risks.scss';
 @import './utilities.scss';

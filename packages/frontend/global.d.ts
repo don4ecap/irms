@@ -2,6 +2,24 @@ import ExecuteR from './src/helpers/ExecuteR'
 import * as Vue from 'vue/types/umd'
 
 /* eslint-disable no-var */
+
+interface Alarm {
+  alertHigh: number
+  alertLow: number
+  contract: string
+  currentValue: string
+  enabled: boolean
+  field: string
+  highDirty: string
+  lowDirty: string
+  numTriggers: number
+  tablerownames: string
+}
+
+// interface Contract {
+//   some: string
+// }
+
 declare global {
   // interface Window {
   //   accountsVar: IAccountsVarMap
@@ -16,6 +34,10 @@ declare global {
   var autoScrollToFirstLine: boolean
 
   var strategies: Array<string>
+
+  var alarms: Array<Alarm>
+
+  // var contracts: Array<Contract>
 
   interface IAccountVar {
     bookIDMap: Array<number>
@@ -56,6 +78,7 @@ declare global {
   var moment: any
   var previewAllOrdersWindow: any
   var previewSingleOrderWindow: any
+  var alarmWindow: any
   var cutOrderQ: string
   var cutOrderP: string
   var ORDER_GENERATION_CODE: string

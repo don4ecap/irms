@@ -1,3 +1,4 @@
+import axios from 'axios'
 import helpers from '.'
 import PageControls from './PageControls'
 
@@ -369,21 +370,64 @@ const aRenderer: RendererCallback = function (
 
     const previewButton = document.createElement('button')
     previewButton.classList.add('button-custom')
+    previewButton.title = 'Order details'
     previewButton.setAttribute(
       'onclick',
       `openPreviewSingleOrderWindow('${rowData.id}')`
     )
     {
       const icon = document.createElement('img')
-      icon.setAttribute('width', '20')
-      icon.setAttribute('height', '20')
+      icon.setAttribute('width', '18.5')
+      icon.setAttribute('height', '18.5')
       icon.setAttribute('src', 'img/magnify.svg')
       previewButton.appendChild(icon)
     }
     container.appendChild(previewButton)
 
+    // Don't show the alarm button under eur or usd
+    if (
+      !(
+        ['usd', 'eur', 'eur loan', 'fund', 'usd cash'].indexOf(
+          rowData.contract.toLocaleLowerCase()
+        ) > -1
+      )
+    ) {
+      const alarmButton = document.createElement('button')
+      alarmButton.classList.add('button-custom', 'alarm-button')
+      alarmButton.title = 'Set market data alarm'
+      alarmButton.setAttribute(
+        'onclick',
+        `openAlarmWindow('${rowData.contract_twodigit}', '${rowData.extension}')`
+      )
+      {
+        const icon = document.createElement('img')
+        icon.setAttribute('width', '20')
+        icon.setAttribute('height', '20')
+        icon.setAttribute('src', 'img/alarm.svg')
+        alarmButton.appendChild(icon)
+      }
+      container.appendChild(alarmButton)
+      for (let i = 0; i < window.alarms.length; i++) {
+        const alarm = window.alarms[i]
+        const [alarm_contract_twodigit, alarm_extension] = alarm.contract
+          .toLowerCase()
+          .split(' ')
+
+        if (
+          alarm_contract_twodigit == rowData.contract_twodigit.toLowerCase() &&
+          alarm_extension == rowData.extension.toLowerCase()
+        ) {
+          const dot = document.createElement('div')
+          dot.classList.add('alarm-dot-green')
+          alarmButton.appendChild(dot)
+          break
+        }
+      }
+    }
+
     const deleteSingleButton = document.createElement('button')
     deleteSingleButton.classList.add('button-custom')
+    deleteSingleButton.title = 'Delete order'
     deleteSingleButton.setAttribute(
       'onclick',
       `DeleteSingle('${rowData.contract}', '${rowData.extension}', '${rowData.id}')`
