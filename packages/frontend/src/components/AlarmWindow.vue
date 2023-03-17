@@ -129,6 +129,7 @@ export default {
       this.$refs.currentWindow.open()
       this.contract = contract
       this.extension = extension
+      this.countdown = this.intervalSecond / 1000
       await this.fetchAlarms()
       this.interval = setInterval(
         this.fetchAlarmsNoLoading,
