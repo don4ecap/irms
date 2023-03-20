@@ -13,6 +13,7 @@ interface Alarm {
   highDirty: string
   lowDirty: string
   numTriggers: number
+  reached: boolean
   tablerownames: string
 }
 

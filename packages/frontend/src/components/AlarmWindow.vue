@@ -21,7 +21,7 @@
               <span :class="{ timer: countdown <= 5 && countdown > 0 }">{{
                 countdown
               }}</span>
-              second to auto refresh
+              seconds to auto-refresh
             </div>
             <table class="alarms-table w-full">
               <caption>
@@ -221,7 +221,6 @@ export default {
     },
 
     updateAlarm(alarm) {
-      console.log(alarm)
       http
         .put(`update/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,

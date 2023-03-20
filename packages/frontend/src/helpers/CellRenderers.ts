@@ -407,6 +407,8 @@ const aRenderer: RendererCallback = function (
         alarmButton.appendChild(icon)
       }
       container.appendChild(alarmButton)
+      const dot = document.createElement('div')
+      dot.classList.add('dot')
       for (let i = 0; i < window.alarms.length; i++) {
         const alarm = window.alarms[i]
         const [alarm_contract_twodigit, alarm_extension] = alarm.contract
@@ -417,10 +419,15 @@ const aRenderer: RendererCallback = function (
           alarm_contract_twodigit == rowData.contract_twodigit.toLowerCase() &&
           alarm_extension == rowData.extension.toLowerCase()
         ) {
-          const dot = document.createElement('div')
-          dot.classList.add('alarm-dot-green')
-          alarmButton.appendChild(dot)
-          break
+          if (alarm.reached && !dot.classList.contains('red')) {
+            dot.classList.add('red')
+            alarmButton.classList.add('swing')
+            alarmButton.appendChild(dot)
+          } else if (!dot.classList.contains('green')) {
+            dot.classList.add('green')
+            alarmButton.appendChild(dot)
+          }
+          if (!alarm.reached) continue
         }
       }
     }

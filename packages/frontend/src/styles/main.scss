@@ -324,15 +324,22 @@ body {
 .alarm-button {
   position: relative;
 
-  & .alarm-dot-green {
+  & .dot {
     position: absolute;
-    background-color: #7cb342;
     width: 0.65rem;
     height: 0.65rem;
     right: 1rem;
     top: 0.3rem;
     border: 1px solid #fff;
     border-radius: 50%;
+
+    &.green {
+      background-color: #7cb342;
+    }
+
+    &.red {
+      background-color: #d30000;
+    }
   }
 }
 

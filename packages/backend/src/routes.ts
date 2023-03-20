@@ -674,7 +674,7 @@ const routes: Array<RouteOptions> = [
         .getConnection()
         .then((connection) => {
           const query = {
-            sql: `SELECT * FROM customRef.mktdata_marketdataalarms`,
+            sql: `SELECT *, IF(CAST(currentValue AS FLOAT) <= CAST(alertLow AS FLOAT) OR CAST(currentValue AS FLOAT) >= CAST(alertHigh AS FLOAT), true, false) AS reached FROM customRef.mktdata_marketdataalarms`,
           }
 
           res.header('X-IRMS-SQL-QUERY', query.sql)
@@ -688,6 +688,7 @@ const routes: Array<RouteOptions> = [
                 alarms.map((alarm) => ({
                   ...alarm,
                   enabled: alarm.enabled.toLowerCase() === 'true',
+                  reached: Boolean(alarm.reached),
                 }))
               )
             )
@@ -876,13 +877,24 @@ const routes: Array<RouteOptions> = [
         .getConnection()
         .then(async (connection) => {
           const { contract, field } = req.params as CommonAlertData
-          const { alertLow, alertHigh } = req.body as UpdateAlertBody
+          let { alertLow, alertHigh } = req.body as UpdateAlertBody
+
+          // @ts-ignore
+          // eslint-disable-next-line no-extra-boolean-cast
+          alertLow = !!alertLow ? alertLow : null
+          // @ts-ignore
+          // eslint-disable-next-line no-extra-boolean-cast
+          alertHigh = !!alertHigh ? alertHigh : null
 
           const query = {
-            sql: `UPDATE customRef.mktdata_marketdataalarms SET alertLow='${alertLow}', alertHigh='${alertHigh}' WHERE contract='${contract}' AND field='${field}'`,
+            sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=? WHERE contract=? AND field=?',
+            params: [alertLow, alertHigh, contract, field],
           }
 
-          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
           const isAlarmExist = await db.alarms.isExist(contract, field)
@@ -894,7 +906,7 @@ const routes: Array<RouteOptions> = [
           }
 
           connection
-            .query(query.sql)
+            .query(query.sql, query.params)
             .then(async () => {
               return res.send({
                 success: true,
