@@ -1,89 +1,87 @@
 <template>
-  <div id="dynacontainer">
-    <JqxWindow
-      ref="currentWindow"
-      theme="office"
-      :min-width="1200"
-      :min-height="500"
-      :auto-open="false"
-      @close="clearIntervals"
-    >
-      <h2 id="preview-single-window-header" style="margin: 0">Alarms</h2>
-      <div class="preview-window-content single-order-preview">
-        <div class="orders-container flex-grow">
-          <SkeletonLoader
-            v-if="loading.load"
-            caption="Loading alarms..."
-            style="min-height: 200px; padding-top: 0.1rem"
-          />
-          <div v-else>
-            <div class="text-right relative">
-              <span :class="{ timer: countdown <= 5 && countdown > 0 }">{{
-                countdown
-              }}</span>
-              seconds to auto-refresh
-            </div>
-            <table class="alarms-table w-full">
-              <caption>
-                <h3 v-if="contract" class="text-left">
-                  Set alarm for contract {{ contract }}
-                </h3>
-                <h3 v-else class="text-left">Showing all working alarms</h3>
-              </caption>
-              <thead class="bold">
-                <td>Contract</td>
-                <td>Field</td>
-                <td
-                  style="width: 10rem"
-                  :class="{ 'not-visible': !(alarms && alarms.length) }"
-                >
-                  Down
-                </td>
-                <td :class="{ 'not-visible': !(alarms && alarms.length) }">
-                  Current
-                </td>
-                <td
-                  style="width: 10rem"
-                  :class="{ 'not-visible': !(alarms && alarms.length) }"
-                >
-                  Up
-                </td>
-                <td
-                  class="w-0"
-                  :class="{ 'not-visible': !(alarms && alarms.length) }"
-                >
-                  Enabled
-                </td>
-                <td class="w-0">Action</td>
-              </thead>
-              <tbody>
-                <AlarmRow
-                  v-for="(alarm, index) in alarms"
-                  :key="index"
-                  :index="index"
-                  :alarm="alarm"
-                  @delete="deleteAlarm"
-                  @update-enabled="updateEnabledAlarm"
-                  @submit="updateAlarm"
-                />
-                <!-- v-if="contract" -->
-                <AlarmAddRow
-                  :contract="contract"
-                  :extension="extension"
-                  :disable="loading.delete || loading.addAlarm"
-                  @add="addAlarm"
-                />
-              </tbody>
-            </table>
-            <p>* Press enter to update</p>
+  <JqxWindow
+    ref="currentWindow"
+    theme="office"
+    :min-width="1200"
+    :min-height="500"
+    :auto-open="false"
+    @close="clearIntervals"
+  >
+    <h2 id="preview-single-window-header" style="margin: 0">Alarms</h2>
+    <div class="preview-window-content single-order-preview">
+      <div class="orders-container flex-grow">
+        <SkeletonLoader
+          v-if="loading.load"
+          caption="Loading alarms..."
+          style="min-height: 200px; padding-top: 0.1rem"
+        />
+        <div v-else>
+          <div class="text-right relative">
+            <span :class="{ timer: countdown <= 5 && countdown > 0 }">{{
+              countdown
+            }}</span>
+            seconds to auto-refresh
           </div>
-        </div>
-        <div>
-          <jqxButton theme="office" @click="close"> close </jqxButton>
+          <table class="alarms-table w-full">
+            <caption>
+              <h3 v-if="contract" class="text-left">
+                Set alarm for contract {{ contract }}
+              </h3>
+              <h3 v-else class="text-left">Showing all working alarms</h3>
+            </caption>
+            <thead class="bold">
+              <td>Contract</td>
+              <td>Field</td>
+              <td
+                style="width: 10rem"
+                :class="{ 'not-visible': !(alarms && alarms.length) }"
+              >
+                Down
+              </td>
+              <td :class="{ 'not-visible': !(alarms && alarms.length) }">
+                Current
+              </td>
+              <td
+                style="width: 10rem"
+                :class="{ 'not-visible': !(alarms && alarms.length) }"
+              >
+                Up
+              </td>
+              <td
+                class="w-0"
+                :class="{ 'not-visible': !(alarms && alarms.length) }"
+              >
+                Enabled
+              </td>
+              <td class="w-0">Action</td>
+            </thead>
+            <tbody>
+              <AlarmRow
+                v-for="(alarm, index) in alarms"
+                :key="index"
+                :index="index"
+                :alarm="alarm"
+                @delete="deleteAlarm"
+                @update-enabled="updateEnabledAlarm"
+                @submit="updateAlarm"
+              />
+              <!-- v-if="contract" -->
+              <AlarmAddRow
+                :contract="contract"
+                :extension="extension"
+                :disable="loading.delete || loading.addAlarm"
+                @add="addAlarm"
+              />
+            </tbody>
+          </table>
+          <p>* Press enter to update</p>
         </div>
       </div>
-    </JqxWindow>
-  </div>
+      <div>
+        <jqxButton theme="office" @click="close"> close </jqxButton>
+      </div>
+    </div>
+  </JqxWindow>
 </template>
 
 <script lang="ts">
