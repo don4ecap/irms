@@ -747,29 +747,22 @@ const routes: Array<RouteOptions> = [
         .then(async (connection) => {
           const { contract, field } = req.body as CommonAlertData
 
-          const contractSplited = contract.split(' ')
-          if (contractSplited.length < 2) {
-            return res.code(422).send({
-              success: false,
-              message: 'Invalid contract',
-            })
-          }
+          // const contractSplited = contract.split(' ')
+          // if (contractSplited.length < 2) {
+          //   return res.code(422).send({
+          //     success: false,
+          //     message: 'Invalid contract',
+          //   })
+          // }
 
-          const [contract_, extension] = contractSplited
-          const contracts = await db.contracts.getContract(contract_, extension)
-          if (contracts?.length < 1) {
-            return res.code(422).send({
-              success: false,
-              message: `Contract '${contract}' is not valid contract`,
-            })
-          }
-
-          const query = {
-            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames,contract,field,alertLow,alertHigh,enabled,lowDirty,highDirty,numTriggers,currentValue) VALUES (1,'${contract.toUpperCase()}','${field}','','','TRUE','FALSE','FALSE',0,0)`,
-          }
-
-          res.header('X-IRMS-SQL-QUERY', query.sql)
-          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+          // const [contract_, extension] = contractSplited
+          // const contracts = await db.contracts.getContract(contract_, extension)
+          // if (contracts?.length < 1) {
+          //   return res.code(422).send({
+          //     success: false,
+          //     message: `Contract '${contract}' is not valid contract`,
+          //   })
+          // }
 
           const isAlarmExist = await db.alarms.isExist(contract, field)
           if (isAlarmExist) {
@@ -778,6 +771,12 @@ const routes: Array<RouteOptions> = [
               message: 'Alarm already exist',
             })
           }
+
+          const query = {
+            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames,contract,field,alertLow,alertHigh,enabled,lowDirty,highDirty,numTriggers,currentValue) VALUES (1,'${contract.toUpperCase()}','${field}','','','TRUE','FALSE','FALSE',0,0)`,
+          }
+          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
           await connection
             .query(query.sql)
@@ -830,7 +829,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${prefix}/update_enabled/:contract/:field`,
+    url: `${prefix}/update_enabled_alert/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -871,7 +870,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${prefix}/update/:contract/:field`,
+    url: `${prefix}/update_alert/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -886,6 +885,14 @@ const routes: Array<RouteOptions> = [
           // eslint-disable-next-line no-extra-boolean-cast
           alertHigh = !!alertHigh ? alertHigh : null
 
+          const isAlarmExist = await db.alarms.isExist(contract, field)
+          if (!isAlarmExist) {
+            return res.code(404).send({
+              success: false,
+              message: 'Alarm not exist',
+            })
+          }
+
           const query = {
             sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=? WHERE contract=? AND field=?',
             params: [alertLow, alertHigh, contract, field],
@@ -896,14 +903,6 @@ const routes: Array<RouteOptions> = [
             helpers.queryString(query.sql, query.params)
           )
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
-
-          const isAlarmExist = await db.alarms.isExist(contract, field)
-          if (!isAlarmExist) {
-            return res.code(404).send({
-              success: false,
-              message: 'Alarm not exist',
-            })
-          }
 
           connection
             .query(query.sql, query.params)

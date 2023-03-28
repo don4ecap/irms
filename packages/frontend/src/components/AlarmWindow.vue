@@ -212,7 +212,7 @@ export default {
     },
 
     updateEnabledAlarm(alarm) {
-      http.put(`update_enabled/${alarm.contract}/${alarm.field}`, {
+      http.put(`update_enabled_alert/${alarm.contract}/${alarm.field}`, {
         enabled: alarm.enabled,
         numTriggers: alarm.numTriggers,
       })
@@ -220,7 +220,7 @@ export default {
 
     updateAlarm(alarm) {
       http
-        .put(`update/${alarm.contract}/${alarm.field}`, {
+        .put(`update_alert/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
         })
