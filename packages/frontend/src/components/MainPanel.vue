@@ -836,12 +836,14 @@ export default {
       this.labels.loadBooks = 'Load iRMS'
       // @ts-ignore
       $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
+      $(this.$refs.btnPreview.$el).jqxButton({ disabled: false })
     },
 
     showLoadingBooks() {
       this.labels.loadBooks = 'Loading...'
       // @ts-ignore
       $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
+      $(this.$refs.btnPreview.$el).jqxButton({ disabled: true })
     },
 
     resetNavData() {
