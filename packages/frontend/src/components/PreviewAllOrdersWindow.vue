@@ -158,7 +158,7 @@ export default {
             selectionmode: 'multiplerowsextended',
           })
 
-          $('#jqxwindow').on('close', (event) => {
+          $('#jqxwindow').on('close', (/* event */) => {
             $('#preview-orders-grid').jqxGrid('destroy')
           })
         })
@@ -179,7 +179,7 @@ export default {
 
       let ignoreStrategies = 'CHECK'
       let excluded = 0
-      let excludedStrategy = 0
+      // let excludedStrategy = 0
 
       const orders = []
 
@@ -239,31 +239,29 @@ export default {
           }
 
           if (strategy.indexOf('#') != -1) {
-            if (strategy.split('#')[1] == '') {
-              contract = sectorRow.contract + '-' + strategy.split('#')[1]
+            const frontContract = sectorRow.contract
+            const backContract = strategy.split('#')[1]
+
+            if (backContract == '') {
+              contract = frontContract + '-' + backContract
             } else {
               let ordered = await API.postOrderContracts(
-                sectorRow.contract,
-                strategy.split('#')[1],
+                frontContract,
+                backContract,
                 extension
               )
               if (ordered.length < 2) {
                 PageControls.error(
-                  `Post order contract of ${sectorRow.contract} failed, the data should have 2 rows but got ${ordered.length}`
+                  `Post order contract of ${frontContract} failed, the data should have 2 rows but got ${ordered.length}`
                 )
                 continue
               }
-              contract =
-                ordered[0].contract_onedigit +
-                '-' +
-                ordered[1].contract_onedigit
-
-              contract_twodigit =
-                ordered[0].contract_twodigit +
-                '-' +
-                ordered[1].contract_twodigit
+              contract = frontContract + '-' + backContract
+              contract_twodigit = ordered
+                .filter((row) => row.contract === frontContract)
+                .map((row) => row.contract_twodigit)
             }
-            strategy = strategy.replace('#' + strategy.split('#')[1], '')
+            strategy = strategy.replace('#' + backContract, '')
           }
 
           if (strategy === ignoreStrategies) continue
@@ -287,10 +285,10 @@ export default {
             continue
           }
 
-          if (strategies.indexOf(strategy) == -1) {
-            excludedStrategy++
-            // continue
-          }
+          // if (strategies.indexOf(strategy) == -1) {
+          // excludedStrategy++
+          // continue
+          // }
 
           orders[j] = {
             account,
