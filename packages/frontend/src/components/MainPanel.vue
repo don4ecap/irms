@@ -430,11 +430,11 @@ export default {
       await this.loadStrategies()
       await this.loadAlarms()
       // this.loadContracts()
+      await this.loadConfigTags()
 
       await this.loadBooks()
         .then(this.loadNav)
         .then(async () => {
-          this.loadConfigTags()
           const date = await this.getLastBookCalculation()
           this.lastBookCalculation = moment(date).format('LLL')
           // Attach last book calclulation scheduler, runs every one minute
