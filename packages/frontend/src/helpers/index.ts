@@ -31,7 +31,7 @@ function formatNavData(nav: any, account: string) {
 }
 
 const getDateFromISO = (isoDate: string): string => isoDate.split('T').at(0)
-const isNullOrEmpty = (val: any) => isNaN(val) || val == null || val == ''
+const isNullOrEmpty = (val: any) => val == null || val == ''
 
 function parseOrder(quantity: string, strategy: string) {
   if (

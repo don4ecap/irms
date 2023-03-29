@@ -19,14 +19,17 @@ function filterNonNull(/* datum, action */) {
       const row = TreeGridUtils.getRow2(data.id)
       if (accountVar.showNonNull) {
         if (
-          helpers.isNullOrEmpty(data.qty) &&
-          helpers.isNullOrEmpty(data.current_allocation_lots) &&
-          helpers.isNullOrEmpty(data.target_allocation_lots) &&
+          (isNaN(data.qty) || helpers.isNullOrEmpty(data.qty)) &&
+          (isNaN(data.current_allocation_lots) ||
+            helpers.isNullOrEmpty(data.current_allocation_lots)) &&
+          (isNaN(data.current_allocation_lots) ||
+            helpers.isNullOrEmpty(data.target_allocation_lots)) &&
           helpers.isNullOrEmpty(data.orderQ) &&
           helpers.isNullOrEmpty(data.target_risks_post)
         ) {
-          // @ts-ignore
-          if (row) Promise.resolve().then(() => (row.style.display = 'none'))
+          if (row)
+            // @ts-ignore
+            Promise.resolve().then(() => (row.style.display = 'none'))
         }
       } else {
         // @ts-ignore
