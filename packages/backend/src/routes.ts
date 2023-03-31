@@ -635,6 +635,29 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  {
+    method: 'GET',
+    url: `${prefix}/get_db_status`,
+    async handler(req, res) {
+      try {
+        const connection = await db.pool.getConnection()
+        try {
+          await connection.query('SELECT 1 FROM trading.tbltrading LIMIT 1')
+          const server = db.config.host
+          return res.send({
+            data: `Connection: OK, Server: ${server}, Database: trading`,
+          })
+        } catch (err) {
+          internalServerErrorHandler(res)(err)
+        } finally {
+          connection?.end()
+        }
+      } catch (err) {
+        internalServerErrorHandler(res)(err)
+      }
+    },
+  },
+
   // {
   //   method: 'GET',
   //   url: `${prefix}/test`,

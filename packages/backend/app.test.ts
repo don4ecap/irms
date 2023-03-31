@@ -322,6 +322,15 @@ async function main() {
     })
   }
 
+  /* ------------------------ TEST GET DATABASE STATUS ------------------------ */
+  await test(`Test '/api/get_db_status'`, async function (t) {
+    const resp = await server.inject({
+      method: 'GET',
+      url: '/api/get_db_status',
+    })
+    t.hasProp(JSON.parse(resp.body), 'data', `should have a 'data' property`)
+  })
+
   await server.close().then(() => {
     process.exit(0)
   })
