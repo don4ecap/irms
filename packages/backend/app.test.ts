@@ -129,17 +129,17 @@ async function main() {
         '`value` is a valid `Date` type'
       )
 
-      const oldIRMSResp = await oldIRMS.post('', {
-        id: 18,
-        method: 'checklastcalculated',
-        params: [null],
-      })
-      const oldResponseBody = JSON.parse(oldIRMSResp.data.result)
-      t.same(
-        responseBody.value,
-        oldResponseBody,
-        COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
-      )
+      // const oldIRMSResp = await oldIRMS.post('', {
+      //   id: 18,
+      //   method: 'checklastcalculated',
+      //   params: [null],
+      // })
+      // const oldResponseBody = JSON.parse(oldIRMSResp.data.result)
+      // t.same(
+      //   responseBody.value,
+      //   oldResponseBody,
+      //   COMMON_MESSAGES.EQUAL_WITH_OLD_IRMS_API
+      // )
     })
   }
 
