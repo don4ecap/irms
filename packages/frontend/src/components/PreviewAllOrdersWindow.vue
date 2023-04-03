@@ -256,10 +256,21 @@ export default {
                 )
                 continue
               }
-              contract = frontContract + '-' + backContract
-              contract_twodigit = ordered
-                .filter((row) => row.contract === frontContract)
+              contract = `${frontContract}-${backContract}`
+
+              const frontContract2 = ordered
+                .filter((row) => row.contract_onedigit === frontContract)
                 .map((row) => row.contract_twodigit)
+
+              if (ordered.length > 1) {
+                const backContract2 = ordered
+                  .filter((row) => row.contract_onedigit === backContract)
+                  .map((row) => row.contract_twodigit)
+
+                contract_twodigit = `${frontContract2}-${backContract2}`
+              } else {
+                contract_twodigit = frontContract2
+              }
             }
             strategy = strategy.replace('#' + backContract, '')
           }
@@ -307,8 +318,9 @@ export default {
       }
 
       if (excluded > 0) {
-        alert(
-          excluded + ' orders have been excluded as they are already in iTrade.'
+        PageControls.log(
+          `${excluded} orders have been excluded as they are already in iTrade`,
+          6500
         )
       }
 

@@ -124,8 +124,8 @@ function decimalPlaces(num: number) {
 //var console = {};
 //console.log = function (stat) { $("#livestatus").text(stat); };
 
-function log(text: string) {
-  alertify.set({ delay: 2000 })
+function log(text: string, delay = 2000) {
+  alertify.set({ delay })
   alertify.log(text)
 }
 
