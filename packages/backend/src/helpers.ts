@@ -45,6 +45,7 @@ function properRound(number: string): number {
 /** This function takes a value and escapes it for use in a SQL query */
 function sqlEscape(value: any) {
   if (typeof value === 'string') {
+    if (!value.length) return '""'
     // Escape special characters like single quotes and backslashes
     // eslint-disable-next-line no-control-regex
     value = value.replace(/[\0\n\r\b\t'"\x1a]/g, function (char) {
@@ -67,7 +68,7 @@ function sqlEscape(value: any) {
     })
   }
   // Return the escaped value
-  return value
+  return isNaN(value) ? `"${value}"` : value
 }
 
 /**
