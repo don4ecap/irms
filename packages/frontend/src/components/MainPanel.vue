@@ -52,6 +52,7 @@
               width="130"
               :source="sessions"
               :selected-index="0"
+              title="iRMS book session"
               @change="onChangeSession"
             />
             <input
@@ -63,6 +64,7 @@
                 (showNonNull ? 'jqx-fill-state-pressed-office' : '')
               "
               :aria-checked="showNonNull"
+              title="Hides the contract rows of the iRMS which have 0 Positions, 0 Allocation and No Orders"
               @click="onShowNonNullClicked"
             />
           </div>
@@ -71,12 +73,18 @@
           class="col-3 flex flex-column"
           style="min-width: 8.3rem; gap: 0.3rem"
         >
-          <JqxButton ref="loadButton" theme="office" @click="loadIRMS">
+          <JqxButton
+            ref="loadButton"
+            theme="office"
+            title="Fetches the recently calculated iRMS data from the database"
+            @click="loadIRMS"
+          >
             {{ labels.loadBooks }}
           </JqxButton>
           <JqxButton
             ref="btnCalculate"
             theme="office"
+            title="Launches the R Script to calculate the iRMS via ExecuteR. Waits for it to finish and then executes Load iRMS"
             onclick="Calculate(this)"
           >
             Calculate
@@ -176,6 +184,7 @@
               theme="office"
               tag
               section
+              title="Launches the R Script to generate orders for the iRMS via ExecuteR. Waits for it to finish and then executes Load iRMS"
               onclick="Generate(this)"
               >Generate</JqxButton
             >
@@ -183,6 +192,7 @@
               ref="btnPreview"
               class="inline-block"
               theme="office"
+              title="Parses the existing orders in the iRMS and Displays them in the Preview Orders pane"
               @click="$emit('btn-preview-clicked')"
             >
               Preview
@@ -190,6 +200,7 @@
             <JqxButton
               class="inline-block"
               theme="office"
+              title="Deletes all orders from the iRMS"
               onclick="DeleteSector('')"
             >
               Delete
