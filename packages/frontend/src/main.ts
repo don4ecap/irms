@@ -144,7 +144,7 @@ window.IRMS_APP = new Vue({
   render: (h) => h(App),
 }).$mount('#app')
 
-http
+http.irms
   .get('get_irms_config/ORDER_GENERATION_CODE')
   .then(({ data }) => {
     ORDER_GENERATION_CODE = data.content

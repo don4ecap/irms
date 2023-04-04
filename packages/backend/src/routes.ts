@@ -21,7 +21,6 @@ import axios from 'axios'
 import config from './config'
 import helpers from './helpers'
 
-const prefix = '/api'
 const VALID_SESSIONS = ['eod', 'morning', 'afternoon', 'evening']
 
 /** Function that takes a `FastifyReply` object and returns a function that handles internal server errors */
@@ -34,7 +33,7 @@ const routes: Array<RouteOptions> = [
   /* --------------------------------- GET NAV -------------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_nav/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_nav/:account/:trade_date`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -69,7 +68,7 @@ const routes: Array<RouteOptions> = [
   /* -------------------------------- GET BOOK -------------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_book/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_book/:account/:trade_date`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -145,7 +144,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------ GET PORTFOLIO ----------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_portfolio/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_portfolio/:account/:trade_date`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -174,7 +173,7 @@ const routes: Array<RouteOptions> = [
   /* -------------------------- CHECK LAST CALCULATED ------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/check_last_calculated/:account`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/check_last_calculated/:account`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -199,7 +198,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------ GET COMMO INDICATOR LEVEL ----------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_commo_indicator_level`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_commo_indicator_level`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -222,7 +221,7 @@ const routes: Array<RouteOptions> = [
   /* ----------------------------- GET STRATEGIES ----------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_strategies`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_strategies`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -250,7 +249,7 @@ const routes: Array<RouteOptions> = [
   /* -------------------------------- SAVE CELL ------------------------------- */
   {
     method: 'POST',
-    url: `${prefix}/save_cell/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/save_cell/:account/:trade_date`,
     schema: schemas.saveCell,
     handler(req, res) {
       const params: CommonRequestParams = req.params as CommonRequestParams
@@ -303,7 +302,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------- GET WORKING ------------------------------ */
   {
     method: 'GET',
-    url: `${prefix}/get_working/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_working/:account/:trade_date`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -334,7 +333,7 @@ const routes: Array<RouteOptions> = [
   /* ---------------------------- DELETE ALL ORDERS --------------------------- */
   {
     method: 'DELETE',
-    url: `${prefix}/delete_all_orders/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_all_orders/:account/:trade_date`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -376,7 +375,7 @@ const routes: Array<RouteOptions> = [
   /* --------------------------- DELETE SINGLE ORDER -------------------------- */
   {
     method: 'DELETE',
-    url: `${prefix}/delete_single/:account/:trade_date/:contract/:extension`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_single/:account/:trade_date/:contract/:extension`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -412,7 +411,7 @@ const routes: Array<RouteOptions> = [
   /* ---------------------------- DELETE COMMODITY ---------------------------- */
   {
     method: 'DELETE',
-    url: `${prefix}/delete_commodity/:account/:trade_date/:commodity/:extension`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_commodity/:account/:trade_date/:commodity/:extension`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -449,7 +448,7 @@ const routes: Array<RouteOptions> = [
   /* --------------------------- GET ORDER CONTRACTS -------------------------- */
   {
     method: 'POST',
-    url: `${prefix}/order_contracts`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/order_contracts`,
     schema: schemas.orderContracts,
     handler(req, res) {
       const body: OrderContractsBody = req.body as OrderContractsBody
@@ -497,7 +496,7 @@ const routes: Array<RouteOptions> = [
   /* ----------------------------- GET CONFIG TAGS ---------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_configtags/:account`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_configtags/:account`,
     handler(req, res) {
       const { account } = req.params as AccountOnlyParams
       axios
@@ -517,7 +516,7 @@ const routes: Array<RouteOptions> = [
   /* ----------------------------- GET CONFIG FILE ---------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_raw_config/:account/:config_type`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_raw_config/:account/:config_type`,
     handler(req, res) {
       const { account, config_type } = req.params as GetRawConfigParams
       const config = config_type === 'directional' ? 'DIR' : 'ID'
@@ -537,7 +536,7 @@ const routes: Array<RouteOptions> = [
   // TODO: AUTOMATED TESTING
   {
     method: 'POST',
-    url: `${prefix}/send_to_itrade/:account/:trade_date`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/send_to_itrade/:account/:trade_date`,
     schema: schemas.sendToItrade,
     handler(req, res) {
       const params: CommonRequestParams = req.params as CommonRequestParams
@@ -609,7 +608,7 @@ const routes: Array<RouteOptions> = [
   /* ----------------------------- GET IRMS CONFIG ---------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_irms_config/:config_field_name`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_irms_config/:config_field_name`,
     handler(req, res) {
       const { config_field_name } = req.params as GetConfigField
 
@@ -630,7 +629,7 @@ const routes: Array<RouteOptions> = [
   /* ---------------------------- GET DB HOST INFO ---------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_db_info`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_db_info`,
     handler(req, res) {
       return res.send({
         DB_HOST: db.config.host,
@@ -641,7 +640,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'GET',
-    url: `${prefix}/get_db_status`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_db_status`,
     async handler(req, res) {
       try {
         const connection = await db.pool.getConnection()
@@ -668,7 +667,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'GET',
-    url: `${prefix}/get_alarms`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_alarms`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -702,7 +701,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------- GET ALARMS ------------------------------- */
   {
     method: 'GET',
-    url: `${prefix}/get_alarms/:contract`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_alarms/:contract`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -740,7 +739,7 @@ const routes: Array<RouteOptions> = [
   /* -------------------------------- ADD ALARM ------------------------------- */
   {
     method: 'POST',
-    url: `${prefix}/add_alert`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/add_alert`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -798,7 +797,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------ DELETE ALARM ------------------------------ */
   {
     method: 'DELETE',
-    url: `${prefix}/delete_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_alert/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -829,7 +828,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${prefix}/update_enabled_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_enabled_alert/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -870,7 +869,7 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${prefix}/update_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_alert/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -922,7 +921,7 @@ const routes: Array<RouteOptions> = [
   /* -------------------------- GET CONTRACTS -------------------------- */
   // {
   //   method: 'GET',
-  //   url: `${prefix}/get_contracts`,
+  //   url: `${config.IRMS_CONFIG. IRMS_API_BASE_PATH_PREFIX}/get_contracts`,
   //   handler(req, res) {
   //     db.pool
   //       .getConnection()
@@ -954,7 +953,7 @@ const routes: Array<RouteOptions> = [
 
   // {
   //   method: 'GET',
-  //   url: `${prefix}/test`,
+  //   url: `${config.IRMS_CONFIG. IRMS_API_BASE_PATH_PREFIX}/test`,
   //   async handler(req, res) {
   //     res.send({ message: 'hello world' })
   //   },

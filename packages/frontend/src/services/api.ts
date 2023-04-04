@@ -5,7 +5,7 @@ function postOrderContracts(
   contract2: string,
   extension: string
 ) {
-  return http
+  return http.irms
     .post(`order_contracts`, {
       contract1,
       contract2,

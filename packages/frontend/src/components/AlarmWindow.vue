@@ -151,7 +151,7 @@ export default {
       if (showLoading) this.loading.load = true
       const contract = this.contract
       const url = !this.contract ? 'get_alarms' : `get_alarms/${contract}`
-      return http
+      return http.irms
         .get(url)
         .then(({ data: alarms }) => {
           this.alarms = alarms.map((alarm) => ({

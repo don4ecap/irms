@@ -60,7 +60,7 @@ export default {
 
       if (!accountVar.books.length) return
       this.loading.get = true
-      http
+      http.irms
         .get(`get_working/${currentAccount}/${accountVar.tradeDate}`)
         .then(async ({ data }) => {
           const orders = await this.buildPreview(this.sector || '', data)
@@ -245,7 +245,7 @@ export default {
             if (backContract == '') {
               contract = frontContract + '-' + backContract
             } else {
-              let ordered = await API.postOrderContracts(
+              let ordered = await http.irms.postOrderContracts(
                 frontContract,
                 backContract,
                 extension

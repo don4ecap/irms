@@ -355,7 +355,7 @@ function DeleteSingle(contract: string, extension: string, id: string) {
 //   // ignoreStrategies = 'CHECK'
 //   let excluded = 0
 //   let excludedStrategy = 0
-//   const existingOrders = await http.get(
+//   const existingOrders = await http.irms.get(
 //     `get_working/${currentAccount}/${currentAccountVar.tradeDate}`
 //   )
 //   const orders = []
@@ -494,7 +494,7 @@ function SoftReload(account: string) {
     .then(async ({ data: books }) => {
       accountVar.books = books
 
-      accountVar.portfolio = await http
+      accountVar.portfolio = await http.irms
         .get(`get_portfolio/${account}/${accountVar.tradeDate}`)
         .then(({ data }) => data)
         .catch((error) => console.error('Failed to get portfolio:', error))
@@ -636,7 +636,7 @@ function LoadConfig(type: string, what: string) {
         `<textarea spellcheck='false' readonly style='width:100%' id='ta' rows='35' cols=500 autofocus></textarea>
           <input disabled type='button' id='saveConfig' onclick="SaveConfig('${type}', '${what}')" value='Save ${what}'/>`
       )
-      http
+      http.irms
         .get(`get_raw_config/${account}/${type}`)
         .then(({ data }) => {
           $('#ta').val(data)

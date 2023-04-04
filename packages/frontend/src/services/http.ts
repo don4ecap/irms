@@ -1,10 +1,18 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
-const serverAPI = axios.create({
+interface AXIOS_EXTENDED_IRMS extends AxiosInstance {
+  postOrderContracts?: (
+    contract1: string,
+    contract2: string,
+    extension: string
+  ) => Promise<any>
+}
+
+const irms: AXIOS_EXTENDED_IRMS = axios.create({
   baseURL: import.meta.env.VITE_IRMS_BACKEND_URL,
 })
 
-serverAPI.interceptors.request.use((req) => {
+irms.interceptors.request.use((req) => {
   req.headers['Content-Type'] = 'application/json'
   req.headers['Accept'] = 'application/json'
   return req
@@ -31,7 +39,7 @@ function logQuery(timestamp: string, query: string) {
   }
 }
 
-serverAPI.interceptors.response.use(
+irms.interceptors.response.use(
   (res) => {
     if (res?.headers['x-irms-sql-query']) {
       logQuery(res.headers['x-irms-timestamp'], res.headers['x-irms-sql-query'])
@@ -49,4 +57,26 @@ serverAPI.interceptors.response.use(
   }
 )
 
-export default serverAPI
+irms.postOrderContracts = function (
+  contract1: string,
+  contract2: string,
+  extension: string
+) {
+  return irms
+    .post(`order_contracts`, {
+      contract1,
+      contract2,
+      extension,
+    })
+    .then(({ data }) => {
+      return Promise.resolve(data)
+    })
+    .catch((error) => {
+      console.error('Error when post order contracts:\n', error)
+      return Promise.resolve([])
+    })
+}
+
+export default {
+  irms,
+}

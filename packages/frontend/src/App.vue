@@ -131,7 +131,7 @@ export default {
 
     /** Fetch database info from server and shot it under query logs */
     fetchDatabaseInfo() {
-      http
+      http.irms
         .get('get_db_info')
         .then(({ data: databaseInfo }) => {
           this.dbInfo.host = databaseInfo.DB_HOST

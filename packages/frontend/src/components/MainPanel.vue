@@ -325,7 +325,7 @@
 </template>
 
 <script lang="ts">
-import httpService from '../services/http'
+import http from '../services/http'
 import gridColumns from '../helpers/gridOptions'
 import Risks from '../helpers/Risks'
 import helpers from '../helpers'
@@ -464,14 +464,14 @@ export default {
     },
 
     loadStrategies() {
-      return httpService.get('get_strategies').then(({ data }) => {
+      return http.irms.get('get_strategies').then(({ data }) => {
         data.unshift('CHECK')
         strategies = data
       })
     },
 
     loadConfigTags() {
-      return httpService
+      return http.irms
         .get(`get_configtags/${this.account}`)
         .then(({ data }) => {
           const accountVar = helpers.getAccountVar(this.account)
@@ -486,7 +486,7 @@ export default {
     loadNav() {
       console.time(`Load ${this.account} nav`)
       const accountVar = helpers.getAccountVar(this.account)
-      return httpService
+      return http.irms
         .get(`get_nav/${this.account}/${accountVar.tradeDate}`)
         .then(({ data }) => {
           this.nav = helpers.formatNavData(data, this.account)
@@ -529,7 +529,7 @@ export default {
       this.showLoadingBooks()
       this.loadingBooks = true
 
-      return httpService
+      return http.irms
         .get(`get_book/${this.account}/${tradeDate}?session=${session}`)
         .then(async ({ data: books }) => {
           accountVar.books = books
@@ -538,7 +538,7 @@ export default {
 
           this.bookIsError = false
 
-          accountVar.portfolio = await httpService
+          accountVar.portfolio = await http.irms
             .get(`get_portfolio/${this.account}/${tradeDate}`)
             .then(({ data }) => data)
             .catch((error) => console.error('Failed to get portfolio:', error))
@@ -721,7 +721,7 @@ export default {
 
     loadCommoIndicatorLevel() {
       const accountVar = helpers.getAccountVar(this.account)
-      return httpService
+      return http.irms
         .get('get_commo_indicator_level')
         .then(({ data }) => (accountVar.indLevel = data))
     },
@@ -793,7 +793,7 @@ export default {
     },
 
     getLastBookCalculation() {
-      return httpService
+      return http.irms
         .get(`check_last_calculated/${this.account}`)
         .then(({ data }) => {
           return data.value
@@ -871,7 +871,7 @@ export default {
     },
 
     loadAlarms() {
-      return httpService
+      return http.irms
         .get('get_alarms')
         .then(({ data: alarms }) => {
           window.alarms = alarms
@@ -883,7 +883,7 @@ export default {
 
     // loadContracts() {
     //   window.contracts = []
-    //   return httpService.get('get_contracts').then(({ data: contracts }) => {
+    //   return http..irms.get('get_contracts').then(({ data: contracts }) => {
     //     window.contracts = contracts
     //   })
     // },
