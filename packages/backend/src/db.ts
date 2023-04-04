@@ -10,7 +10,7 @@ interface IConnectionStringConfig {
   SERVER: string
 }
 
-console.log('Load iRMS config file from', config.configFilePath)
+console.log('Load iRMS config file from', config.IRMS_CONFIG.CONFIG_FILE_PATH)
 
 const reQuotes = /"|'/g
 const connectionString: string = config.getConfig('IRMS_DB_CONNECTIONSTRING')
