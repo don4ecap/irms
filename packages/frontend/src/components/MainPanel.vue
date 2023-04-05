@@ -257,20 +257,20 @@
         <!-- BUTTONS -->
         <div class="flex self-baseline" style="gap: 0.3rem">
           <div class="permission bold text-center self-center">RWX</div>
-          <JqxButton
+          <!-- <JqxButton
             class="inline-block"
             theme="office"
             onclick="LoadConfig('directional','Config')"
           >
             Directional Config
-          </JqxButton>
-          <JqxButton
+          </JqxButton> -->
+          <!-- <JqxButton
             class="inline-block"
             theme="office"
             onclick="LoadConfig('intraday','Config')"
           >
             Intraday Config
-          </JqxButton>
+          </JqxButton> -->
           <JqxButton
             class="inline-block"
             theme="office"
