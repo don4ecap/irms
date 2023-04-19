@@ -9,6 +9,8 @@ import 'jqwidgets-framework/jqwidgets/jqxinput.js'
 import 'jqwidgets-framework/jqwidgets/jqxwindow.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
+import 'jqwidgets-framework/jqwidgets/jqxgrid.columnsresize.js'
+import 'jqwidgets-framework/jqwidgets/jqxgrid.sort.js'
 
 // Helpers, load it here so we can globally expose it
 import RMSOperations from './helpers/RMSOperations'

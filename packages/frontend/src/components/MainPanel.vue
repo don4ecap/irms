@@ -89,6 +89,14 @@
           >
             Calculate
           </JqxButton>
+          <JqxButton
+            ref="btnLoadICMSNav"
+            theme="office"
+            title="Switch and load iCMS NAV"
+            @click="showAndLoadICMSNav"
+          >
+            Load iCMS NAV
+          </JqxButton>
         </div>
         <div class="col-4 flex flex-column" style="min-width: 17rem">
           <table>
@@ -234,13 +242,11 @@
         ref="treeGridContainer"
         class="tree-grid-container"
       >
-        <!-- <JqxGrid
-          ref="mainGrid"
-          width="1580px"
-          :source="dataAdapter"
-          :column-groups="columnGroups"
-          theme="office"
-        /> -->
+        <ICMSNavGrid
+          v-show="showICMSNAVGrid"
+          ref="ICMSNavGrid"
+          :account="account"
+        />
         <div
           v-show="bookIsError && !loadingBooks"
           class="book-error-msg flex flex-column flex-grow items-center justify-center"
@@ -271,6 +277,15 @@
           >
             Intraday Config
           </JqxButton> -->
+          <JqxToggleButton
+            ref="btnToggleShowICMSNavGrid"
+            class="inline-block"
+            :checked="showICMSNAVGrid"
+            theme="office"
+            @click="toggleShowICMSNavGrid"
+          >
+            iCMS NAV
+          </JqxToggleButton>
           <JqxButton
             class="inline-block"
             theme="office"
@@ -331,13 +346,16 @@ import Risks from '../helpers/Risks'
 import helpers from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
+import PageControls from '../helpers/PageControls'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import JqxDropDownList from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdropdownlist.vue'
-import PageControls from '../helpers/PageControls'
+import JqxToggleButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtogglebutton.vue'
+import ICMSNavGrid from '../components/icms/NavGrid.vue'
+import { Alarm } from 'irms-shared-types'
 
 let smallSuccessTimeout = 0
 
@@ -366,6 +384,8 @@ export default {
     // eslint-disable-next-line vue/no-unused-components
     JqxTreeGrid,
     JqxDropDownList,
+    JqxToggleButton,
+    ICMSNavGrid,
   },
 
   props: {
@@ -386,7 +406,7 @@ export default {
       },
       sessions: ['EOD', 'MORNING', 'AFTERNOON', 'EVENING'],
       panels: [
-        { size: 100, min: 100, max: 100, collapsible: true },
+        { size: 103, min: 103, max: 103, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
       ],
       bookLoadedDate: '',
@@ -404,6 +424,7 @@ export default {
       bookIsError: false,
       bookErrorMsg: '',
       loadingBooks: false,
+      showICMSNAVGrid: false,
     }
   },
 
@@ -434,6 +455,15 @@ export default {
 
   methods: {
     async loadIRMS() {
+      // Prevent reload when switch between iCMS NAV
+      if (this.showICMSNAVGrid) {
+        this.toggleShowICMSNavGrid()
+        this.$refs.btnToggleShowICMSNavGrid.unCheck()
+        if (this.$refs.treeGridContainer.querySelector('.jqx-datatable')) {
+          return
+        }
+      }
+
       this.showLoadingBooks()
       this.bookLoadedDate = moment().format('LLL')
 
@@ -874,19 +904,47 @@ export default {
       return http.irms
         .get('get_alarms')
         .then(({ data: alarms }) => {
-          window.alarms = alarms
+          window.alarms = alarms as Array<Alarm>
         })
         .catch((error) => {
           console.error('Failed to load alarms', error)
         })
     },
 
-    // loadContracts() {
-    //   window.contracts = []
-    //   return http..irms.get('get_contracts').then(({ data: contracts }) => {
-    //     window.contracts = contracts
-    //   })
-    // },
+    toggleShowICMSNavGrid(/* event */) {
+      this.showICMSNAVGrid = !this.showICMSNAVGrid
+      const otherElement = (otherElement: HTMLDivElement) =>
+        !otherElement.isSameNode(this.$refs.ICMSNavGrid.$el)
+
+      const otherElements = Array.from(
+        this.$refs.treeGridContainer.children
+      ).filter(otherElement)
+
+      if (otherElements?.length) {
+        if (this.showICMSNAVGrid) {
+          // @ts-ignore
+          otherElements.forEach((el) => (el.style.display = 'none'))
+        } else {
+          const treeGrid =
+            this.$refs.treeGridContainer.querySelector('.jqx-datatable')
+          if (treeGrid) {
+            treeGrid.style.display = null
+          } else {
+            // @ts-ignore
+            otherElements.forEach((el) => (el.style.display = null))
+          }
+        }
+      }
+    },
+
+    showAndLoadICMSNav() {
+      if (!this.showICMSNAVGrid) {
+        this.toggleShowICMSNavGrid()
+        this.$refs.btnToggleShowICMSNavGrid.check()
+      } else {
+        this.$refs.ICMSNavGrid.getICMSNavData()
+      }
+    },
   },
 }
 </script>

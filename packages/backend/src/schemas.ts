@@ -58,6 +58,39 @@ const schemas: ValidationSchemas = {
       },
     },
   },
+  updateICMSNav: {
+    body: {
+      type: 'object',
+      required: [
+        'admin',
+        'adminnav',
+        'comissions',
+        'comments',
+        'fxadj',
+        'incentive',
+        'management',
+        'misc',
+        'nav',
+        'pnl',
+        'propagate',
+        'subred',
+      ],
+      properties: {
+        admin: { type: 'number' },
+        adminnav: { type: 'number' },
+        comissions: { type: 'number' },
+        comments: { type: 'string' },
+        fxadj: { type: 'number' },
+        incentive: { type: 'number' },
+        management: { type: 'number' },
+        misc: { type: 'number' },
+        nav: { type: 'number' },
+        pnl: { type: 'number' },
+        propagate: { type: 'number' },
+        subred: { type: 'number' },
+      },
+    },
+  },
 }
 
 export default schemas

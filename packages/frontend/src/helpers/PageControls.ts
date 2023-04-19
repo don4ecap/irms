@@ -145,10 +145,33 @@ function small_success(text: string, timeout: number) {
   accountVar.vue.showSmallSuccess(text, timeout)
 }
 
+/** Add new line to log query view */
+function logQuery(timestamp: string, query: string) {
+  const logsEl = document.body.querySelector('#logs')
+  const line = document.createElement('div')
+  const timestampEl = document.createElement('div')
+  const queryEl = document.createElement('div')
+
+  line.classList.add('flex')
+  timestampEl.style.marginRight = '0.9rem'
+
+  timestampEl.textContent = `[${timestamp}]`
+  queryEl.textContent = query
+
+  line.appendChild(timestampEl)
+  line.appendChild(queryEl)
+  logsEl.prepend(line)
+  //@ts-ignore
+  if (IRMS_APP.$children[0].showQueryLog && window.autoScrollToFirstLine) {
+    logsEl.scrollTop = 0
+  }
+}
+
 export default {
+  CreateGenerateButtons,
   decimalPlaces,
   error,
   log,
+  logQuery,
   success,
-  CreateGenerateButtons,
 }

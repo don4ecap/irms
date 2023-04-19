@@ -9,12 +9,11 @@
     "dev": "vite --force",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist node_modules",
-    "install": "sed -i 's/}(this));/}(this || self ||  globalThis));/g' ../../node_modules/jqwidgets-framework/jqwidgets/globalization/globalize.js "
+    "install": "sed -i 's/window.Globalize = Globalize;/(globalThis || self || window).Globalize = Globalize;/g' ../../node_modules/jqwidgets-framework/jqwidgets/globalization/globalize.js"
   },
   "author": "Alphien",
   "dependencies": {
-    "axios": "^1.1.2",
-    "jqwidgets-framework": "^14.0.0",
+    "jqwidgets-framework": "^16.0.0",
     "vue": "~2.7.10"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { RendererCallback } from '../types'
 import helpers from '.'
 import PageControls from './PageControls'
 

@@ -1,5 +1,7 @@
 import mariadb from 'mariadb'
 import config from './config'
+import helpers from './helpers'
+import { ICMSNavData } from 'irms-shared-types'
 
 interface IConnectionStringConfig {
   DRIVER: string
@@ -76,6 +78,66 @@ const alarms = {
   },
 }
 
+/* ------------------------------- ICMS MODELS ------------------------------ */
+const icms = {
+  /** Get single nav */
+  async getNav(
+    account: string,
+    tradeDate: string
+  ): Promise<ICMSNavData | null> {
+    try {
+      const connection = await pool.getConnection()
+      const result = await connection?.query(
+        'SELECT * FROM trading.tblnav WHERE account=? AND date=? ORDER BY date DESC',
+        [account, helpers.formatDate(tradeDate)]
+      )
+      connection.end()
+      return result.length ? result[0] : null
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  },
+
+  /** Get list of nav by account and trade date */
+  async getNewerNavs(
+    account: string,
+    tradeDate: string
+  ): Promise<Array<ICMSNavData>> {
+    try {
+      const connection = await pool.getConnection()
+      const result = await connection?.query(
+        'SELECT * FROM trading.tblnav WHERE account=? AND date > ? ORDER BY date DESC',
+        [account, helpers.formatDate(tradeDate)]
+      )
+      connection.end()
+      return result
+    } catch (error) {
+      console.error(error)
+      return []
+    }
+  },
+
+  async updateNavField(
+    account: string,
+    tradeDate: string,
+    nav: number
+  ): Promise<boolean> {
+    try {
+      const connection = await pool.getConnection()
+      const result = await connection?.query(
+        'UPDATE trading.tblnav SET nav=? WHERE account=? AND date=?',
+        [nav, account, helpers.formatDate(tradeDate)]
+      )
+      connection.end()
+      return !!result.affectedRows
+    } catch (error) {
+      console.error(error)
+      return false
+    }
+  },
+}
+
 const contracts = {
   async getContract(contract: string, extension: string) {
     let connection
@@ -93,8 +155,9 @@ const contracts = {
 }
 
 export default {
-  pool,
-  config: dbConfig,
   alarms,
+  config: dbConfig,
   contracts,
+  icms,
+  pool,
 }

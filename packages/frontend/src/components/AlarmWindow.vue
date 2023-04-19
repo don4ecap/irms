@@ -92,6 +92,7 @@ import AlarmRow from '../components/AlarmRow.vue'
 import AlarmAddRow from '../components/AlarmAddRow.vue'
 import http from '../services/http'
 import PageControls from '../helpers/PageControls'
+import { Alarm } from 'irms-shared-types'
 
 export default {
   name: 'AlarmWindow',
@@ -211,15 +212,15 @@ export default {
         })
     },
 
-    updateEnabledAlarm(alarm) {
-      http.put(`update_enabled_alert/${alarm.contract}/${alarm.field}`, {
+    updateEnabledAlarm(alarm: Alarm) {
+      http.irms.put(`update_enabled_alert/${alarm.contract}/${alarm.field}`, {
         enabled: alarm.enabled,
         numTriggers: alarm.numTriggers,
       })
     },
 
-    updateAlarm(alarm) {
-      http
+    updateAlarm(alarm: Alarm) {
+      http.irms
         .put(`update_alert/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,

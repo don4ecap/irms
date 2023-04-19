@@ -30,7 +30,7 @@ declare global {
   /** Vue instance of main app. Need to be exposed at
    * the global object so easier to access from anywhere
    */
-  var IRMS_APP: Vue
+  var IRMS_APP: Vue | any
 
   var autoScrollToFirstLine: boolean
 
@@ -92,7 +92,12 @@ declare global {
     extension: string,
     instrument: string
   )
-  function filterNonNullCommo(commo, extension, instrument, expandEl)
+  function filterNonNullCommo(
+    commodity: string,
+    extension: string,
+    instrument: string,
+    expandEl: HTMLSpanElement
+  )
 }
 
 export {}

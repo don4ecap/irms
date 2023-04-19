@@ -1,5 +1,6 @@
 import TreeGridUtils from './TreeGridUtils'
 import helpers from '../helpers'
+import type { IRMSBook } from 'irms-shared-types/Data'
 
 function filterNonNull(/* datum, action */) {
   // console.log('Filter Non Null Called')
@@ -54,17 +55,17 @@ function filterNonNull(/* datum, action */) {
 }
 
 async function filterNonNullCommo(
-  commo: string,
+  commodity: string,
   extension: string,
   instrument: string,
-  expandEl
+  expandEl: HTMLSpanElement
 ) {
   const accountVar = helpers.getAccountVar(currentAccount)
   for (let i = 0; i < accountVar.books.length; i++) {
     const book = accountVar.books[i]
     if (
       book.rowType == 'contract' &&
-      book.commo == commo &&
+      book.commo == commodity &&
       book.extension == extension &&
       book.instrument == instrument
     ) {
@@ -121,7 +122,7 @@ function render() {
 // }
 
 function colorExpiries(row: IRMSBook) {
-  // const a = moment(row.notice4E)
+  const a = moment(row.notice4E)
   const accountVar = helpers.getAccountVar(currentAccount)
   const b = moment(row.expiry4E)
   const c = moment(accountVar.tradeDate)
@@ -148,25 +149,22 @@ function colorExpiries(row: IRMSBook) {
       ) {
         cell.style.backgroundColor = 'red'
         cell.style.color = 'white'
-        // cell.css('background-color', 'red')
-        // cell.css('color', 'white')
       }
     }
   }
-
-  /*  else if (c >= a) {
+  //
+  else if (c >= a) {
     //Notice4E
-    for (var i = 0; i < 17; i++) {
-            cell = TreeGridUtils. TreeGridUtils. getCell(row.id, i)
-            if (cell.css('background-color') == 'rgb(255, 255, 255)') {
-                cell.css('background-color', 'orange');
-                cell.css('color', 'blue');
-            }
-        }
+    /* for (var i = 0; i < 17; i++) {
+      cell = TreeGridUtils.TreeGridUtils.getCell(row.id, i)
+      if (cell.css('background-color') == 'rgb(255, 255, 255)') {
+        cell.css('background-color', 'orange')
+        cell.css('color', 'blue')
+      }
+    } */
+  } else {
+    //
   }
-  else {
-
-  } */
 
   if (row.settlement_available == 'FALSE') {
     cell = TreeGridUtils.getCell2(row.id, 0)
@@ -265,6 +263,93 @@ function createToolTip(row: IRMSBook) {
   })
 }
 
+type CellElementHorizontalAlign = 'left' | 'middle' | 'right'
+
+/** Create common cell element and its styles */
+function createCellElement(
+  initialTextContent = '',
+  horizontalAlign: CellElementHorizontalAlign = 'left'
+) {
+  const cellElement = document.createElement('div')
+  cellElement.textContent = initialTextContent
+  cellElement.classList.add(`jqx-grid-cell-${horizontalAlign}-align`)
+  cellElement.style.marginTop = '0.35em'
+  return cellElement
+}
+
+function currencyFormatter(
+  rowID: number,
+  columnfield: string,
+  value: number
+  // defaulthtml: string,
+  // columnproperties,
+) {
+  const currency = accounting.formatMoney(value)
+  const cellElement = createCellElement(currency)
+  if (columnfield == 'chNav' && value != 0) {
+    cellElement.classList.add('chnav-not-empty')
+  }
+  if (value == 0) {
+    cellElement.style.color = 'silver'
+  }
+  return cellElement.outerHTML
+}
+
+function dateFormatter(
+  rowID: number,
+  columnfield: string,
+  value: string
+  // defaulthtml: string
+  // columnproperties
+) {
+  // @ts-ignore
+  const date = moment(value).format('DD-MMM-YYYY')
+  const cellElement = createCellElement(date, 'middle')
+  return cellElement.outerHTML
+}
+
+function percentFormatter(
+  rowID: number,
+  columnfield: string,
+  value: number
+  // defaulthtml: string
+  // columnproperties
+) {
+  const percent = (value * 100).toFixed(4)
+  let color: string
+  if (value > 0) {
+    color = 'green'
+  } else if (value < 0) {
+    color = 'red'
+  } else {
+    color = 'blue'
+  }
+  const cellElement = createCellElement(percent + ' %')
+  cellElement.style.color = color
+  return cellElement.outerHTML
+}
+
+function subRedFormatter(
+  rowID: number,
+  columnfield: string,
+  value: number
+  // defaulthtml: string
+  // columnproperties
+) {
+  if (value == 0) {
+    // @ts-ignore
+    return currencyFormatter(rowID, columnfield, value, 0, 0)
+  }
+  const currency = accounting.formatMoney(value)
+  const cellElement = createCellElement(currency)
+  if (value > 0) {
+    cellElement.classList.add('subred-gt-0')
+  } else {
+    cellElement.classList.add('subred-lt-0')
+  }
+  return cellElement.outerHTML
+}
+
 // $.extend({
 //   getUrlVars: function () {
 //     var vars = [],
@@ -320,4 +405,8 @@ function createToolTip(row: IRMSBook) {
 export default {
   filterNonNull,
   filterNonNullCommo,
+  currencyFormatter,
+  dateFormatter,
+  percentFormatter,
+  subRedFormatter,
 }

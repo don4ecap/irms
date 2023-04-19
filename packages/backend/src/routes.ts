@@ -15,6 +15,8 @@ import type {
   UpdateAlertEnabledBody,
   UpdateAlertBody,
 } from './types'
+import { ICMSNavData } from 'irms-shared-types'
+import { UpdateICMSNavRequestBody } from 'irms-shared-types/REST'
 import db from './db'
 import schemas from './schemas'
 import axios from 'axios'
@@ -180,7 +182,7 @@ const routes: Array<RouteOptions> = [
         .then((connection) => {
           const params: AccountOnlyParams = req.params as AccountOnlyParams
 
-          const sqlQuery = `SELECT value FROM cacheDB.cache2 WHERE Name LIKE 'irms_calculate_${params.account}' LIMIT 1`
+          const sqlQuery = `SELECT value FROM cacheDB.cache2 WHERE Name LIKE "irms_calculate_${params.account}" LIMIT 1`
           res.header('X-IRMS-SQL-QUERY', sqlQuery)
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
@@ -908,13 +910,131 @@ const routes: Array<RouteOptions> = [
             .then(async () => {
               return res.send({
                 success: true,
-                message: 'Successfully update alarm',
+                message: 'Successfully update icms alarm',
               })
             })
             .catch(internalServerErrorHandler(res))
             .finally(connection.end)
         })
         .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* ----------------------------------- ### ---------------------------------- */
+  /* -------------------------------- ICMS APIs ------------------------------- */
+  /* ----------------------------------- ### ---------------------------------- */
+
+  /* ------------------------------ GET ICMS NAV ------------------------------ */
+  {
+    method: 'GET',
+    url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/get_navs/:account`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then((connection) => {
+          const { account } = req.params as AccountOnlyParams
+
+          const query = {
+            sql: 'SELECT * FROM trading.tblnav WHERE account=? ORDER BY date DESC',
+            params: [account],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql, query.params)
+            .then((navData: Array<ICMSNavData>) => {
+              return res.send(navData)
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  {
+    method: 'PUT',
+    url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/update_nav/:account/:trade_date`,
+    schema: schemas.updateICMSNav,
+    async handler(req, res) {
+      try {
+        const connection = await db.pool.getConnection()
+        const { account, trade_date } = req.params as CommonRequestParams
+
+        const existingICMSNav = await db.icms.getNav(account, trade_date)
+        if (!existingICMSNav) {
+          return res.code(404).send({
+            success: false,
+            message: 'Nav row does not exist',
+          })
+        }
+
+        const updateICMSNavRequestBody = req.body as UpdateICMSNavRequestBody
+        if (updateICMSNavRequestBody.nav === 0) {
+          updateICMSNavRequestBody.nav = existingICMSNav.nav
+        }
+
+        let propagateMessage = ''
+        if (updateICMSNavRequestBody.propagate) {
+          const navDiff = updateICMSNavRequestBody.nav - existingICMSNav.nav
+          const subRedDiff =
+            updateICMSNavRequestBody.subred - existingICMSNav.nav
+          const totalDiff = navDiff + subRedDiff
+          const newerNavs = await db.icms.getNewerNavs(account, trade_date)
+          if (newerNavs?.length) {
+            const startDate = newerNavs[0].date
+            const endDate = newerNavs[newerNavs.length - 1].date
+            newerNavs.forEach(async (newerNav) => {
+              await db.icms.updateNavField(
+                account,
+                trade_date,
+                newerNav.nav + totalDiff
+              )
+            })
+            propagateMessage = `NAV updated by $${totalDiff} between ${startDate} and ${endDate} (inclusive)`
+          } else {
+            propagateMessage = 'Nothing to propagate'
+          }
+        }
+        console.log(trade_date)
+        const query = {
+          sql: 'UPDATE trading.tblnav SET nav=?, fee1=?, fee2=?, fee3=?, fxAdj=?, comments=?, brokerCommissions=?, misc=?, subred=?, chNav=? WHERE account=? AND date=?',
+          params: [
+            updateICMSNavRequestBody.nav,
+            updateICMSNavRequestBody.admin,
+            updateICMSNavRequestBody.management,
+            updateICMSNavRequestBody.incentive,
+            updateICMSNavRequestBody.fxadj,
+            updateICMSNavRequestBody.comments,
+            updateICMSNavRequestBody.comissions,
+            updateICMSNavRequestBody.misc,
+            updateICMSNavRequestBody.subred,
+            updateICMSNavRequestBody.adminnav,
+            account,
+            trade_date,
+          ],
+        }
+
+        res.header(
+          'X-IRMS-SQL-QUERY',
+          helpers.queryString(query.sql, query.params)
+        )
+        res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+        await connection.query(query.sql, query.params)
+        await connection.end()
+        return res.send({
+          success: true,
+          message: `Nav upated for ${trade_date}\r\n${propagateMessage}\r\nRebased NAV recalculated for account ${account}\r\nClick OK to reload the table...`,
+        })
+      } catch (error) {
+        internalServerErrorHandler(res)
+      }
     },
   },
 

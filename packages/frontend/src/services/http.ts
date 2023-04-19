@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
+import PageControls from '../helpers/PageControls'
 
-interface AXIOS_EXTENDED_IRMS extends AxiosInstance {
+interface IRMSHttpClientInstance extends AxiosInstance {
   postOrderContracts?: (
     contract1: string,
     contract2: string,
@@ -8,54 +9,46 @@ interface AXIOS_EXTENDED_IRMS extends AxiosInstance {
   ) => Promise<any>
 }
 
-const irms: AXIOS_EXTENDED_IRMS = axios.create({
-  baseURL: import.meta.env.VITE_IRMS_BACKEND_URL,
-})
+/** Create new HTTP client with commonly used configuration */
+function createCommonHttpClient(baseURL: string) {
+  const httpClient = axios.create({
+    baseURL: baseURL,
+  })
 
-irms.interceptors.request.use((req) => {
-  req.headers['Content-Type'] = 'application/json'
-  req.headers['Accept'] = 'application/json'
-  return req
-})
+  httpClient.interceptors.request.use((req) => {
+    req.headers['Content-Type'] = 'application/json'
+    req.headers['Accept'] = 'application/json'
+    return req
+  })
 
-function logQuery(timestamp: string, query: string) {
-  const logsEl = document.body.querySelector('#logs')
-  const line = document.createElement('div')
-  const timestampEl = document.createElement('div')
-  const queryEl = document.createElement('div')
+  httpClient.interceptors.response.use(
+    function (res) {
+      if (res?.headers['x-irms-sql-query']) {
+        PageControls.logQuery(
+          res.headers['x-irms-timestamp'],
+          res.headers['x-irms-sql-query']
+        )
+      }
+      return Promise.resolve(res)
+    },
+    function (error) {
+      if (error?.response.headers['x-irms-sql-query']) {
+        PageControls.logQuery(
+          error.response.headers['x-irms-timestamp'],
+          error.response.headers['x-irms-sql-query']
+        )
+      }
+      return Promise.reject(error)
+    }
+  )
 
-  line.classList.add('flex')
-  timestampEl.style.marginRight = '0.9rem'
-
-  timestampEl.textContent = `[${timestamp}]`
-  queryEl.textContent = query
-
-  line.appendChild(timestampEl)
-  line.appendChild(queryEl)
-  logsEl.prepend(line)
-  //@ts-ignore
-  if (IRMS_APP.$children[0].showQueryLog && window.autoScrollToFirstLine) {
-    logsEl.scrollTop = 0
-  }
+  return httpClient
 }
 
-irms.interceptors.response.use(
-  (res) => {
-    if (res?.headers['x-irms-sql-query']) {
-      logQuery(res.headers['x-irms-timestamp'], res.headers['x-irms-sql-query'])
-    }
-    return Promise.resolve(res)
-  },
-  function (error) {
-    if (error?.response.headers['x-irms-sql-query']) {
-      logQuery(
-        error.response.headers['x-irms-timestamp'],
-        error.response.headers['x-irms-sql-query']
-      )
-    }
-    return Promise.reject(error)
-  }
-)
+/** HTTP client instance with extended methods related with iRMS API */
+const irms = createCommonHttpClient(
+  import.meta.env.VITE_IRMS_BACKEND_URL
+) as IRMSHttpClientInstance
 
 irms.postOrderContracts = function (
   contract1: string,
@@ -77,6 +70,10 @@ irms.postOrderContracts = function (
     })
 }
 
+/** HTTP client instance with extended methods related with iCMS API */
+const icms = createCommonHttpClient(import.meta.env.VITE_ICMS_BACKEND_URL)
+
 export default {
   irms,
+  icms,
 }

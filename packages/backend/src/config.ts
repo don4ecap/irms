@@ -7,8 +7,10 @@ const IRMS_CONFIG = {
   CONFIG_FILE_PATH:
     process.env.IRMS_BACKEND_CONFIG_FILE ||
     '/mnt/public/GLibs/FourElementsConfig/iRMS/config.cfg',
-  /** iRMS API base path prefix  */
+  /** iRMS API base path prefix */
   IRMS_API_BASE_PATH_PREFIX: '/api/irms/v1',
+  /** iCMS API base path prefix */
+  ICMS_API_BASE_PATH_PREFIX: '/api/icms/v1',
 }
 
 /**

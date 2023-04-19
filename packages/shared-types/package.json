@@ -1,0 +1,12 @@
+{
+  "name": "irms-shared-types",
+  "version": "1.0",
+  "description": "A package that sharing types, interfaces, etc of iRMS",
+  "private": true,
+  "main": "index.d.ts",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FourElementsCapital"
+}

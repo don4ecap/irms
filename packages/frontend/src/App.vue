@@ -59,6 +59,7 @@
     <PreviewAllOrdersWindow ref="previewAllOrdersWindow" />
     <PreviewSingleOrderWindow ref="previewSingleOrderWindow" />
     <AlarmWindow ref="alarmWindow" />
+    <EditICMSNavWindow ref="editICMSNavWindow" />
   </div>
 </template>
 
@@ -68,7 +69,9 @@ import MainPanel from './components/MainPanel.vue'
 import PreviewAllOrdersWindow from './components/PreviewAllOrdersWindow.vue'
 import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
 import AlarmWindow from './components/AlarmWindow.vue'
+import EditICMSNavWindow from './components/icms/EditNavWindow.vue'
 import http from './services/http'
+import { ICMSNavData } from 'irms-shared-types'
 
 export default {
   name: 'AppRoot',
@@ -79,6 +82,7 @@ export default {
     PreviewAllOrdersWindow,
     PreviewSingleOrderWindow,
     AlarmWindow,
+    EditICMSNavWindow,
   },
 
   data() {
@@ -127,6 +131,10 @@ export default {
 
     openPreviewWindow() {
       this.$refs.previewAllOrdersWindow.open()
+    },
+
+    openEditICMSNavWindow(ICMSNavDataToUpdate: ICMSNavData, grid) {
+      this.$refs.editICMSNavWindow.open(ICMSNavDataToUpdate, grid)
     },
 
     /** Fetch database info from server and shot it under query logs */
