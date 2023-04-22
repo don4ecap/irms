@@ -42,10 +42,10 @@ import helpers from '.'
 //   )
 // }
 
-function getCell2(key: string, cellNum: number) {
+function getCell2(key: string, cellNum: number): HTMLDivElement {
   const row = getRow2(key)
   if (!row) return null
-  return row.children[cellNum]
+  return row.children[cellNum] as HTMLDivElement
 }
 
 function getCell(key: string, cellNum: number) {
@@ -61,7 +61,7 @@ function getRow(key: string) {
   return $(a[0])
 }
 
-function getRow2(key: string) {
+function getRow2(key: string): HTMLDivElement {
   const accountVar = helpers.getAccountVar(currentAccount)
   return document.body.querySelector(
     `#${accountVar.treeGridID} tr[data-key='${key}']`

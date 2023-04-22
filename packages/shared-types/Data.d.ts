@@ -92,4 +92,8 @@ export interface IRMSBook {
   valuept: number
   vega: number
   year: number
+
+  // Extended fields, added in frontend side
+  action?: string
+  style?: string
 }

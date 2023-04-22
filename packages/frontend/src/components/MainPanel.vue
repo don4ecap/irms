@@ -93,7 +93,7 @@
             ref="btnLoadICMSNav"
             theme="office"
             title="Switch and load iCMS NAV"
-            @click="showAndLoadICMSNav"
+            @click="loadICMSNavGrid"
           >
             Load iCMS NAV
           </JqxButton>
@@ -237,21 +237,37 @@
           </div>
         </div>
       </div>
-      <div
-        :id="'tree-grid-container-' + account.toLowerCase()"
-        ref="treeGridContainer"
-        class="tree-grid-container"
-      >
+      <div ref="mainContainer" class="main-container">
+        <!-- iRMS Book  -->
+        <div
+          v-show="currentViewIndex === 0"
+          ref="IRMSBookTreeGridContainer"
+          class="irms-book-tree-grid-container flex w-full"
+        >
+          <div
+            v-show="!bookIsError"
+            :id="IRMSBookTreeGridID"
+            ref="IRMSBookTreeGrid"
+            class="irms-book-tree-grid"
+          />
+          <div
+            v-show="bookIsError && !loadingBooks"
+            class="book-error-msg flex flex-column flex-grow items-center justify-center"
+          >
+            {{ bookErrorMsg }}
+          </div>
+        </div>
+
+        <!-- iCMS NAV -->
         <ICMSNavGrid
-          v-show="showICMSNAVGrid"
+          v-show="currentViewIndex === 1"
           ref="ICMSNavGrid"
           :account="account"
         />
-        <div
-          v-show="bookIsError && !loadingBooks"
-          class="book-error-msg flex flex-column flex-grow items-center justify-center"
-        >
-          {{ bookErrorMsg }}
+
+        <!-- iCMS Commissions -->
+        <div>
+          <!--  -->
         </div>
       </div>
     </JqxSplitter>
@@ -277,15 +293,13 @@
           >
             Intraday Config
           </JqxButton> -->
-          <JqxToggleButton
-            ref="btnToggleShowICMSNavGrid"
+          <JqxButton
             class="inline-block"
-            :checked="showICMSNAVGrid"
             theme="office"
-            @click="toggleShowICMSNavGrid"
+            @click="loadICMSNavGrid"
           >
             iCMS NAV
-          </JqxToggleButton>
+          </JqxButton>
           <JqxButton
             class="inline-block"
             theme="office"
@@ -353,11 +367,10 @@ import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import JqxDropDownList from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdropdownlist.vue'
-import JqxToggleButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtogglebutton.vue'
 import ICMSNavGrid from '../components/icms/NavGrid.vue'
-import { Alarm } from 'irms-shared-types'
+import type { Alarm } from 'irms-shared-types'
 
-let smallSuccessTimeout = 0
+let smallSuccessTimeout = {} as NodeJS.Timer
 
 const navInitialData = {
   account: 'EE02',
@@ -369,7 +382,7 @@ const navInitialData = {
   last_subred: '',
   last_pnl_pct: '',
   live_nav: '',
-  live_pnl: '',
+  live_pnl: undefined,
   live_pnl_pct: '',
   subred: '',
 }
@@ -384,7 +397,6 @@ export default {
     // eslint-disable-next-line vue/no-unused-components
     JqxTreeGrid,
     JqxDropDownList,
-    JqxToggleButton,
     ICMSNavGrid,
   },
 
@@ -412,27 +424,37 @@ export default {
       bookLoadedDate: '',
       lastBookCalculationScheduler: '',
       lastBookCalculation: '',
-      lastBookCalculationSchedulerInterval: null,
+      lastBookCalculationSchedulerInterval: {} as NodeJS.Timer,
       calculateRisksLive: true,
       forceRenderedOnce: true,
       showNonNull: true,
-      // @ts-ignore
       version: import.meta.env.VITE_IRMS_VERSION,
-      // @ts-ignore
       gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
       selectedSessionIndex: 0,
       bookIsError: false,
       bookErrorMsg: '',
       loadingBooks: false,
-      showICMSNAVGrid: false,
+      /** Current view index to indicate track which view is opened right now
+       * 0 for iRMS book, 1 for iCMS NAV, and 2 for iCMS Commissions
+       */
+      currentViewIndex: 0,
+      IRMSBookTreeGridID: 'irms-book-tree-grid-' + this.account.toLowerCase(),
     }
   },
 
-  // computed: {
-  //   isNotEE04Account() {
-  //     return this.account !== 'EE04'
-  //   },
-  // },
+  computed: {
+    // isNotEE04Account() {
+    //   return this.account !== 'EE04'
+    // },
+
+    selectedSession() {
+      return this.sessions[this.selectedSessionIndex] || ''
+    },
+
+    tradeDate() {
+      return helpers.getDateFromISO(this.bookDate.toISOString())
+    },
+  },
 
   mounted() {
     // Remove each main panel element width assigned by jqwidgets
@@ -440,28 +462,137 @@ export default {
 
     const accountVar = helpers.getAccountVar(this.account)
     accountVar.vue = this
-
-    accountVar.tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
+    accountVar.treeGridID = this.IRMSBookTreeGridID
+    accountVar.tradeDate = this.tradeDate
 
     // Prevent right click
-    this.$refs.treeGridContainer.addEventListener('contextmenu', (e) =>
+    this.$refs.mainContainer.addEventListener('contextmenu', (e) =>
       e.preventDefault()
     )
 
-    // this.$refs.btnPreview.$el.addEventListener('click', RMSOperations.preview)
-
-    // this.loadNav()
+    this.initialize(accountVar)
   },
 
   methods: {
+    initialize(accountVar: IAccountVar) {
+      const IRMSBookDataAdapter = new $.jqx.dataAdapter({
+        dataType: 'json',
+        dataFields: [
+          { name: 'sector', type: 'string' },
+          { name: 'commo', type: 'string' },
+          { name: 'contract', type: 'string' },
+          { name: 'contract_twodigit', type: 'string' },
+          { name: 'extension', type: 'string' },
+          { name: 'contract', type: 'string' },
+          { name: 'qty', type: 'number' },
+          { name: 'ccy', type: 'string' },
+          { name: 'valuept', type: 'string' },
+          { name: 'settlement', type: 'number' },
+          { name: 'last_price', type: 'number' },
+          { name: 'last_fx', type: 'number' },
+          { name: 'live_fx', type: 'number' },
+          { name: 'last_nav', type: 'number' },
+          { name: 'target_allocation_pct', type: 'number' },
+          { name: 'current_allocation_pct', type: 'number' },
+          { name: 'positions_pct_target', type: 'number' },
+          { name: 'positions_pct_current', type: 'number' },
+          { name: 'target_allocation_lots', type: 'number' },
+          { name: 'target_allocation_delta', type: 'number' },
+          { name: 'current_allocation_lots', type: 'number' },
+          { name: 'current_allocation_delta', type: 'number' },
+          { name: 'current_risks_pre', type: 'number' },
+          { name: 'target_risks_pre', type: 'number' },
+          { name: 'current_risks_post', type: 'number' },
+          { name: 'target_risks_post', type: 'number' },
+          { name: 'rowType', type: 'string' },
+          { name: 'first_notice_date', type: 'string' },
+          { name: 'last_trade_date', type: 'string' },
+          { name: 'expiry4E', type: 'string' },
+          { name: 'notice4E', type: 'string' },
+          { name: 'orderQ', type: 'string' },
+          { name: 'orderP', type: 'string' },
+          { name: 'id', type: 'number' },
+          { name: 'parent', type: 'number' },
+          { name: 'display', type: 'string' },
+          { name: 'expanded', type: 'bool' },
+          { name: 'action', type: 'string' },
+          { name: 'order_size', type: 'number' },
+          { name: 'style', type: 'string' },
+        ],
+        hierarchy: {
+          keyDataField: { name: 'id' },
+          parentDataField: { name: 'parent' },
+        },
+        id: 'id',
+        localData: [],
+      })
+
+      $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid({
+        source: IRMSBookDataAdapter,
+        sortable: true,
+        editable: true,
+        editSettings: {
+          saveOnPageChange: true,
+          saveOnBlur: true,
+          saveOnSelectionChange: true,
+          cancelOnEsc: true,
+          saveOnEnter: true,
+          editSingleCell: false,
+          enableHover: true,
+          editOnDoubleClick: false,
+          editOnF2: true,
+        },
+        enableHover: false,
+        ready() {
+          accountVar.forceRenderedOnce = false
+        },
+        rendered() {
+          if (accountVar.calculateRisksLive && accountVar.books.length > 1) {
+            Formatters.filterNonNull()
+          }
+        },
+        columns: gridColumns,
+        selectionMode: 'singleRow',
+        columnGroups: [
+          { text: 'Exposure', name: 'exposure', align: 'center' },
+          {
+            text: 'Current Allocation',
+            name: 'current_allocation',
+            align: 'center',
+          },
+          {
+            text: 'Target Allocation',
+            name: 'target_allocation',
+            align: 'center',
+          },
+          {
+            text: 'Risks Pre-Orders',
+            name: 'risks_pre',
+            align: 'center',
+          },
+          {
+            text: 'Risks Post-Orders',
+            name: 'risks_post',
+            align: 'center',
+          },
+          { text: 'Orders', name: 'orders', align: 'center' },
+        ],
+        theme: 'office',
+        showStatusbar: false,
+      })
+
+      // Attach event listeners
+      $(this.$refs.IRMSBookTreeGrid).on('rowClick', EventHandlers.onRowClick)
+      $(this.$refs.IRMSBookTreeGrid).on(
+        'rowEndEdit',
+        EventHandlers.onRowEndEdit
+      )
+    },
+
     async loadIRMS() {
-      // Prevent reload when switch between iCMS NAV
-      if (this.showICMSNAVGrid) {
-        this.toggleShowICMSNavGrid()
-        this.$refs.btnToggleShowICMSNavGrid.unCheck()
-        if (this.$refs.treeGridContainer.querySelector('.jqx-datatable')) {
-          return
-        }
+      if (this.currentViewIndex !== 0) {
+        this.currentViewIndex = 0
+        return
       }
 
       this.showLoadingBooks()
@@ -474,303 +605,193 @@ export default {
       await this.loadConfigTags()
 
       await this.loadBooks()
-        .then(this.loadNav)
-        .then(async () => {
-          const date = await this.getLastBookCalculation()
-          this.lastBookCalculation = moment(date).format('LLL')
-          // Attach last book calclulation scheduler, runs every one minute
-          this.updateLastBookCalculationScheduler()
-          if (!this.lastBookCalculationSchedulerInterval) {
-            console.debug(
-              'Check last book calculation scheduler has been attached'
-            )
-            this.lastBookCalculationSchedulerInterval = setInterval(
-              this.updateLastBookCalculationScheduler,
-              60000
-            )
-          }
-          return Promise.resolve()
-        })
+      await this.loadNav()
+
+      const date = await this.getLastBookCalculation()
+      this.lastBookCalculation = moment(date).format('LLL')
+      // Attach last book calclulation scheduler, runs every one minute
+      this.updateLastBookCalculationScheduler()
+      if (!this.lastBookCalculationSchedulerInterval) {
+        console.debug('Check last book calculation scheduler has been attached')
+        this.lastBookCalculationSchedulerInterval = setInterval(
+          this.updateLastBookCalculationScheduler,
+          60000
+        )
+      }
+      return Promise.resolve()
     },
 
-    loadStrategies() {
-      return http.irms.get('get_strategies').then(({ data }) => {
-        data.unshift('CHECK')
-        strategies = data
-      })
+    async loadStrategies() {
+      const { data } = await http.irms.get('get_strategies')
+      data.unshift('CHECK')
+      strategies = data
     },
 
-    loadConfigTags() {
-      return http.irms
-        .get(`get_configtags/${this.account}`)
-        .then(({ data }) => {
-          const accountVar = helpers.getAccountVar(this.account)
-          accountVar.configTags = data
-          PageControls.CreateGenerateButtons()
-        })
-        .catch((error) => {
-          console.error('Failed to fetch config tags', error)
-        })
+    async loadConfigTags() {
+      try {
+        const { data } = await http.irms.get(`get_configtags/${this.account}`)
+        const accountVar = helpers.getAccountVar(this.account)
+        accountVar.configTags = data
+        PageControls.CreateGenerateButtons()
+      } catch (error) {
+        console.error('Failed to fetch config tags', error)
+      }
     },
 
-    loadNav() {
+    async loadNav() {
       console.time(`Load ${this.account} nav`)
       const accountVar = helpers.getAccountVar(this.account)
-      return http.irms
-        .get(`get_nav/${this.account}/${accountVar.tradeDate}`)
-        .then(({ data }) => {
-          this.nav = helpers.formatNavData(data, this.account)
-
-          if (this.account !== 'EE04') {
-            this.labels.riskRate = 'Risk Ratio'
-            // if (this.account === 'DBPM') {
-            //   this.labels.riskRate = 'Drawdown'
-            // }
-          }
-
-          // TODO: GET RATIO
-          // TODO: Getcurrencyhedging
-        })
+      const { data } = await http.irms.get(
+        `get_nav/${this.account}/${accountVar.tradeDate}`
+      )
+      this.nav = helpers.formatNavData(data, this.account)
+      if (this.account !== 'EE04') {
+        this.labels.riskRate = 'Risk Ratio'
+      }
     },
 
-    loadBooks() {
+    async loadBooks() {
       console.time(`Load ${this.account} books`)
-      const lowerAccountName = this.account.toLowerCase()
-      const currentTreeGridID = `tree-grid-${lowerAccountName}`
-      const containerSelector = `#tree-grid-container-${lowerAccountName}`
-      const gridContainer = document.querySelector(containerSelector)
-      const existingGridEl = $(`#${currentTreeGridID}`)
       const accountVar = helpers.getAccountVar(this.account)
-      accountVar.treeGridID = currentTreeGridID
 
-      if (existingGridEl?.length) {
-        existingGridEl.jqxTreeGrid('destroy')
-      }
-
-      PageControls.CreateGenerateButtons()
-
-      // Create new grid element for attach the new tree grid
-      const newGrid = document.createElement('div')
-      newGrid.setAttribute('id', `${currentTreeGridID}`)
-      gridContainer?.appendChild(newGrid)
-
-      const session = this.sessions[this.selectedSessionIndex] || ''
-      const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
       this.showLoadingBooks()
       this.loadingBooks = true
 
-      return http.irms
-        .get(`get_book/${this.account}/${tradeDate}?session=${session}`)
-        .then(async ({ data: books }) => {
-          accountVar.books = books
-          accountVar.bookIDMap = []
-          accountVar.bookIDMapRev = []
+      try {
+        const { data: books } = await http.irms.get(
+          `get_book/${this.account}/${this.tradeDate}?session=${this.selectedSession}`
+        )
+        $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('clear')
+        accountVar.books = books
+        accountVar.bookIDMap = []
+        accountVar.bookIDMapRev = []
 
-          this.bookIsError = false
+        this.bookIsError = false
+        await this.loadPortfolio()
 
-          accountVar.portfolio = await http.irms
-            .get(`get_portfolio/${this.account}/${tradeDate}`)
-            .then(({ data }) => data)
-            .catch((error) => console.error('Failed to get portfolio:', error))
+        for (let i = 0; i < accountVar.books.length; i++) {
+          const book = accountVar.books[i]
+          book.expanded = true
+          book.order_size = null
+          book.action = ''
+          accountVar.bookIDMap[i] = parseInt(book.id)
+          accountVar.bookIDMapRev[book.id] = i
+          book.style = 'background-color:red'
+        }
 
-          accountVar.portfolio.display = 'PORTFOLIO'
-          accountVar.portfolio.rowType = 'sector'
-          accountVar.portfolio.parent = null
+        Risks.ComputeRisks()
+        accountVar.spdRisks = Risks.SpreadRisks()
 
-          accountVar.books.unshift(accountVar.portfolio)
-          for (let i = 0; i < accountVar.books.length; i++) {
-            const book = accountVar.books[i]
-            book.expanded = true
-            book.order_size = null
-            book.action = ''
-            accountVar.bookIDMap[i] = parseInt(book.id)
-            accountVar.bookIDMapRev[book.id] = i
-            book.style = 'background-color:red'
-          }
-
-          Risks.ComputeRisks()
-          accountVar.spdRisks = Risks.SpreadRisks()
-
-          const dataAdapter = new $.jqx.dataAdapter({
-            dataType: 'json',
-            dataFields: [
-              { name: 'sector', type: 'string' },
-              { name: 'commo', type: 'string' },
-              { name: 'contract', type: 'string' },
-              { name: 'contract_twodigit', type: 'string' },
-              { name: 'extension', type: 'string' },
-              { name: 'contract', type: 'string' },
-              { name: 'qty', type: 'number' },
-              { name: 'ccy', type: 'string' },
-              { name: 'valuept', type: 'string' },
-              { name: 'settlement', type: 'number' },
-              { name: 'last_price', type: 'number' },
-              { name: 'last_fx', type: 'number' },
-              { name: 'live_fx', type: 'number' },
-              { name: 'last_nav', type: 'number' },
-              { name: 'target_allocation_pct', type: 'number' },
-              { name: 'current_allocation_pct', type: 'number' },
-              { name: 'positions_pct_target', type: 'number' },
-              { name: 'positions_pct_current', type: 'number' },
-              { name: 'target_allocation_lots', type: 'number' },
-              { name: 'target_allocation_delta', type: 'number' },
-              { name: 'current_allocation_lots', type: 'number' },
-              { name: 'current_allocation_delta', type: 'number' },
-              { name: 'current_risks_pre', type: 'number' },
-              { name: 'target_risks_pre', type: 'number' },
-              { name: 'current_risks_post', type: 'number' },
-              { name: 'target_risks_post', type: 'number' },
-              { name: 'rowType', type: 'string' },
-              { name: 'first_notice_date', type: 'string' },
-              { name: 'last_trade_date', type: 'string' },
-              { name: 'expiry4E', type: 'string' },
-              { name: 'notice4E', type: 'string' },
-              { name: 'orderQ', type: 'string' },
-              { name: 'orderP', type: 'string' },
-              { name: 'id', type: 'number' },
-              { name: 'parent', type: 'number' },
-              { name: 'display', type: 'string' },
-              { name: 'expanded', type: 'bool' },
-              { name: 'action', type: 'string' },
-              { name: 'order_size', type: 'number' },
-              { name: 'style', type: 'string' },
-            ],
-            hierarchy: {
-              keyDataField: { name: 'id' },
-              parentDataField: { name: 'parent' },
-            },
-            id: 'id',
-            localData: accountVar.books,
-          })
-
-          $(`#${currentTreeGridID}`).jqxTreeGrid({
-            source: dataAdapter,
-            sortable: true,
-            editable: true,
-            editSettings: {
-              saveOnPageChange: true,
-              saveOnBlur: true,
-              saveOnSelectionChange: true,
-              cancelOnEsc: true,
-              saveOnEnter: true,
-              editSingleCell: false,
-              enableHover: true,
-              editOnDoubleClick: false,
-              editOnF2: true,
-            },
-            enableHover: false,
-            ready: () => {
-              accountVar.forceRenderedOnce = false
-              //alert("ready");
-            },
-            rendered: () => {
-              if (accountVar.calculateRisksLive) {
-                //@ts-ignore
-                Formatters.filterNonNull()
-              }
-              // this.buildGrid()
-              // LoadComments()
-              //alert("rendered");
-            },
-            columns: gridColumns,
-            // width: (gridContainer?.clientWidth || 1580) + 'px',
-            selectionMode: 'singleRow',
-            columnGroups: [
-              { text: 'Exposure', name: 'exposure', align: 'center' },
-              {
-                text: 'Current Allocation',
-                name: 'current_allocation',
-                align: 'center',
-              },
-              {
-                text: 'Target Allocation',
-                name: 'target_allocation',
-                align: 'center',
-              },
-              {
-                text: 'Risks Pre-Orders',
-                name: 'risks_pre',
-                align: 'center',
-              },
-              {
-                text: 'Risks Post-Orders',
-                name: 'risks_post',
-                align: 'center',
-              },
-              { text: 'Orders', name: 'orders', align: 'center' },
-            ],
-            theme: 'office',
-            showStatusbar: false,
-            // renderStatusbar(toolbar) {
-            //   const x = $("<div style='margin: 3px;'></div>")
-            //   const span = $(
-            //     "<span style='float: left; margin-top: 2px; margin-right: 2px;' id='livestatus'></span>"
-            //   )
-            //   toolbar.append(x)
-            //   x.append(span)
-            // },
-          })
-
-          // Reset editingRowID
-          accountVar.editingRowID = -1
-
-          // Attach event listeners
-          $(`#${currentTreeGridID}`).on('rowClick', EventHandlers.onRowClick)
-          $(`#${currentTreeGridID}`).on(
-            'rowEndEdit',
-            EventHandlers.onRowEndEdit
-          )
+        const newDataAdapter = new $.jqx.dataAdapter({
+          dataType: 'json',
+          dataFields: [
+            { name: 'sector', type: 'string' },
+            { name: 'commo', type: 'string' },
+            { name: 'contract', type: 'string' },
+            { name: 'contract_twodigit', type: 'string' },
+            { name: 'extension', type: 'string' },
+            { name: 'contract', type: 'string' },
+            { name: 'qty', type: 'number' },
+            { name: 'ccy', type: 'string' },
+            { name: 'valuept', type: 'string' },
+            { name: 'settlement', type: 'number' },
+            { name: 'last_price', type: 'number' },
+            { name: 'last_fx', type: 'number' },
+            { name: 'live_fx', type: 'number' },
+            { name: 'last_nav', type: 'number' },
+            { name: 'target_allocation_pct', type: 'number' },
+            { name: 'current_allocation_pct', type: 'number' },
+            { name: 'positions_pct_target', type: 'number' },
+            { name: 'positions_pct_current', type: 'number' },
+            { name: 'target_allocation_lots', type: 'number' },
+            { name: 'target_allocation_delta', type: 'number' },
+            { name: 'current_allocation_lots', type: 'number' },
+            { name: 'current_allocation_delta', type: 'number' },
+            { name: 'current_risks_pre', type: 'number' },
+            { name: 'target_risks_pre', type: 'number' },
+            { name: 'current_risks_post', type: 'number' },
+            { name: 'target_risks_post', type: 'number' },
+            { name: 'rowType', type: 'string' },
+            { name: 'first_notice_date', type: 'string' },
+            { name: 'last_trade_date', type: 'string' },
+            { name: 'expiry4E', type: 'string' },
+            { name: 'notice4E', type: 'string' },
+            { name: 'orderQ', type: 'string' },
+            { name: 'orderP', type: 'string' },
+            { name: 'id', type: 'number' },
+            { name: 'parent', type: 'number' },
+            { name: 'display', type: 'string' },
+            { name: 'expanded', type: 'bool' },
+            { name: 'action', type: 'string' },
+            { name: 'order_size', type: 'number' },
+            { name: 'style', type: 'string' },
+          ],
+          hierarchy: {
+            keyDataField: { name: 'id' },
+            parentDataField: { name: 'parent' },
+          },
+          id: 'id',
+          localData: accountVar.books,
         })
-        .catch((error) => {
-          if (error.response.status !== 404) {
-            console.error(
-              `Failed to fetch books of ${this.account} account\n`,
-              error
-            )
-          }
-          this.bookIsError = true
-          if (!error?.response?.data?.message) {
-            this.bookErrorMsg = `Failed to fetch books of ${
-              this.account
-            } account with ${this.sessions[this.selectedSessionIndex]} session`
-          } else {
-            console.error(error.response.data.message)
-            this.bookErrorMsg = error.response.data.message
-          }
-          clearInterval(this.lastBookCalculationSchedulerInterval)
-          this.resetNavData()
-          this.resetConfigTagsButton()
-          return Promise.reject()
-        })
-        .finally(() => {
-          this.loadingBooks = false
-          this.unshowLoadingBooks()
-          console.timeEnd(`Load ${this.account} books`)
-        })
+        $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid({ source: newDataAdapter })
+
+        // Reset editingRowID
+        accountVar.editingRowID = -1
+        return await Promise.resolve()
+      } catch (error) {
+        if (error.response.status !== 404) {
+          console.error('Failed to fetch books', this.account, error)
+        }
+        this.bookIsError = true
+        if (!error?.response?.data?.message) {
+          this.bookErrorMsg = `Failed to fetch books of ${
+            this.account
+          } account with ${this.sessions[this.selectedSessionIndex]} session`
+        } else {
+          console.error(error.response.data.message)
+          this.bookErrorMsg = error.response.data.message
+        }
+        clearInterval(this.lastBookCalculationSchedulerInterval)
+        this.resetNavData()
+        this.resetConfigTagsButton()
+        return await Promise.reject()
+      } finally {
+        this.loadingBooks = false
+        this.unshowLoadingBooks()
+        console.timeEnd(`Load ${this.account} books`)
+      }
     },
 
-    loadCommoIndicatorLevel() {
+    async loadPortfolio() {
+      const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
+      try {
+        const { data: portfolio } = await http.irms.get(
+          `get_portfolio/${this.account}/${tradeDate}`
+        )
+        const accountVar = helpers.getAccountVar(this.account)
+        accountVar.portfolio = portfolio
+        accountVar.portfolio.display = 'PORTFOLIO'
+        accountVar.portfolio.rowType = 'sector'
+        accountVar.portfolio.parent = null
+        accountVar.books.unshift(accountVar.portfolio)
+      } catch (error) {
+        console.error('Failed to get portfolio', error)
+      }
+    },
+
+    async loadCommoIndicatorLevel() {
       const accountVar = helpers.getAccountVar(this.account)
-      return http.irms
-        .get('get_commo_indicator_level')
-        .then(({ data }) => (accountVar.indLevel = data))
+      const { data } = await http.irms.get('get_commo_indicator_level')
+      return (accountVar.indLevel = data)
     },
 
     buildGrid() {
-      // const a = new Date()
       if (helpers.getAccountVar(this.account).calculateRisksLive) {
         Formatters.filterNonNull()
       }
-      // const b = new Date()
-      //@ts-ignore
-      // const dif = b - a
-      // console.log(`FilterNonNull took ${dif} secs to complete`)
-
-      // InitializeControls();
     },
 
     onShowNonNullClicked() {
-      //@ts-ignore
       this.showNonNull = helpers.getAccountVar(this.account).showNonNull =
         !this.showNonNull
       this.buildGrid()
@@ -778,64 +799,55 @@ export default {
 
     showContract() {
       const accountVar = helpers.getAccountVar(this.account)
-      if (!accountVar.treeGridID.length) {
-        const msg = 'There is no data yet. Please Load iRMS data first'
-        alert(msg)
-        throw SyntaxError(msg)
+      if (!accountVar.bookIDMap.length) {
+        const message = 'There is no data yet. Please Load iRMS data first'
+        PageControls.error(message)
       }
 
-      setTimeout(function () {
-        for (let i = 0; i < accountVar.books.length; i++) {
-          const book = accountVar.books[i]
-          if (book.rowType == 'sector') book.expanded = true
-          if (book.rowType == 'commodity') book.expanded = true
-        }
-        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-      }, 500)
+      for (const book of accountVar.books) {
+        if (book.rowType == 'sector') book.expanded = true
+        if (book.rowType == 'commodity') book.expanded = true
+      }
+      $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('updateBoundData')
     },
 
     showSector() {
       const accountVar = helpers.getAccountVar(this.account)
-      Promise.resolve().then(() => {
-        for (let i = 0; i < accountVar.books.length; i++) {
-          const book = accountVar.books[i]
-          if (book.rowType == 'sector') {
-            book.expanded = false
-          }
+      for (const book of accountVar.books) {
+        if (book.rowType == 'sector') {
+          book.expanded = false
         }
-        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-      })
+      }
+      $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('updateBoundData')
     },
 
     showCommodity() {
       const accountVar = helpers.getAccountVar(this.account)
       Promise.resolve().then(() => {
-        for (let i = 0; i < accountVar.books.length; i++) {
-          const book = accountVar.books[i]
+        for (const book of accountVar.books) {
           if (book.rowType == 'sector') {
             book.expanded = true
           } else if (book.rowType == 'commodity') {
             book.expanded = false
           }
         }
-        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('updateBoundData')
       })
     },
 
-    getLastBookCalculation() {
-      return http.irms
-        .get(`check_last_calculated/${this.account}`)
-        .then(({ data }) => {
-          return data.value
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to fetch last calculation date for ${this.account}`,
-            error
-          )
-
-          return new Date()
-        })
+    async getLastBookCalculation() {
+      try {
+        const { data } = await http.irms.get(
+          `check_last_calculated/${this.account}`
+        )
+        return data.value
+      } catch (error) {
+        console.error(
+          `Failed to fetch last calculation date for ${this.account}`,
+          error
+        )
+        return new Date()
+      }
     },
 
     updateLastBookCalculationScheduler() {
@@ -849,7 +861,7 @@ export default {
       accountVar.calculateRisksLive = this.calculateRisksLive
       if (this.calculateRisksLive) {
         Risks.ComputeRisks()
-        $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+        $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('updateBoundData')
       }
     },
 
@@ -873,18 +885,16 @@ export default {
       this.selectedSessionIndex = event.args.index || 0
     },
 
-    unshowLoadingBooks() {
-      this.labels.loadBooks = 'Load iRMS'
-      // @ts-ignore
-      $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
-      $(this.$refs.btnPreview.$el).jqxButton({ disabled: false })
-    },
-
     showLoadingBooks() {
       this.labels.loadBooks = 'Loading...'
-      // @ts-ignore
       $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
       $(this.$refs.btnPreview.$el).jqxButton({ disabled: true })
+    },
+
+    unshowLoadingBooks() {
+      this.labels.loadBooks = 'Load iRMS'
+      $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
+      $(this.$refs.btnPreview.$el).jqxButton({ disabled: false })
     },
 
     resetNavData() {
@@ -900,50 +910,21 @@ export default {
       )
     },
 
-    loadAlarms() {
-      return http.irms
-        .get('get_alarms')
-        .then(({ data: alarms }) => {
-          window.alarms = alarms as Array<Alarm>
-        })
-        .catch((error) => {
-          console.error('Failed to load alarms', error)
-        })
-    },
-
-    toggleShowICMSNavGrid(/* event */) {
-      this.showICMSNAVGrid = !this.showICMSNAVGrid
-      const otherElement = (otherElement: HTMLDivElement) =>
-        !otherElement.isSameNode(this.$refs.ICMSNavGrid.$el)
-
-      const otherElements = Array.from(
-        this.$refs.treeGridContainer.children
-      ).filter(otherElement)
-
-      if (otherElements?.length) {
-        if (this.showICMSNAVGrid) {
-          // @ts-ignore
-          otherElements.forEach((el) => (el.style.display = 'none'))
-        } else {
-          const treeGrid =
-            this.$refs.treeGridContainer.querySelector('.jqx-datatable')
-          if (treeGrid) {
-            treeGrid.style.display = null
-          } else {
-            // @ts-ignore
-            otherElements.forEach((el) => (el.style.display = null))
-          }
-        }
+    async loadAlarms() {
+      try {
+        const { data: alarms } = await http.irms.get('get_alarms')
+        window.alarms = alarms as Array<Alarm>
+      } catch (error) {
+        console.error('Failed to load alarms', error)
       }
     },
 
-    showAndLoadICMSNav() {
-      if (!this.showICMSNAVGrid) {
-        this.toggleShowICMSNavGrid()
-        this.$refs.btnToggleShowICMSNavGrid.check()
-      } else {
-        this.$refs.ICMSNavGrid.getICMSNavData()
+    loadICMSNavGrid() {
+      if (this.currentViewIndex !== 1) {
+        this.currentViewIndex = 1
+        return
       }
+      this.$refs.ICMSNavGrid.getICMSNavData()
     },
   },
 }

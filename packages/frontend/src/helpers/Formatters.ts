@@ -2,51 +2,44 @@ import TreeGridUtils from './TreeGridUtils'
 import helpers from '../helpers'
 import type { IRMSBook } from 'irms-shared-types/Data'
 
-function filterNonNull(/* datum, action */) {
-  // console.log('Filter Non Null Called')
+async function filterNonNull() {
   console.time('filterNonNull')
-  // console.log('caller is ' + arguments.callee.caller.toString())
   const accountVar = helpers.getAccountVar(currentAccount)
-  for (let i = 0; i < accountVar.books.length; i++) {
-    const data = accountVar.books[i]
-    if (data.rowType == 'sector' && data.id) {
-      const cell = TreeGridUtils.getCell2(data.id, 16)
-      // @ts-ignore
-      cell.style.textAlign = 'right'
-      setTimeout(createSectorToolTip, 500, data)
+
+  for (const book of accountVar.books) {
+    if (book.rowType == 'sector' && book.id) {
+      const cell = TreeGridUtils.getCell2(book.id, 16)
+      if (cell) cell.style.textAlign = 'right'
+      setTimeout(createSectorToolTip, 500, book)
     }
 
-    if (data.rowType == 'contract') {
-      const row = TreeGridUtils.getRow2(data.id)
+    if (book.rowType == 'contract') {
+      const row = TreeGridUtils.getRow2(book.id)
       if (accountVar.showNonNull) {
         if (
-          (isNaN(data.qty) || helpers.isNullOrEmpty(data.qty)) &&
-          (isNaN(data.current_allocation_lots) ||
-            helpers.isNullOrEmpty(data.current_allocation_lots)) &&
-          (isNaN(data.current_allocation_lots) ||
-            helpers.isNullOrEmpty(data.target_allocation_lots)) &&
-          helpers.isNullOrEmpty(data.orderQ) &&
-          helpers.isNullOrEmpty(data.target_risks_post)
+          (isNaN(book.qty) || helpers.isNullOrEmpty(book.qty)) &&
+          (isNaN(book.current_allocation_lots) ||
+            helpers.isNullOrEmpty(book.current_allocation_lots)) &&
+          (isNaN(book.current_allocation_lots) ||
+            helpers.isNullOrEmpty(book.target_allocation_lots)) &&
+          helpers.isNullOrEmpty(book.orderQ) &&
+          helpers.isNullOrEmpty(book.target_risks_post)
         ) {
-          if (row)
-            // @ts-ignore
-            Promise.resolve().then(() => (row.style.display = 'none'))
+          if (row) Promise.resolve().then(() => (row.style.display = 'none'))
         }
       } else {
-        // @ts-ignore
-        if (row) Promise.resolve().then(() => (row.style.display = 'table-row'))
+        if (row) Promise.resolve().then(() => (row.style.display = null))
       }
 
-      // if (!data.valid && data.instrument != 'Cash' && data.id) {
-      // const cell = TreeGridUtils.getCell2(data.id, 0)
-      // TreeGridUtils.getCell(data.id, 0).css('background-color', '#ff1b1b')
+      // if (!book.valid && book.instrument != 'Cash' && book.id) {
+      // const cell = TreeGridUtils.getCell2(book.id, 0)
+      // TreeGridUtils.getCell(book.id, 0).css('background-color', '#ff1b1b')
       // @ts-ignore
       // cell.style.backgroundColor = '#ff1b1b'
       // }
-      // setTimeout(colorExpiries, 100, data)
-      Promise.resolve().then(() => colorExpiries(data))
-      // setTimeout(createToolTip, 0, data)
-      Promise.resolve().then(() => createToolTip(data))
+
+      Promise.resolve().then(() => colorExpiries(book))
+      Promise.resolve().then(() => createToolTip(book))
     }
   }
 
@@ -54,15 +47,14 @@ function filterNonNull(/* datum, action */) {
   console.timeEnd('filterNonNull')
 }
 
-async function filterNonNullCommo(
+function filterNonNullCommo(
   commodity: string,
   extension: string,
   instrument: string,
   expandEl: HTMLSpanElement
 ) {
   const accountVar = helpers.getAccountVar(currentAccount)
-  for (let i = 0; i < accountVar.books.length; i++) {
-    const book = accountVar.books[i]
+  for (const book of accountVar.books) {
     if (
       book.rowType == 'contract' &&
       book.commo == commodity &&
@@ -78,15 +70,10 @@ async function filterNonNullCommo(
           helpers.isNullOrEmpty(book.orderQ) &&
           helpers.isNullOrEmpty(book.target_risks_post)
         ) {
-          // @ts-ignore
-          // if (row) setTimeout(() => (row.style.display = 'none'), 10)
           if (row) Promise.resolve().then(() => (row.style.display = 'none'))
         }
       } else {
-        // if (row) setTimeout(() => (row.style.display = 'table-row'), 10)
-        if (row)
-          // @ts-ignore
-          Promise.resolve().then(() => (row.style.display = 'table-row'))
+        if (row) Promise.resolve().then(() => (row.style.display = null))
       }
     }
   }
@@ -109,17 +96,6 @@ function render() {
     $(`#${accountVar.treeGridID}`).jqxTreeGrid('render')
   }
 }
-
-// function colorFixings(row) {
-//   if (fixings.indexOf(row.contract) != -1) {
-//     TreeGridUtils.getCell2(row.id, 12)
-//       .css('border-width', '3px')
-//       .css('border-color', 'lightslategray')
-//     TreeGridUtils.getCell2(row.id, 14)
-//       .css('border-width', '3px')
-//       .css('border-color', 'lightslategray')
-//   }
-// }
 
 function colorExpiries(row: IRMSBook) {
   const a = moment(row.notice4E)
@@ -200,11 +176,9 @@ function createToolTip(row: IRMSBook) {
   if (row.comment != null && row.comment != '') {
     comment = '<b>Comment: ' + row.comment + '</b></br><br/>'
     const cell17 = TreeGridUtils.getCell2(row.id, 17)
-    // @ts-ignore
     if (cell17) cell17.style.backgroundColor = '#000'
 
     const cell16 = TreeGridUtils.getCell2(row.id, 17)
-    // @ts-ignore
     if (cell16) cell16.style.backgroundColor = '#000'
   }
 
@@ -302,7 +276,6 @@ function dateFormatter(
   // defaulthtml: string
   // columnproperties
 ) {
-  // @ts-ignore
   const date = moment(value).format('DD-MMM-YYYY')
   const cellElement = createCellElement(date, 'middle')
   return cellElement.outerHTML
@@ -349,58 +322,6 @@ function subRedFormatter(
   }
   return cellElement.outerHTML
 }
-
-// $.extend({
-//   getUrlVars: function () {
-//     var vars = [],
-//       hash
-//     var hashes = window.location.href
-//       .slice(window.location.href.indexOf('?') + 1)
-//       .split('&')
-//     for (var i = 0; i < hashes.length; i++) {
-//       hash = hashes[i].split('=')
-//       vars.push(hash[0])
-//       vars[hash[0]] = hash[1]
-//     }
-
-//     return vars
-//   },
-//   getUrlVar: function (name) {
-//     a = $.getUrlVars()[name]
-//     if (a[a.length - 1] == '#') a = a.substr(0, a.length - 1)
-//     return a
-//   },
-// })
-
-// function showSector() {
-//   setTimeout(function () {
-//     for (i = 0; i < book.length; i++) {
-//       if (book[i].rowType == 'sector') book[i].expanded = false
-//     }
-//     $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-//   }, 500)
-// }
-
-// function showCommodity() {
-//   setTimeout(function () {
-//     for (i = 0; i < book.length; i++) {
-//       if (book[i].rowType == 'sector') book[i].expanded = true
-//       if (book[i].rowType == 'commodity') book[i].expanded = false
-//     }
-//     $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-//   }, 500)
-// }
-
-// function showContract() {
-//   setTimeout(function () {
-//     for (let i = 0; i < currentAccountVar.books.length; i++) {
-//       const book = currentAccountVar.books[i]
-//       if (book.rowType == 'sector') book.expanded = true
-//       if (book.rowType == 'commodity') book.expanded = true
-//     }
-//     $(`#${currentAccountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-//   }, 500)
-// }
 
 export default {
   filterNonNull,

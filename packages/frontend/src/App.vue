@@ -71,7 +71,7 @@ import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
 import AlarmWindow from './components/AlarmWindow.vue'
 import EditICMSNavWindow from './components/icms/EditNavWindow.vue'
 import http from './services/http'
-import { ICMSNavData } from 'irms-shared-types'
+import type { ICMSNavData } from 'irms-shared-types'
 
 export default {
   name: 'AppRoot',

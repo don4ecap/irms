@@ -17,5 +17,9 @@ module.exports = {
     DeleteSingle: true,
     DeleteCommodity: true,
     filterNonNullCommo: true,
+
+    // Undef types
+    NodeJS: 'readonly',
+    IAccountVar: 'readonly',
   },
 }
