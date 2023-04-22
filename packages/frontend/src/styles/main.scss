@@ -22,9 +22,9 @@
 //   font-size: 12px;
 // }
 
-// .jqx-grid-cell-wrap {
-//   white-space: nowrap !important;
-// }
+.jqx-grid-cell.wrap {
+  white-space: nowrap !important;
+}
 
 .btn__reset {
   appearance: none;

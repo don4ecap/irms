@@ -556,7 +556,7 @@ const colorType: RendererCallback = function (
       commo = 'commo'
     }
     if (dataField == 'orderQ' || dataField == 'orderP') {
-      commo = 'editable'
+      commo = 'editable wrap'
     }
     if (dataField.indexOf('delta') != -1) {
       commo = 'white'
