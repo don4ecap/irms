@@ -711,9 +711,7 @@ const routes: Array<RouteOptions> = [
           const params: GetAlarmsParams = req.params as GetAlarmsParams
 
           const query = {
-            sql: `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract LIKE '${helpers.sqlEscape(
-              params.contract
-            )}%'`,
+            sql: `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract LIKE "${params.contract}%"`,
             // params: [params.contract],
           }
 
