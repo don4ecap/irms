@@ -276,7 +276,10 @@ const qRenderer: RendererCallback = function (
     rowData.rowType === 'commodity' ||
     rowData.rowType === 'contract'
   ) {
-    return cellValue
+    const orderStrategy = document.createElement('span')
+    orderStrategy.title = cellValue
+    orderStrategy.textContent = cellValue
+    return orderStrategy.outerHTML
   }
   // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/ > ");
 }
@@ -288,16 +291,22 @@ const pRenderer: RendererCallback = function (
   rowData
   // cellText
 ) {
-  if (rowData.rowType === 'commodity' || rowData.rowType === 'contract') {
+  if (rowData.rowType === 'contract') {
+    const orderStrategy = document.createElement('span')
+    orderStrategy.title = cellValue
+    orderStrategy.textContent = cellValue
+    return orderStrategy.outerHTML
+  }
+
+  if (rowData.rowType === 'commodity') {
     return cellValue
   }
 
-  const accountVar = helpers.getAccountVar(currentAccount)
-
   if (rowData.rowType === 'sector' && rowData.display !== 'PORTFOLIO') {
     let generateButtons = ''
-    for (let i = 0; i < accountVar.configTags.length; i++) {
-      const configTag = accountVar.configTags[i]
+
+    const accountVar = helpers.getAccountVar(currentAccount)
+    for (const configTag of accountVar.configTags) {
       const generateButton = document.createElement('button')
       generateButton.classList.add('custombutton')
       generateButton.setAttribute('name', 'generate')
