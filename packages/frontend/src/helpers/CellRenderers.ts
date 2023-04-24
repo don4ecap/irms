@@ -303,7 +303,8 @@ const pRenderer: RendererCallback = function (
   }
 
   if (rowData.rowType === 'sector' && rowData.display !== 'PORTFOLIO') {
-    let generateButtons = ''
+    const container = document.createElement('div')
+    container.classList.add('flex', 'sector-buttons-container')
 
     const accountVar = helpers.getAccountVar(currentAccount)
     for (const configTag of accountVar.configTags) {
@@ -314,7 +315,7 @@ const pRenderer: RendererCallback = function (
       generateButton.setAttribute('section', configTag)
       generateButton.setAttribute('onclick', 'Generate(this)')
       generateButton.textContent = `gen ${configTag}`
-      generateButtons += generateButton.outerHTML
+      container.appendChild(generateButton)
     }
 
     const generateIDButton = document.createElement('button')
@@ -323,7 +324,7 @@ const pRenderer: RendererCallback = function (
     generateIDButton.setAttribute('tag', rowData.sector)
     generateIDButton.setAttribute('onclick', 'Generate(this)')
     generateIDButton.textContent = 'gen id'
-    generateButtons += generateIDButton.outerHTML
+    container.appendChild(generateIDButton)
 
     const previewOrderBySectorButton = document.createElement('button')
     previewOrderBySectorButton.classList.add('custombutton')
@@ -333,12 +334,10 @@ const pRenderer: RendererCallback = function (
       `openPreviewAllOrdersWindow('${rowData.sector}')`
     )
     previewOrderBySectorButton.textContent = 'prev'
-    generateButtons += previewOrderBySectorButton.outerHTML
+    container.appendChild(previewOrderBySectorButton)
 
-    return generateButtons
+    return container.outerHTML
   }
-
-  // return ("<input type='text' value='manas' style='font-size: 6px;height: 10px;'/>");
 }
 
 const aRenderer: RendererCallback = function (

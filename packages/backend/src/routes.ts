@@ -15,7 +15,7 @@ import type {
   UpdateAlertEnabledBody,
   UpdateAlertBody,
 } from './types'
-import { ICMSNavData } from 'irms-shared-types'
+import { ICMSCommissionsData, ICMSNavData } from 'irms-shared-types'
 import { UpdateICMSNavRequestBody } from 'irms-shared-types/REST'
 import db from './db'
 import schemas from './schemas'
@@ -1032,6 +1032,122 @@ const routes: Array<RouteOptions> = [
         })
       } catch (error) {
         internalServerErrorHandler(res)
+      }
+    },
+  },
+
+  /* -------------------------- GET ICMS COMMISSIONS -------------------------- */
+  {
+    method: 'GET',
+    url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/get_commissions/:account`,
+    handler(req, res) {
+      db.pool
+        .getConnection()
+        .then((connection) => {
+          const { account } = req.params as AccountOnlyParams
+
+          const query = {
+            sql: 'SELECT * FROM tradingRef.tblTradingFees WHERE account=?',
+            params: [account],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          connection
+            .query(query.sql, query.params)
+            .then((commissions) => {
+              return res.send(commissions)
+            })
+            .catch(internalServerErrorHandler(res))
+            .finally(connection.end)
+        })
+        .catch(internalServerErrorHandler(res))
+    },
+  },
+
+  /* --------------------------- ADD COMMODITY FEES --------------------------- */
+  {
+    method: 'POST',
+    url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/add_fees`,
+    schema: schemas.addFees,
+    async handler(req, res) {
+      try {
+        const body: ICMSCommissionsData = req.body as ICMSCommissionsData
+        const validateBodyRequest = req.compileValidationSchema(
+          schemas.addFees.body as FastifySchema
+        )
+
+        if (validateBodyRequest(req.body)) {
+          const connection = await db.pool.getConnection()
+          const {
+            commodity,
+            extension,
+            instrument,
+            account,
+            sle,
+            currency,
+            viaVoice,
+            viaGL,
+            clearingOnly,
+            phoneExcludingFees,
+            dmaExcludingFees,
+            exchangeFees,
+          } = body
+
+          const isFeesExist = await db.icms.isFeesExist(
+            commodity,
+            extension,
+            instrument,
+            account
+          )
+
+          if (isFeesExist) {
+            return res.code(404).send({
+              success: false,
+              message: 'Fees exist',
+            })
+          }
+
+          const query = {
+            sql: 'INSERT INTO tradingRef.tblTradingFees(commodity, instrument, extension, account, sle, currency, viaVoice, viaGL, clearingOnly, phoneExcludingFees, dmaExcludingFees, exchangeFees) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            params: [
+              commodity,
+              instrument,
+              extension,
+              account,
+              sle,
+              currency,
+              viaVoice,
+              viaGL,
+              clearingOnly,
+              phoneExcludingFees,
+              dmaExcludingFees,
+              exchangeFees,
+            ],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          const result = await connection.query(query.sql, query.params)
+          if (result?.affectedRows) {
+            res.send({
+              success: true,
+              message: 'Commodity fees has been added successfully',
+            })
+          }
+          connection.end()
+        }
+      } catch (error) {
+        console.error(error)
+        internalServerErrorHandler(res)(error)
       }
     },
   },

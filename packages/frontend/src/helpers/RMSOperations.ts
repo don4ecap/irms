@@ -489,7 +489,7 @@ function DeleteSingle(contract: string, extension: string, id: string) {
 function SoftReload(account: string) {
   const accountVar = helpers.getAccountVar(account)
 
-  http
+  http.irms
     .get(`get_book/${account}/${accountVar.tradeDate}`)
     .then(async ({ data: books }) => {
       accountVar.books = books

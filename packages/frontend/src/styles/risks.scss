@@ -26,13 +26,14 @@
 }
 .sector {
   background-color: gray;
+  border-left: none;
+  border-right: none;
 }
 .portfolio {
   background-color: lightyellow;
 }
 .commo {
   background-color: lightgrey;
-  border-color: Black;
 }
 
 .nonnull {
@@ -54,9 +55,16 @@
 }
 
 .custombutton {
+  border-radius: 0.2rem;
+  border: 1px solid rgb(0 0 0 / 75%);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.4rem;
+  transition: transform 0.3ms ease-in-out;
   vertical-align: baseline;
-  height: 20px;
-  font-size: 0.65rem;
+  &:active {
+    transform: scale(1.1);
+  }
 }
 
 // .editable {

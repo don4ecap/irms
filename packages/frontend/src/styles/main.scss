@@ -168,11 +168,11 @@
   display: inline-flex;
   justify-content: center;
   padding: 0.5em;
-  transition: transform 0.3 ease-in-out;
+  transition: transform 0.3ms ease-in-out;
 }
 
 .button-custom:active {
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
 .book-error-msg {
@@ -336,6 +336,22 @@
       background-color: #d30000;
     }
   }
+}
+
+.irms-book-tree-grid .jqx-grid-cell.sector:has(.sector-buttons-container) {
+  padding: 0;
+  padding-right: 0.25rem;
+  height: 100%;
+  overflow-x: auto;
+  vertical-align: top;
+}
+
+.sector-buttons-container {
+  flex-wrap: wrap;
+  gap: 0.09rem;
+  justify-content: right;
+  align-items: center;
+  height: 2rem;
 }
 
 @import './risks.scss';

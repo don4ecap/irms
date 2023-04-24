@@ -198,8 +198,8 @@
 .jqx-grid-column-header-office,
 .jqx-grid-office {
   font-family: var(--jqx-font-family);
-  border-color: #d4d4d4;
-  color: #444444;
+  /* border-color: #d4d4d4; */
+  /* color: #444444; */
   background: #fff;
 }
 

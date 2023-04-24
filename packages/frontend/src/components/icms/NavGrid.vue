@@ -1,5 +1,8 @@
 <template>
   <div class="icms-nav-grid-container w-full overflow-hidden">
+    <div class="flex p-2 gap-2">
+      <JqxButton theme="office" @click="getICMSNavData">Reload</JqxButton>
+    </div>
     <JqxGrid
       ref="ICMSNavGrid"
       class="icms-nav-grid"
@@ -27,6 +30,7 @@ import type { ICMSNavData } from 'irms-shared-types'
 import type { UpdateICMSNavRequestBody } from 'irms-shared-types/REST'
 
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
+import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import http from '../../services/http'
 import helpers from '../../helpers'
 import PageControls from '../../helpers/PageControls'
@@ -41,6 +45,7 @@ export default {
 
   components: {
     JqxGrid,
+    JqxButton,
   },
 
   props: {

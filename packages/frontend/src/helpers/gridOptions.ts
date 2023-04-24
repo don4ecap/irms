@@ -181,7 +181,7 @@ const gridColumns = [
   {
     text: 'Order Strategy',
     dataField: 'orderP',
-    width: 350,
+    width: 500,
     columnGroup: 'orders',
     cellsRenderer: cellRenderers.pRenderer,
     align: 'center',

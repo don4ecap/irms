@@ -16,6 +16,24 @@ export interface ICMSNavData {
   subred: number
 }
 
+export interface ICMSCommissionsData {
+  commodity: string
+  extension: string
+  instrument: string
+  account: string
+  sle: string
+  currency: string
+  viaVoice: number
+  viaGL: number
+  clearingOnly: number
+  phoneExcludingFees: number
+  dmaExcludingFees: number
+  exchangeFees: number
+  phoneIncludingFees: number
+  dmaIncludingFees: number
+  effectiveDate: null | Date
+}
+
 export interface Alarm {
   alertHigh: number
   alertLow: number

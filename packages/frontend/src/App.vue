@@ -60,18 +60,21 @@
     <PreviewSingleOrderWindow ref="previewSingleOrderWindow" />
     <AlarmWindow ref="alarmWindow" />
     <EditICMSNavWindow ref="editICMSNavWindow" />
+    <AddICMSCommissionsWindow ref="addICMSCommissionsWindow" />
   </div>
 </template>
 
 <script lang="ts">
+import type { ICMSNavData } from 'irms-shared-types'
+
+import http from './services/http'
 import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
 import MainPanel from './components/MainPanel.vue'
 import PreviewAllOrdersWindow from './components/PreviewAllOrdersWindow.vue'
 import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
 import AlarmWindow from './components/AlarmWindow.vue'
 import EditICMSNavWindow from './components/icms/EditNavWindow.vue'
-import http from './services/http'
-import type { ICMSNavData } from 'irms-shared-types'
+import AddICMSCommissionsWindow from './components/icms/AddCommissionsWindow.vue'
 
 export default {
   name: 'AppRoot',
@@ -83,6 +86,7 @@ export default {
     PreviewSingleOrderWindow,
     AlarmWindow,
     EditICMSNavWindow,
+    AddICMSCommissionsWindow,
   },
 
   data() {
@@ -135,6 +139,10 @@ export default {
 
     openEditICMSNavWindow(ICMSNavDataToUpdate: ICMSNavData, grid) {
       this.$refs.editICMSNavWindow.open(ICMSNavDataToUpdate, grid)
+    },
+
+    openAddICMSCommissionsWindow(account: string, onSuccessFn: () => void) {
+      this.$refs.addICMSCommissionsWindow.open(account, onSuccessFn)
     },
 
     /** Fetch database info from server and shot it under query logs */

@@ -136,6 +136,26 @@ const icms = {
       return false
     }
   },
+
+  async isFeesExist(
+    commodity: string,
+    extension: string,
+    instrument: string,
+    account: string
+  ): Promise<boolean> {
+    try {
+      const connection = await pool.getConnection()
+      const result = await connection.query(
+        'SELECT commodity FROM tradingRef.tblTradingFees WHERE commodity=? AND extension=? AND instrument=? AND account=?',
+        [commodity, extension, instrument, account]
+      )
+      await connection.end()
+      return result.length > 0
+    } catch (error) {
+      console.error(error)
+      return true
+    }
+  },
 }
 
 const contracts = {

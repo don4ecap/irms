@@ -89,14 +89,6 @@
           >
             Calculate
           </JqxButton>
-          <JqxButton
-            ref="btnLoadICMSNav"
-            theme="office"
-            title="Switch and load iCMS NAV"
-            @click="loadICMSNavGrid"
-          >
-            Load iCMS NAV
-          </JqxButton>
         </div>
         <div class="col-4 flex flex-column" style="min-width: 17rem">
           <table>
@@ -266,6 +258,11 @@
         />
 
         <!-- iCMS Commissions -->
+        <ICMSCommissionsGrid
+          v-show="currentViewIndex === 2"
+          ref="ICMSCommissionsGrid"
+          :account="account"
+        />
         <div>
           <!--  -->
         </div>
@@ -293,15 +290,36 @@
           >
             Intraday Config
           </JqxButton> -->
-          <JqxButton
+          <JqxToggleButton
+            ref="loadIRMSButton2"
             class="inline-block"
             theme="office"
+            :toggled="currentViewIndex === 0"
+            @click="loadIRMS"
+          >
+            iRMS Book
+          </JqxToggleButton>
+          <JqxToggleButton
+            ref="loadICMSNavButton2"
+            class="inline-block"
+            theme="office"
+            :toggled="currentViewIndex === 1"
             @click="loadICMSNavGrid"
           >
             iCMS NAV
-          </JqxButton>
+          </JqxToggleButton>
+          <JqxToggleButton
+            ref="loadICMSCommissionsButton2"
+            class="inline-block"
+            theme="office"
+            :toggled="currentViewIndex === 2"
+            @click="loadICMSCommissionsGrid"
+          >
+            iCMS Commissions
+          </JqxToggleButton>
           <JqxButton
             class="inline-block"
+            style="margin-left: 1rem"
             theme="office"
             onclick="openAlarmWindow(null, null)"
           >
@@ -361,14 +379,16 @@ import helpers from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
 import PageControls from '../helpers/PageControls'
+import type { Alarm } from 'irms-shared-types'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
+import JqxToggleButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtogglebutton.vue'
 import JqxDateTimeInput from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdatetimeinput.vue'
 import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import JqxDropDownList from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdropdownlist.vue'
 import ICMSNavGrid from '../components/icms/NavGrid.vue'
-import type { Alarm } from 'irms-shared-types'
+import ICMSCommissionsGrid from '../components/icms/CommisionsGrid.vue'
 
 let smallSuccessTimeout = {} as NodeJS.Timer
 
@@ -397,7 +417,9 @@ export default {
     // eslint-disable-next-line vue/no-unused-components
     JqxTreeGrid,
     JqxDropDownList,
+    JqxToggleButton,
     ICMSNavGrid,
+    ICMSCommissionsGrid,
   },
 
   props: {
@@ -453,6 +475,30 @@ export default {
 
     tradeDate() {
       return helpers.getDateFromISO(this.bookDate.toISOString())
+    },
+  },
+
+  watch: {
+    currentViewIndex(val) {
+      const buttonRefs = [
+        this.$refs.loadIRMSButton2,
+        this.$refs.loadICMSNavButton2,
+        this.$refs.loadICMSCommissionsButton2,
+      ]
+      if (val < buttonRefs.length) {
+        const toggleButton = buttonRefs[val]
+        buttonRefs.splice(val, 1)
+        if (
+          toggleButton &&
+          'check' in toggleButton &&
+          typeof toggleButton.check === 'function'
+        ) {
+          toggleButton.check()
+        }
+        for (const otherButton of buttonRefs) {
+          otherButton.unCheck()
+        }
+      }
     },
   },
 
@@ -925,6 +971,14 @@ export default {
         return
       }
       this.$refs.ICMSNavGrid.getICMSNavData()
+    },
+
+    loadICMSCommissionsGrid() {
+      if (this.currentViewIndex !== 2) {
+        this.currentViewIndex = 2
+        return
+      }
+      this.$refs.ICMSCommissionsGrid.getICMSCommissionsData()
     },
   },
 }
