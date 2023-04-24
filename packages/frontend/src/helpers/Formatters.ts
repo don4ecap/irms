@@ -143,9 +143,13 @@ function colorExpiries(row: IRMSBook) {
   }
 
   if (row.settlement_available == 'FALSE') {
-    cell = TreeGridUtils.getCell2(row.id, 0)
-    cell.style.backgroundColor = 'brown'
-    cell.style.color = 'yellow'
+    try {
+      cell = TreeGridUtils.getCell2(row.id, 0)
+      cell.style.backgroundColor = 'brown'
+      cell.style.color = 'yellow'
+    } catch (error) {
+      console.warn('cannot find first cell element of book with id', row.id)
+    }
   }
 }
 
