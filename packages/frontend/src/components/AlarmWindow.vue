@@ -176,7 +176,7 @@ export default {
         ...contractDetails,
         contract: `${contractDetails.contract} ${contractDetails.extension}`,
       }
-      http
+      http.irms
         .post('/add_alert', contractDetails)
         .then(({ data: addedAlarm }) => {
           addedAlarm = {
@@ -202,7 +202,7 @@ export default {
       const alarmToDelete = this.alarms[index]
       alarmToDelete.loading.delete = true
       this.loading.delete = true
-      http
+      http.irms
         .delete(`delete_alert/${alarmToDelete.contract}/${alarmToDelete.field}`)
         .then((/* { data } */) => {
           this.fetchAlarms(false)

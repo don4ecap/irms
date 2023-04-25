@@ -113,7 +113,7 @@ function onRowEndEdit(event) {
   }
 
   // Send request to server for save cell
-  http
+  http.irms
     .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
     .then(({ data }) => {
       if (parseInt(data.id) == -1) {

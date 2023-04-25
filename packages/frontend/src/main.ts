@@ -110,7 +110,7 @@ contextMenu.on('itemclick', async function ({ args: menuITem }) {
     order_p: row.orderP || null,
   }
 
-  await http
+  await http.irms
     .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
     .then(({ data }) => {
       if (parseInt(data.id) == -1) {

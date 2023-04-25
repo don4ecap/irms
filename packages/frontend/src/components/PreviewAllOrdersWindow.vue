@@ -344,7 +344,7 @@ export default {
           index,
           ...rows[index],
         }
-        http
+        http.irms
           .post(`send_to_itrade/${account}/${accountVar.tradeDate}`, dataToSend)
           .then(({ data }) => {
             $('#preview-orders-grid').jqxGrid('unselectrow', data.result)

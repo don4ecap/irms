@@ -171,7 +171,7 @@ export default {
         order_p: this.strategies || null,
       }
 
-      http
+      http.irms
         .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
         .then(({ data }) => {
           if (parseInt(data.id) == -1) {

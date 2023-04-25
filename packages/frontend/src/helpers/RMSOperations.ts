@@ -260,7 +260,7 @@ function GenerateID(btn: HTMLElement) {
 function DeleteSector(sector: string) {
   const account = currentAccount
   const accountVar = helpers.getAccountVar(account)
-  return http
+  return http.irms
     .delete(
       `delete_all_orders/${account}/${accountVar.tradeDate}`,
       //  @ts-ignore
@@ -294,7 +294,7 @@ function DeleteCommodity(
 ) {
   const account = currentAccount
   const accountVar = helpers.getAccountVar(account)
-  http
+  http.irms
     .delete(
       `delete_commodity/${account}/${accountVar.tradeDate}/${commodity}/${extension}`
     )
@@ -325,7 +325,7 @@ function DeleteCommodity(
 function DeleteSingle(contract: string, extension: string, id: string) {
   const account = currentAccount
   const accountVar = helpers.getAccountVar(account)
-  http
+  http.irms
     .delete(
       `delete_single/${account}/${accountVar.tradeDate}/${contract}/${extension}`
     )
