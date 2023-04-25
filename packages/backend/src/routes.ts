@@ -1031,7 +1031,7 @@ const routes: Array<RouteOptions> = [
           message: `Nav upated for ${trade_date}\r\n${propagateMessage}\r\nRebased NAV recalculated for account ${account}\r\nClick OK to reload the table...`,
         })
       } catch (error) {
-        internalServerErrorHandler(res)
+        internalServerErrorHandler(res)(error)
       }
     },
   },
@@ -1146,7 +1146,87 @@ const routes: Array<RouteOptions> = [
           connection.end()
         }
       } catch (error) {
-        console.error(error)
+        internalServerErrorHandler(res)(error)
+      }
+    },
+  },
+
+  {
+    method: 'PUT',
+    url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/update_fees`,
+    schema: schemas.updateFees,
+    async handler(req, res) {
+      try {
+        const body: ICMSCommissionsData = req.body as ICMSCommissionsData
+        const validateBodyRequest = req.compileValidationSchema(
+          schemas.updateFees.body as FastifySchema
+        )
+
+        if (validateBodyRequest(req.body)) {
+          const connection = await db.pool.getConnection()
+          const {
+            commodity,
+            extension,
+            instrument,
+            account,
+            sle,
+            currency,
+            viaVoice,
+            viaGL,
+            clearingOnly,
+            phoneExcludingFees,
+            dmaExcludingFees,
+            exchangeFees,
+          } = body
+
+          const isFeesExist = await db.icms.isFeesExist(
+            commodity,
+            extension,
+            instrument,
+            account
+          )
+
+          if (!isFeesExist) {
+            return res.code(404).send({
+              success: false,
+              message: 'The fees not exist',
+            })
+          }
+
+          const query = {
+            sql: 'UPDATE tradingRef.tblTradingFees SET sle=?, currency=?, viaVoice=?, viaGL=?, clearingOnly=?, phoneExcludingFees=?, dmaExcludingFees=?, exchangeFees=? WHERE commodity=? AND extension=? AND instrument=? AND account=?',
+            params: [
+              sle,
+              currency,
+              viaVoice,
+              viaGL,
+              clearingOnly,
+              phoneExcludingFees,
+              dmaExcludingFees,
+              exchangeFees,
+              commodity,
+              extension,
+              instrument,
+              account,
+            ],
+          }
+
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
+          res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
+
+          const result = await connection.query(query.sql, query.params)
+          if (result?.affectedRows) {
+            res.send({
+              success: true,
+              message: 'Commodity fees has been updated successfully',
+            })
+          }
+          connection.end()
+        }
+      } catch (error) {
         internalServerErrorHandler(res)(error)
       }
     },

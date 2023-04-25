@@ -8,64 +8,19 @@
     theme="office"
   >
     <div>
-      <b>Add New Commodity Fees</b>
+      <b>Edit Commodity Fees</b>
     </div>
     <div class="window-body">
-      <form ref="form" class="flex flex-column h-full" @submit.prevent="submit">
+      <form ref="form" class="flex flex-column h-full" @submit.prevent="save">
         <div class="flex-grow">
           <table class="w-full overflow-auto" style="max-width: 97%">
             <tr>
-              <td><label for="commodity-1" class="block">Name</label></td>
+              <td><label for="commodity-2" class="block">Name</label></td>
               <td style="width: 55%">
                 <input
-                  id="commodity-1"
+                  id="commodity-2"
                   v-model="commission.commodity"
-                  name="commodity-1"
-                  type="text"
-                  required
-                  @keypress="onInputKeypress"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label for="extension-1" class="block">Extension</label>
-              </td>
-              <td>
-                <input
-                  id="extension-1"
-                  v-model="commission.extension"
-                  name="extension-1"
-                  type="text"
-                  required
-                  @keypress="onInputKeypress"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label for="instrument-1" class="block">Instrument</label>
-              </td>
-              <td>
-                <input
-                  id="instrument-1"
-                  v-model="commission.instrument"
-                  name="instrument-1"
-                  type="text"
-                  required
-                  @keypress="onInputKeypress"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label for="account-1" class="block">Account</label>
-              </td>
-              <td>
-                <input
-                  id="account-1"
-                  v-model="commission.account"
-                  name="account-1"
+                  name="commodity-2"
                   type="text"
                   disabled
                   required
@@ -75,13 +30,61 @@
             </tr>
             <tr>
               <td>
-                <label for="sle-1" class="block">SLE Server</label>
+                <label for="extension-2" class="block">Extension</label>
               </td>
               <td>
                 <input
-                  id="sle-1"
+                  id="extension-2"
+                  v-model="commission.extension"
+                  name="extension-2"
+                  type="text"
+                  disabled
+                  required
+                  @keypress="onInputKeypress"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="instrument-2" class="block">Instrument</label>
+              </td>
+              <td>
+                <input
+                  id="instrument-2"
+                  v-model="commission.instrument"
+                  name="instrument-2"
+                  type="text"
+                  disabled
+                  required
+                  @keypress="onInputKeypress"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="account-2" class="block">Account</label>
+              </td>
+              <td>
+                <input
+                  id="account-2"
+                  v-model="commission.account"
+                  name="account-2"
+                  type="text"
+                  disabled
+                  required
+                  @keypress="onInputKeypress"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="sle-2" class="block">SLE Server</label>
+              </td>
+              <td>
+                <input
+                  id="sle-2"
                   v-model="commission.sle"
-                  name="sle-1"
+                  name="sle-2"
                   type="text"
                   required
                   @keypress="onInputKeypress"
@@ -90,13 +93,13 @@
             </tr>
             <tr>
               <td>
-                <label for="currency-1" class="block">Currency</label>
+                <label for="currency-2" class="block">Currency</label>
               </td>
               <td>
                 <input
-                  id="currency-1"
+                  id="currency-2"
                   v-model="commission.currency"
-                  name="currency-1"
+                  name="currency-2"
                   required
                   @keypress="onInputKeypress"
                 />
@@ -104,13 +107,13 @@
             </tr>
             <tr>
               <td>
-                <label for="viaVoice-1" class="block">Via Voice</label>
+                <label for="viaVoice-2" class="block">Via Voice</label>
               </td>
               <td>
                 <input
-                  id="viaVoice-1"
+                  id="viaVoice-2"
                   v-model="commission.viaVoice"
-                  name="viaVoice-1"
+                  name="viaVoice-2"
                   type="number"
                   step="any"
                   required
@@ -120,13 +123,13 @@
             </tr>
             <tr>
               <td>
-                <label for="viaGL-1" class="block">Via GL</label>
+                <label for="viaGL-2" class="block">Via GL</label>
               </td>
               <td>
                 <input
-                  id="viaGL-1"
+                  id="viaGL-2"
                   v-model="commission.viaGL"
-                  name="viaGL-1"
+                  name="viaGL-2"
                   type="number"
                   step="any"
                   required
@@ -136,13 +139,13 @@
             </tr>
             <tr>
               <td>
-                <label for="clearingOnly-1" class="block">Clearing Only</label>
+                <label for="clearingOnly-2" class="block">Clearing Only</label>
               </td>
               <td>
                 <input
-                  id="clearingOnly-1"
+                  id="clearingOnly-2"
                   v-model="commission.clearingOnly"
-                  name="clearingOnly-1"
+                  name="clearingOnly-2"
                   type="number"
                   step="any"
                   required
@@ -152,15 +155,15 @@
             </tr>
             <tr>
               <td>
-                <label for="phoneExFees-1" class="block">
+                <label for="phoneExFees-2" class="block">
                   Phone (ex. Exchange Fees)
                 </label>
               </td>
               <td>
                 <input
-                  id="phoneExFees-1"
+                  id="phoneExFees-2"
                   v-model="commission.phoneExcludingFees"
-                  name="phoneExFees-1"
+                  name="phoneExFees-2"
                   type="number"
                   step="any"
                   required
@@ -170,15 +173,15 @@
             </tr>
             <tr>
               <td>
-                <label for="dmaExcludingFees-1" class="block">
+                <label for="dmaExcludingFees-2" class="block">
                   DMA (ex. Exchange Fees)
                 </label>
               </td>
               <td>
                 <input
-                  id="dmaExcludingFees-1"
+                  id="dmaExcludingFees-2"
                   v-model="commission.dmaExcludingFees"
-                  name="dmaExcludingFees-1"
+                  name="dmaExcludingFees-2"
                   type="number"
                   step="any"
                   required
@@ -188,15 +191,15 @@
             </tr>
             <tr>
               <td>
-                <label for="exchangeFees-1" class="block">
+                <label for="exchangeFees-2" class="block">
                   Exchange Fees
                 </label>
               </td>
               <td>
                 <input
-                  id="exchangeFees-1"
+                  id="exchangeFees-2"
                   v-model="commission.exchangeFees"
-                  name="exchangeFees-1"
+                  name="exchangeFees-2"
                   type="number"
                   step="any"
                   required
@@ -212,9 +215,9 @@
             class="ml-auto"
             type="submit"
             theme="office"
-            @click="submit"
+            @click="save"
           >
-            Submit
+            Save
           </jqxButton>
         </div>
       </form>
@@ -266,14 +269,17 @@ export default {
   },
 
   methods: {
-    open(account: string, onSuccessFn: () => void) {
+    open(existingCommission: ICMSCommissionsData, onSuccessFn: () => void) {
+      this.commission = JSON.parse(JSON.stringify(existingCommission))
       this.onSuccessFn = onSuccessFn
-      this.commission.account = account
       this.$refs.jqxWindow.open()
-      setTimeout(() => this.$el.querySelector('input').focus(), 200)
+      this.$refs.jqxWindow.setTitle(
+        `<b>Edit Commodity Fees - ${this.commission.commodity}</b>`
+      )
+      setTimeout(() => this.$el.querySelector('#sle-2').focus(), 200)
     },
 
-    submit() {
+    save() {
       if (!this.$refs.form.checkValidity()) {
         this.$refs.form.reportValidity()
         return
@@ -281,7 +287,7 @@ export default {
       this.setActionButtonsDisabledState(true)
       const feesData = JSON.parse(JSON.stringify(this.commission))
       return http.icms
-        .post('add_fees', feesData)
+        .put('update_fees', feesData)
         .then(({ data }) => {
           this.commissions = initialICMSCommissionsData
           if ('message' in data) {
@@ -294,7 +300,7 @@ export default {
           return Promise.resolve()
         })
         .catch((error) => {
-          console.error('Failed to add comodity fees', error)
+          console.error('Failed to update comodity fees', error)
           if ('message' in error.response.data) {
             PageControls.error(error.response.data.message)
           }
@@ -307,7 +313,7 @@ export default {
 
     onInputKeypress(event: KeyboardEvent) {
       if (event.key === 'Enter') {
-        this.submit()
+        this.save()
       }
     },
 

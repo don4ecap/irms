@@ -3,7 +3,7 @@
     class="icms-commissions-grid-container w-full flex flex-column overflow-hidden"
   >
     <div class="flex p-2 gap-2">
-      <JqxButton theme="office" @click="openEditCommissionsWindow">
+      <JqxButton theme="office" @click="openAddICMSCommissionWindow">
         Insert Commodity Fees
       </JqxButton>
       <JqxButton theme="office" @click="getICMSCommissionsData">
@@ -26,6 +26,7 @@
       :sortable="true"
       theme="office"
       width="100%"
+      @rowdoubleclick="openEditICMSCommissionWindow"
     />
   </div>
 </template>
@@ -182,10 +183,17 @@ export default {
         })
     },
 
-    openEditCommissionsWindow() {
+    openAddICMSCommissionWindow() {
       const AppVue = window.IRMS_APP.$children[0]
       AppVue?.openAddICMSCommissionsWindow(
         this.account,
+        this.getICMSCommissionsData
+      )
+    },
+    openEditICMSCommissionWindow({ args }) {
+      const AppVue = window.IRMS_APP.$children[0]
+      AppVue?.openEditICMSCommissionsWindow(
+        args.row.bounddata,
         this.getICMSCommissionsData
       )
     },

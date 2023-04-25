@@ -130,6 +130,40 @@ const schemas: ValidationSchemas = {
       additionalProperties: false,
     },
   },
+  updateFees: {
+    body: {
+      type: 'object',
+      required: [
+        'commodity',
+        'extension',
+        'instrument',
+        'account',
+        'sle',
+        'currency',
+        'viaVoice',
+        'viaGL',
+        'clearingOnly',
+        'phoneExcludingFees',
+        'dmaExcludingFees',
+        'exchangeFees',
+      ],
+      properties: {
+        commodity: { type: 'string' },
+        extension: { type: 'string' },
+        instrument: { type: 'string' },
+        account: { type: 'string' },
+        sle: { type: 'string' },
+        currency: { type: 'string' },
+        viaVoice: { type: 'number' },
+        viaGL: { type: 'number' },
+        clearingOnly: { type: 'number' },
+        phoneExcludingFees: { type: 'number' },
+        dmaExcludingFees: { type: 'number' },
+        exchangeFees: { type: 'number' },
+      },
+      additionalProperties: false,
+    },
+  },
 }
 
 export default schemas

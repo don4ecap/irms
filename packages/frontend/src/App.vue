@@ -61,11 +61,12 @@
     <AlarmWindow ref="alarmWindow" />
     <EditICMSNavWindow ref="editICMSNavWindow" />
     <AddICMSCommissionsWindow ref="addICMSCommissionsWindow" />
+    <EditICMSCommissionsWindow ref="editICMSCommissionsWindow" />
   </div>
 </template>
 
 <script lang="ts">
-import type { ICMSNavData } from 'irms-shared-types'
+import type { ICMSCommissionsData, ICMSNavData } from 'irms-shared-types'
 
 import http from './services/http'
 import JqxTabs from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtabs.vue'
@@ -75,6 +76,7 @@ import PreviewSingleOrderWindow from './components/PreviewSingleOrderWindow.vue'
 import AlarmWindow from './components/AlarmWindow.vue'
 import EditICMSNavWindow from './components/icms/EditNavWindow.vue'
 import AddICMSCommissionsWindow from './components/icms/AddCommissionsWindow.vue'
+import EditICMSCommissionsWindow from './components/icms/EditCommissionsWindow.vue'
 
 export default {
   name: 'AppRoot',
@@ -87,6 +89,7 @@ export default {
     AlarmWindow,
     EditICMSNavWindow,
     AddICMSCommissionsWindow,
+    EditICMSCommissionsWindow,
   },
 
   data() {
@@ -145,6 +148,12 @@ export default {
       this.$refs.addICMSCommissionsWindow.open(account, onSuccessFn)
     },
 
+    openEditICMSCommissionsWindow(
+      commission: ICMSCommissionsData,
+      onSuccessFn: () => void
+    ) {
+      this.$refs.editICMSCommissionsWindow.open(commission, onSuccessFn)
+    },
     /** Fetch database info from server and shot it under query logs */
     fetchDatabaseInfo() {
       http.irms
