@@ -354,5 +354,10 @@
   height: 2rem;
 }
 
+.permission > span {
+  padding: 0 0.1rem;
+  margin: 0 0.08rem;
+}
+
 @import './risks.scss';
 @import './utilities.scss';

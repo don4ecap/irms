@@ -275,7 +275,6 @@
       <div class="flex min-w-max-content" style="gap: 0.3rem">
         <!-- BUTTONS -->
         <div class="flex self-baseline" style="gap: 0.3rem">
-          <div class="permission bold text-center self-center">RWX</div>
           <!-- <JqxButton
             class="inline-block"
             theme="office"
@@ -364,6 +363,11 @@
           </div>
           <div v-show="bookLoadedDate?.length && !bookIsError">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
+          </div>
+          <div class="permission bold text-center self-center cursor-default">
+            <span title="Read">R</span>
+            <span title="Write">W</span>
+            <span title="Excecute">X</span>
           </div>
         </div>
       </div>
