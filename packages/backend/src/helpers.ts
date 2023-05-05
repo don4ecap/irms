@@ -42,6 +42,11 @@ function properRound(number: string): number {
   return Math.round(parseFloat(a))
 }
 
+function decimalRound(number: number, decimalPlaces: number) {
+  const factor = Math.pow(10, decimalPlaces)
+  return Math.round(number * factor) / factor
+}
+
 /** This function takes a value and escapes it for use in a SQL query */
 function sqlEscape(value: any) {
   if (typeof value === 'string') {
@@ -96,6 +101,7 @@ function queryString(query: string, params: Array<any>): string {
 
 export default {
   createUUID,
+  decimalRound,
   formatDate,
   getCurrentDate,
   getCurrentTimestamp,
