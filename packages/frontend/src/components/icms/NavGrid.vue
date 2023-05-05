@@ -13,7 +13,7 @@
       :columnsresize="true"
       editmode="dblclick"
       :enabletooltip="true"
-      height="100%"
+      height="94.6%"
       :rowsheight="24"
       selectionmode="singlerow"
       :sortable="true"
