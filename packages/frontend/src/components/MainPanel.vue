@@ -263,9 +263,13 @@
           ref="ICMSCommissionsGrid"
           :account="account"
         />
-        <div>
-          <!--  -->
-        </div>
+
+        <!-- iAlarms View -->
+        <IAlarmsView
+          v-show="currentViewIndex === 3"
+          ref="IAlarmsView"
+          :account="account"
+        />
       </div>
     </JqxSplitter>
     <div
@@ -290,8 +294,8 @@
             Intraday Config
           </JqxButton> -->
           <JqxToggleButton
-            ref="loadIRMSButton2"
-            class="inline-block"
+            ref="IRMSBookViewButton"
+            class="inline-block bottom-tab-button"
             theme="office"
             :toggled="currentViewIndex === 0"
             @click="loadIRMS"
@@ -299,8 +303,8 @@
             iRMS Book
           </JqxToggleButton>
           <JqxToggleButton
-            ref="loadICMSNavButton2"
-            class="inline-block"
+            ref="ICMSNavViewButton"
+            class="inline-block bottom-tab-button"
             theme="office"
             :toggled="currentViewIndex === 1"
             @click="loadICMSNavGrid"
@@ -308,22 +312,24 @@
             iCMS NAV
           </JqxToggleButton>
           <JqxToggleButton
-            ref="loadICMSCommissionsButton2"
-            class="inline-block"
+            ref="ICMSCommissionViewButton"
+            class="inline-block bottom-tab-button"
             theme="office"
             :toggled="currentViewIndex === 2"
             @click="loadICMSCommissionsGrid"
           >
             iCMS Commissions
           </JqxToggleButton>
-          <JqxButton
-            class="inline-block"
-            style="margin-left: 1rem"
+          <JqxToggleButton
+            ref="IAlarmsViewButton"
+            class="inline-block bottom-tab-button"
             theme="office"
-            onclick="openAlarmWindow(null, null)"
+            title="List of working alarms for this account"
+            :toggled="currentViewIndex === 3"
+            @click="loadAlarmsView"
           >
             Working Alarms
-          </JqxButton>
+          </JqxToggleButton>
           <label class="flex items-center">
             <input
               id="liverisks"
@@ -393,6 +399,7 @@ import JqxTreeGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxtreegrid.vue'
 import JqxDropDownList from 'jqwidgets-framework/jqwidgets-vue/vue_jqxdropdownlist.vue'
 import ICMSNavGrid from '../components/icms/NavGrid.vue'
 import ICMSCommissionsGrid from '../components/icms/CommisionsGrid.vue'
+import IAlarmsView from '../components/AlarmView.vue'
 
 let smallSuccessTimeout = {} as NodeJS.Timer
 
@@ -424,6 +431,7 @@ export default {
     JqxToggleButton,
     ICMSNavGrid,
     ICMSCommissionsGrid,
+    IAlarmsView,
   },
 
   props: {
@@ -483,25 +491,31 @@ export default {
   },
 
   watch: {
-    currentViewIndex(val) {
+    currentViewIndex(index: number, prevIndex: number) {
       const buttonRefs = [
-        this.$refs.loadIRMSButton2,
-        this.$refs.loadICMSNavButton2,
-        this.$refs.loadICMSCommissionsButton2,
+        this.$refs.IRMSBookViewButton,
+        this.$refs.ICMSNavViewButton,
+        this.$refs.ICMSCommissionViewButton,
+        this.$refs.IAlarmsViewButton,
       ]
-      if (val < buttonRefs.length) {
-        const toggleButton = buttonRefs[val]
-        buttonRefs.splice(val, 1)
-        if (
-          toggleButton &&
-          'check' in toggleButton &&
-          typeof toggleButton.check === 'function'
-        ) {
-          toggleButton.check()
-        }
+
+      if (index < buttonRefs.length) {
+        const toggleButton = buttonRefs[index]
+        buttonRefs.splice(index, 1)
+        toggleButton.setOptions({ disabled: true })
         for (const otherButton of buttonRefs) {
+          otherButton.setOptions({ disabled: false })
           otherButton.unCheck()
         }
+      }
+
+      const prevToggleButton = buttonRefs[prevIndex]
+      prevToggleButton?.setOptions({ disabled: false })
+
+      if (index === 3) {
+        this.$refs.IAlarmsView.start()
+      } else if (prevIndex === 3) {
+        this.$refs.IAlarmsView.clearIntervals()
       }
     },
   },
@@ -521,6 +535,7 @@ export default {
     )
 
     this.initialize(accountVar)
+    this.$refs.IRMSBookViewButton.setOptions({ disabled: true })
   },
 
   methods: {
@@ -983,6 +998,12 @@ export default {
         return
       }
       this.$refs.ICMSCommissionsGrid.getICMSCommissionsData()
+    },
+
+    loadAlarmsView() {
+      if (this.currentViewIndex !== 3) {
+        this.currentViewIndex = 3
+      }
     },
   },
 }

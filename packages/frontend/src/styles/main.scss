@@ -359,5 +359,10 @@
   margin: 0 0.08rem;
 }
 
+.bottom-tab-button {
+  &.jqx-fill-state-disabled {
+    opacity: 1;
+  }
+}
 @import './risks.scss';
 @import './utilities.scss';
