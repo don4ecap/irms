@@ -3,10 +3,10 @@
     <form id="form-add-alarm" class="hidden" @submit="emitSubmitEvent">
       <button class="hidden" type="submit"></button>
     </form>
-    <td class="uppercase" :class="{ field: !contract, down: !contract }">
-      <div v-if="contract">{{ contract }} {{ extension }}</div>
+    <td class="uppercase down">
+      <!-- <div v-if="contract">{{ contract }} {{ extension }}</div> -->
+      <!-- v-else -->
       <input
-        v-else
         v-model="contractOnly"
         class="input-contract"
         form="form-add-alarm"
