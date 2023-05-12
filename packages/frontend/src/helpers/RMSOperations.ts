@@ -691,8 +691,8 @@ function openPreviewAllOrdersWindow(sector: string) {
   window.previewAllOrdersWindow.open(sector)
 }
 
-function openAlarmWindow(contract: string, extension: string) {
-  window.alarmWindow.open(contract, extension)
+function openAlarmWindow(contract: string, extension: string, account: string) {
+  window.alarmWindow.open(contract, extension, account)
 }
 
 // function saveod() {

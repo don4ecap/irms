@@ -67,6 +67,7 @@
               />
               <!-- v-if="contract" -->
               <AlarmAddRow
+                ref="addAlarmRow"
                 :contract="contract"
                 :extension="extension"
                 :disable="loading.delete || loading.addAlarm"
@@ -107,6 +108,7 @@ export default {
 
   data() {
     return {
+      account: '',
       contract: '',
       alarms: [],
       loading: {
@@ -115,8 +117,8 @@ export default {
         delete: false,
       },
       extension: '',
-      intervalSecond: 30000,
-      interval: null,
+      fetchIntervalTime: 30000,
+      fetchInterval: null,
       countdown: 0,
       countdownInterval: null,
       endTime: 0,
@@ -124,17 +126,19 @@ export default {
   },
 
   methods: {
-    async open(contract: string, extension: string) {
+    async open(contract: string, extension: string, account: string) {
       this.$refs.currentWindow.open()
       this.contract = contract
       this.extension = extension
-      this.countdown = this.intervalSecond / 1000
+      this.account = account
+      this.countdown = this.fetchIntervalTime / 1000
       await this.fetchAlarms()
-      this.interval = setInterval(
+      this.fetchInterval = setInterval(
         this.fetchAlarmsNoLoading,
-        this.intervalSecond
+        this.fetchIntervalTime
       )
       this.countdownInterval = setInterval(this.updateRemainingTime, 1000)
+      this.$refs.addAlarmRow.focus()
     },
 
     updateRemainingTime() {
@@ -147,13 +151,13 @@ export default {
     },
 
     fetchAlarms(showLoading = true) {
-      this.endTime = Date.now() + this.intervalSecond
+      this.endTime = Date.now() + this.fetchIntervalTime
       this.alarms = []
       if (showLoading) this.loading.load = true
       const contract = this.contract
-      const url = !this.contract ? 'get_alarms' : `get_alarms/${contract}`
+      const account = this.account
       return http.irms
-        .get(url)
+        .get(`get_alarms/${account}/${contract}`)
         .then(({ data: alarms }) => {
           this.alarms = alarms.map((alarm) => ({
             ...alarm,
@@ -175,6 +179,7 @@ export default {
       contractDetails = {
         ...contractDetails,
         contract: `${contractDetails.contract} ${contractDetails.extension}`,
+        account: this.account,
       }
       http.irms
         .post('/add_alert', contractDetails)
@@ -231,7 +236,7 @@ export default {
     },
 
     clearIntervals() {
-      clearInterval(this.interval)
+      clearInterval(this.fetchInterval)
       clearInterval(this.countdownInterval)
     },
 

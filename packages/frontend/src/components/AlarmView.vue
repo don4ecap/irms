@@ -48,8 +48,7 @@
             />
             <!-- v-if="contract" -->
             <AlarmAddRow
-              :contract="contract"
-              :extension="extension"
+              ref="alarmAddRow"
               :disable="loading.delete || loading.addAlarm"
               @add="addAlarm"
             />
@@ -94,8 +93,8 @@ export default defineComponent({
         delete: false,
       },
       extension: '',
-      intervalSecond: 30000,
-      interval: null,
+      fetchIntervalTime: 30000,
+      fetchInterval: null,
       countdown: 0,
       countdownInterval: null,
       endTime: 0,
@@ -108,10 +107,11 @@ export default defineComponent({
 
   methods: {
     async start() {
-      this.countdown = this.intervalSecond / 1000
+      this.countdown = this.fetchIntervalTime / 1000
       await this.fetchAlarms(false)
-      this.interval = setInterval(this.fetc, this.intervalSecond)
+      this.fetchInterval = setInterval(this.fetchAlarms, this.fetchIntervalTime)
       this.countdownInterval = setInterval(this.updateRemainingTime, 1000)
+      this.$refs.alarmAddRow.focus()
     },
 
     updateRemainingTime() {
@@ -124,11 +124,10 @@ export default defineComponent({
     // },
 
     fetchAlarms(/* showLoading = true */) {
-      this.endTime = Date.now() + this.intervalSecond
+      this.endTime = Date.now() + this.fetchIntervalTime
       this.alarms = []
       // if (showLoading) this.loading.load = true
-      const contract = this.contract
-      const url = !this.contract ? 'get_alarms' : `get_alarms/${contract}`
+      const url = `get_alarms?account=${this.account}`
       return http.irms
         .get(url)
         .then(({ data: alarms }) => {
@@ -140,7 +139,11 @@ export default defineComponent({
           }))
         })
         .catch((error) => {
-          console.error('Failed to fetch alarms of contract', contract, error)
+          console.error(
+            'Failed to fetch alarms of account',
+            this.account,
+            error
+          )
         })
       // .finally(() => {
       // if (showLoading) this.loading.load = false
@@ -152,6 +155,7 @@ export default defineComponent({
       contractDetails = {
         ...contractDetails,
         contract: `${contractDetails.contract} ${contractDetails.extension}`,
+        account: this.account,
       }
       http.irms
         .post('/add_alert', contractDetails)
@@ -208,7 +212,7 @@ export default defineComponent({
     },
 
     clearIntervals() {
-      clearInterval(this.interval)
+      clearInterval(this.fetchInterval)
       clearInterval(this.countdownInterval)
     },
   },

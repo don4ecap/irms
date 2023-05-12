@@ -24,6 +24,7 @@ export interface GetConfigField {
 export interface CommonAlertData {
   contract: string
   field: string
+  account: string
 }
 
 export interface UpdateAlertEnabledBody {
@@ -64,6 +65,7 @@ export interface SendToITradeBody {
 }
 
 export interface GetAlarmsParams {
+  account: string
   contract: string
 }
 

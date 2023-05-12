@@ -678,6 +678,11 @@ const routes: Array<RouteOptions> = [
             sql: `SELECT *, IF(CAST(currentValue AS FLOAT) <= CAST(alertLow AS FLOAT) OR CAST(currentValue AS FLOAT) >= CAST(alertHigh AS FLOAT), true, false) AS reached FROM customRef.mktdata_marketdataalarms`,
           }
 
+          const { account } = req.query as { account: string | undefined }
+          if (account) {
+            query.sql += ` WHERE account="${account}"`
+          }
+
           res.header('X-IRMS-SQL-QUERY', query.sql)
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
@@ -703,7 +708,7 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------- GET ALARMS ------------------------------- */
   {
     method: 'GET',
-    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_alarms/:contract`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_alarms/:account/:contract`,
     handler(req, res) {
       db.pool
         .getConnection()
@@ -711,7 +716,7 @@ const routes: Array<RouteOptions> = [
           const params: GetAlarmsParams = req.params as GetAlarmsParams
 
           const query = {
-            sql: `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract LIKE "${params.contract}%"`,
+            sql: `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract LIKE "${params.contract}%" AND account="${params.account}"`,
             // params: [params.contract],
           }
 
@@ -744,7 +749,7 @@ const routes: Array<RouteOptions> = [
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { contract, field } = req.body as CommonAlertData
+          const { account, contract, field } = req.body as CommonAlertData
 
           // const contractSplited = contract.split(' ')
           // if (contractSplited.length < 2) {
@@ -772,13 +777,17 @@ const routes: Array<RouteOptions> = [
           }
 
           const query = {
-            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames,contract,field,alertLow,alertHigh,enabled,lowDirty,highDirty,numTriggers,currentValue) VALUES (1,'${contract.toUpperCase()}','${field}','','','TRUE','FALSE','FALSE',0,0)`,
+            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames, account, contract, field, alertLow, alertHigh, enabled, lowDirty, highDirty, numTriggers, currentValue) VALUES (1, ?, ?, ?, '', '', 'TRUE', 'FALSE', 'FALSE', 0, 0)`,
+            params: [account, contract.toUpperCase(), field],
           }
-          res.header('X-IRMS-SQL-QUERY', query.sql)
+          res.header(
+            'X-IRMS-SQL-QUERY',
+            helpers.queryString(query.sql, query.params)
+          )
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
           await connection
-            .query(query.sql)
+            .query(query.sql, query.params)
             .then(async () => {
               const addedAlarm = await db.alarms.getAlarm(
                 contract.toUpperCase(),

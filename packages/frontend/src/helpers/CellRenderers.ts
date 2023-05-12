@@ -405,7 +405,7 @@ const aRenderer: RendererCallback = function (
       alarmButton.title = 'Set market data alarm'
       alarmButton.setAttribute(
         'onclick',
-        `openAlarmWindow('${rowData.contract_twodigit}', '${rowData.extension}')`
+        `openAlarmWindow('${rowData.contract_twodigit}', '${rowData.extension}', '${currentAccount}')`
       )
       {
         const icon = document.createElement('img')
@@ -419,13 +419,13 @@ const aRenderer: RendererCallback = function (
       dot.classList.add('dot')
       for (let i = 0; i < window.alarms.length; i++) {
         const alarm = window.alarms[i]
-        const [alarm_contract_twodigit, alarm_extension] = alarm.contract
+        const [alarm_contract_twodigit] = alarm.contract
           .toLowerCase()
-          .split(' ')
+          .split(/\s|-/)
 
         if (
-          alarm_contract_twodigit == rowData.contract_twodigit.toLowerCase() &&
-          alarm_extension == rowData.extension.toLowerCase()
+          alarm_contract_twodigit.trim() ==
+          rowData.contract_twodigit.toLowerCase().trim()
         ) {
           if (alarm.reached && !dot.classList.contains('red')) {
             dot.classList.add('red')

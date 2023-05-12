@@ -1,36 +1,21 @@
 <template>
   <tr style="border-top-width: 3px">
-    <form id="form-add-alarm" class="hidden" @submit="emitSubmitEvent">
+    <form :id="formID" class="hidden" @submit="emitSubmitEvent">
       <button class="hidden" type="submit"></button>
     </form>
     <td class="uppercase down">
-      <!-- <div v-if="contract">{{ contract }} {{ extension }}</div> -->
-      <!-- v-else -->
       <input
+        ref="inputContract"
         v-model="contractOnly"
         class="input-contract"
-        form="form-add-alarm"
+        :form="formID"
         type="text"
+        spellcheck="false"
         placeholder="Contract"
       />
-      <!-- <select
-        v-else
-        v-model="alarm.contract"
-        form="form-add-alarm"
-        placeholder="Select contract"
-      >
-        <option selected default disabled value="">Select contract</option>
-        <option
-          v-for="(contractDetail, index) in contracts"
-          :key="index"
-          :value="contractDetail.contract_extension"
-        >
-          {{ contractDetail.contract_extension }}
-        </option>
-      </select> -->
     </td>
     <td class="field">
-      <select v-model="alarm.field" form="form-add-alarm">
+      <select v-model="alarm.field" :form="formID">
         <option value="Bid">Bid</option>
         <option value="Ask">Ask</option>
         <option value="Last">Last</option>
@@ -41,7 +26,7 @@
     <td class="up">
       <!-- <input
         v-model="alarm.alertHigh"
-        form="form-add-alarm"
+        :form="formID"
         type="number"
         placeholder="Click to edit"
       /> -->
@@ -49,7 +34,7 @@
     <td class="enable">
       <!-- <input
         v-model="alarm.enabled"
-        form="form-add-alarm"
+        :form="formID"
         class="enable-alarm-checkbox block mx-auto"
         type="checkbox"
       /> -->
@@ -59,7 +44,7 @@
         :disabled="disable"
         class="button-custom button-delete-alarm block w-full bold"
         style="color: #fff"
-        form="form-add-alarm"
+        :form="formID"
         type="submit"
       >
         ADD
@@ -69,6 +54,8 @@
 </template>
 
 <script lang="ts">
+let instanceCount = 1
+
 export default {
   name: 'AlarmAddRow',
 
@@ -96,23 +83,26 @@ export default {
         contract: this.contract,
         field: 'Bid',
       },
-      contractOnly: '',
+      contractOnly: `${this.contract} ${this.extension}`.toUpperCase().trim(),
+      formID: `form-add-alarm-${instanceCount++}`,
     }
   },
 
   methods: {
     emitSubmitEvent(event) {
       event.preventDefault()
-      if (!this.contract) {
-        const [contract, extension] = this.contractOnly.split(' ')
-        this.$emit('add', {
-          contract: contract || null,
-          extension: extension || null,
-          field: this.alarm.field,
-        })
-      } else {
-        this.$emit('add', this.alarm)
-      }
+      const splitedContract = this.contractOnly.trim().split(' ')
+      const contract = splitedContract[0]
+      const extension = splitedContract[splitedContract.length - 1]
+      this.$emit('add', {
+        contract: contract || null,
+        extension: extension || null,
+        field: this.alarm.field,
+      })
+    },
+
+    focus() {
+      setTimeout(() => this.$refs.inputContract.focus(), 300)
     },
   },
 }
