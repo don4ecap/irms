@@ -806,15 +806,15 @@ const routes: Array<RouteOptions> = [
   /* ------------------------------ DELETE ALARM ------------------------------ */
   {
     method: 'DELETE',
-    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/delete_alert/:account/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { contract, field } = req.params as CommonAlertData
+          const { account, contract, field } = req.params as CommonAlertData
 
           const query = {
-            sql: `DELETE FROM customRef.mktdata_marketdataalarms WHERE contract='${contract.toUpperCase()}' AND field='${field}'`,
+            sql: `DELETE FROM customRef.mktdata_marketdataalarms WHERE account="${account}" AND contract="${contract.toUpperCase()}"  AND field="${field}"`,
           }
 
           res.header('X-IRMS-SQL-QUERY', query.sql)
@@ -837,17 +837,17 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_enabled_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_enabled_alert/:account/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { contract, field } = req.params as CommonAlertData
+          const { account, contract, field } = req.params as CommonAlertData
           const { enabled, numTriggers } = req.body as UpdateAlertEnabledBody
           const _enabled = enabled ? 'TRUE' : 'FALSE'
 
           const query = {
-            sql: `UPDATE customRef.mktdata_marketdataalarms SET enabled='${_enabled}', numTriggers='${numTriggers}' WHERE contract='${contract}' AND field='${field}'`,
+            sql: `UPDATE customRef.mktdata_marketdataalarms SET enabled="${_enabled}", numTriggers="${numTriggers}" WHERE account="${account}" contract="${contract}" AND field="${field}"`,
           }
 
           res.header('X-IRMS-SQL-QUERY', query.sql)
@@ -878,12 +878,12 @@ const routes: Array<RouteOptions> = [
 
   {
     method: 'PUT',
-    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_alert/:contract/:field`,
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_alert/:account/:contract/:field`,
     handler(req, res) {
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { contract, field } = req.params as CommonAlertData
+          const { account, contract, field } = req.params as CommonAlertData
           let { alertLow, alertHigh } = req.body as UpdateAlertBody
 
           // @ts-ignore
@@ -902,8 +902,8 @@ const routes: Array<RouteOptions> = [
           }
 
           const query = {
-            sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=? WHERE contract=? AND field=?',
-            params: [alertLow, alertHigh, contract, field],
+            sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=? WHERE account=? AND contract=? AND field=?',
+            params: [alertLow, alertHigh, account, contract, field],
           }
 
           res.header(

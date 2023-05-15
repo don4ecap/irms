@@ -183,8 +183,11 @@ export default defineComponent({
       const alarmToDelete = this.alarms[index]
       alarmToDelete.loading.delete = true
       this.loading.delete = true
+      const account = this.account
       http.irms
-        .delete(`delete_alert/${alarmToDelete.contract}/${alarmToDelete.field}`)
+        .delete(
+          `delete_alert/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
+        )
         .then((/* { data } */) => {
           this.fetchAlarms(false)
         })
@@ -201,8 +204,9 @@ export default defineComponent({
     },
 
     updateAlarm(alarm: Alarm) {
+      const account = this.account
       http.irms
-        .put(`update_alert/${alarm.contract}/${alarm.field}`, {
+        .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
         })
