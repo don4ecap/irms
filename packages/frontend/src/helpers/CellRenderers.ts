@@ -425,7 +425,8 @@ const aRenderer: RendererCallback = function (
 
         if (
           alarm_contract_twodigit.trim() ==
-          rowData.contract_twodigit.toLowerCase().trim()
+            rowData.contract_twodigit.toLowerCase().trim() &&
+          alarm.account == currentAccount
         ) {
           if (alarm.reached && !dot.classList.contains('red')) {
             dot.classList.add('red')

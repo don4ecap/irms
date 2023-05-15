@@ -4,6 +4,7 @@ import * as Vue from 'vue/types/umd'
 /* eslint-disable no-var */
 
 interface Alarm {
+  account: string
   alertHigh: number
   alertLow: number
   contract: string
