@@ -977,7 +977,9 @@ export default {
 
     async loadAlarms() {
       try {
-        const { data: alarms } = await http.irms.get('get_alarms')
+        const { data: alarms } = await http.irms.get(
+          `get_alarms?account=${this.account}`
+        )
         window.alarms = alarms as Array<Alarm>
       } catch (error) {
         console.error('Failed to load alarms', error)
