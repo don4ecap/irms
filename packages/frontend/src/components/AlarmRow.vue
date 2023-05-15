@@ -74,6 +74,8 @@
 </template>
 
 <script lang="ts">
+let instance = 1
+
 export default {
   name: 'AlarmRow',
 
@@ -91,7 +93,7 @@ export default {
   data() {
     return {
       alarmData: JSON.parse(JSON.stringify(this.alarm)),
-      id: 'form-alarm-row-' + this.index,
+      id: `form-alarm-row-${this.alarm.account}-${this.index}-${instance++}`,
     }
   },
 
