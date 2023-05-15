@@ -768,7 +768,7 @@ const routes: Array<RouteOptions> = [
           //   })
           // }
 
-          const isAlarmExist = await db.alarms.isExist(contract, field)
+          const isAlarmExist = await db.alarms.isExist(account, contract, field)
           if (isAlarmExist) {
             return res.code(409).send({
               success: false,
@@ -853,7 +853,7 @@ const routes: Array<RouteOptions> = [
           res.header('X-IRMS-SQL-QUERY', query.sql)
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
-          const isAlarmExist = await db.alarms.isExist(contract, field)
+          const isAlarmExist = await db.alarms.isExist(account, contract, field)
           if (!isAlarmExist) {
             return res.code(404).send({
               success: false,
@@ -893,7 +893,7 @@ const routes: Array<RouteOptions> = [
           // eslint-disable-next-line no-extra-boolean-cast
           alertHigh = !!alertHigh ? alertHigh : null
 
-          const isAlarmExist = await db.alarms.isExist(contract, field)
+          const isAlarmExist = await db.alarms.isExist(account, contract, field)
           if (!isAlarmExist) {
             return res.code(404).send({
               success: false,

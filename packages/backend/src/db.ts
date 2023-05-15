@@ -48,7 +48,7 @@ const pool = mariadb.createPool(dbConfig)
 /* ------------------------------ ALARMS MODELS ----------------------------- */
 const alarms = {
   /** Check if an alarm exist */
-  async isExist(contract: string, field: string) {
+  async isExist(account: string, contract: string, field: string) {
     let connection
     try {
       connection = await pool.getConnection()
@@ -56,7 +56,7 @@ const alarms = {
       console.error(error)
     }
     const result = await connection?.query(
-      `SELECT * FROM customRef.mktdata_marketdataalarms WHERE contract='${contract}' AND field='${field}'`
+      `SELECT * FROM customRef.mktdata_marketdataalarms WHERE account='${account}' AND contract='${contract}' AND field='${field}'`
     )
     connection?.end()
     return result.length > 0
