@@ -956,14 +956,15 @@ const routes: Array<RouteOptions> = [
             .query(query.sql, query.params)
             .then((navs: Array<ICMSNavData>) => {
               // Calculate daily perf
-              for (let i = 0; i < navs.length; i++) {
-                if (i === navs.length - 1) continue
-                if (navs[i + 1].nav != 0) {
-                  navs[i].daily_perf = helpers.decimalRound(
-                    navs[i].pnl / navs[i + 1].nav,
-                    6
-                  )
-                }
+              for (let i = 0; i < navs.length - 1; i++) {
+                const currentNav = navs[i]
+                const prevNav = navs[i + 1]
+                const perf =
+                  (currentNav.pnl +
+                    currentNav.brokerCommissions +
+                    currentNav.misc) /
+                  (prevNav.nav + prevNav.subred)
+                currentNav.daily_perf = helpers.decimalRound(perf, 6)
               }
               res.send(navs)
             })
