@@ -15,8 +15,8 @@ import type {
   UpdateAlertEnabledBody,
   UpdateAlertBody,
 } from './types'
-import { ICMSCommissionsData, ICMSNavData } from 'irms-shared-types'
-import { UpdateICMSNavRequestBody } from 'irms-shared-types/REST'
+import type { ICMSCommissionsData, ICMSNavData } from 'irms-shared-types'
+import type { UpdateICMSNavRequestBody } from 'irms-shared-types/REST'
 import db from './db'
 import schemas from './schemas'
 import axios from 'axios'
@@ -667,6 +667,7 @@ const routes: Array<RouteOptions> = [
   /* --------------------------------- ALARMS --------------------------------- */
   /* ----------------------------------- ### ---------------------------------- */
 
+  /* ------------------------------- GET ALARMS ------------------------------- */
   {
     method: 'GET',
     url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/get_alarms`,
@@ -835,6 +836,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* -------------------------- UPDATE ENABLED ALARM -------------------------- */
   {
     method: 'PUT',
     url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_enabled_alert/:account/:contract/:field`,
@@ -876,6 +878,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ------------------------------ UPDATE ALARM ------------------------------ */
   {
     method: 'PUT',
     url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/update_alert/:account/:contract/:field`,
@@ -975,6 +978,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* ----------------------------- UPDATE ICMS NAV ---------------------------- */
   {
     method: 'PUT',
     url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/update_nav/:account/:trade_date`,
@@ -1005,8 +1009,13 @@ const routes: Array<RouteOptions> = [
           const totalDiff = navDiff + subRedDiff
           const newerNavs = await db.icms.getNewerNavs(account, trade_date)
           if (newerNavs?.length) {
-            const startDate = newerNavs[0].date
-            const endDate = newerNavs[newerNavs.length - 1].date
+            const startDate = new Date(newerNavs[0].date)
+              .toISOString()
+              .slice(0, 10)
+            const endDate = new Date(newerNavs[newerNavs.length - 1].date)
+              .toISOString()
+              .slice(0, 10)
+
             newerNavs.forEach(async (newerNav) => {
               await db.icms.updateNavField(
                 account,
@@ -1019,7 +1028,6 @@ const routes: Array<RouteOptions> = [
             propagateMessage = 'Nothing to propagate'
           }
         }
-        console.log(trade_date)
         const query = {
           sql: 'UPDATE trading.tblnav SET nav=?, fee1=?, fee2=?, fee3=?, fxAdj=?, comments=?, brokerCommissions=?, misc=?, subred=?, chNav=? WHERE account=? AND date=?',
           params: [
@@ -1171,6 +1179,7 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  /* -------------------------- UPDATE COMMODITY FEES ------------------------- */
   {
     method: 'PUT',
     url: `${config.IRMS_CONFIG.ICMS_API_BASE_PATH_PREFIX}/update_fees`,

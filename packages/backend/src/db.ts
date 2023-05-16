@@ -107,8 +107,8 @@ const icms = {
     try {
       const connection = await pool.getConnection()
       const result = await connection?.query(
-        'SELECT * FROM trading.tblnav WHERE account=? AND date > ? ORDER BY date DESC',
-        [account, helpers.formatDate(tradeDate)]
+        'SELECT * FROM trading.tblnav WHERE account=? AND date > ? ORDER BY date ASC',
+        [account, new Date(tradeDate)]
       )
       connection.end()
       return result
