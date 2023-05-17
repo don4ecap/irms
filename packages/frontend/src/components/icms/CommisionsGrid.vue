@@ -144,6 +144,13 @@ export default {
           rendered: columnHeaderRenderer,
         },
         {
+          text: 'DMA (Incl. Fees)',
+          datafield: 'dmaIncludingFees',
+          width: 125,
+          cellsalign: 'center',
+          rendered: columnHeaderRenderer,
+        },
+        {
           text: 'Account',
           datafield: 'account',
           width: 85,
