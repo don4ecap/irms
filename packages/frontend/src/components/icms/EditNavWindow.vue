@@ -8,7 +8,7 @@
     theme="office"
   >
     <div>
-      <b>Edit Nav deails for</b>
+      <b>Edit Nav details for</b>
     </div>
     <div class="window-body">
       <form ref="form" class="flex flex-column h-full" @submit.prevent="save">
@@ -219,7 +219,7 @@ export default {
       this.$refs.jqxWindow.open()
       const navDate = moment(nav.date).format('DD-MMM-YYYY')
       this.$refs.jqxWindow.setTitle(
-        `Edit NAV deails for TD: <b>${navDate}</b> Account: <b>${this.nav.account}</b>`
+        `Edit NAV details for TD: <b>${navDate}</b> Account: <b>${this.nav.account}</b>`
       )
       setTimeout(() => this.$el.querySelector('input').focus(), 200)
     },
