@@ -21,8 +21,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
               <label for="managementfees" class="block">Management Fees</label>
@@ -33,8 +34,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
               <label for="incentivefees" class="block">Incentive Fees</label>
@@ -45,8 +47,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
           </tr>
           <tr>
@@ -59,8 +62,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
               <label for="brokercommissions" class="block">
@@ -73,8 +77,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td><label for="misc" class="block">Miscellaneous</label></td>
             <td>
@@ -83,8 +88,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
           </tr>
           <tr>
@@ -95,9 +101,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
                 disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td><label for="subred" class="block">Sub/Red</label></td>
             <td>
@@ -106,8 +112,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
           </tr>
           <tr>
@@ -118,9 +125,9 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
                 disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
               <label for="administratornav" class="block">
@@ -133,18 +140,19 @@
                 type="number"
                 step="any"
                 required
-                @keypress="onInputKeypress"
+                disabled
               />
+              <!-- @keypress="onInputKeypress" -->
             </td>
           </tr>
           <tr>
             <td><label for="comments" class="block">Comments</label></td>
             <td colspan="6">
-              <input type="text" style="width: 97%" size="100" />
+              <input type="text" style="width: 97%" size="100" disabled />
             </td>
           </tr>
         </table>
-        <div class="window-buttons-container flex">
+        <!-- <div class="window-buttons-container flex">
           <jqxButton
             ref="buttonSaveChangesOnly"
             class="ml-auto"
@@ -162,7 +170,7 @@
           >
             Save and Propagate Changes
           </jqxButton>
-        </div>
+        </div> -->
       </form>
     </div>
   </JqxWindow>
@@ -171,7 +179,7 @@
 <script lang="ts">
 import { ICMSNavData } from 'irms-shared-types'
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
-import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
+// import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 
 const initialICMSNavData: ICMSNavData = {
   account: 'EE02',
@@ -196,7 +204,7 @@ export default {
 
   components: {
     JqxWindow,
-    JqxButton,
+    // JqxButton,
   },
 
   data() {
@@ -204,7 +212,7 @@ export default {
       nav: {
         ...initialICMSNavData,
       },
-      grid: null,
+      // grid: null,
       state: false,
     }
   },
@@ -215,42 +223,43 @@ export default {
         this.$refs.jqxWindow.close()
       }
       this.nav = JSON.parse(JSON.stringify(nav))
-      this.grid = grid
+      // this.grid = grid
       this.$refs.jqxWindow.open()
       const navDate = moment(nav.date).format('DD-MMM-YYYY')
       this.$refs.jqxWindow.setTitle(
-        `Edit NAV details for TD: <b>${navDate}</b> Account: <b>${this.nav.account}</b>`
+        // `Edit NAV details for TD: <b>${navDate}</b> Account: <b>${this.nav.account}</b>`
+        `NAV details for TD: <b>${navDate}</b> Account: <b>${this.nav.account}</b>`
       )
-      setTimeout(() => this.$el.querySelector('input').focus(), 200)
+      // setTimeout(() => this.$el.querySelector('input').focus(), 200)
     },
 
-    save(propagate = false) {
-      if (!this.$refs.form.checkValidity()) {
-        this.$refs.form.reportValidity()
-        return
-      }
-      this.setActionButtonsDisabledState(true)
-      this.grid
-        .update(this.nav, propagate)
-        .then(() => {
-          this.nav = initialICMSNavData
-          this.$refs.jqxWindow.close()
-        })
-        .finally(() => {
-          this.setActionButtonsDisabledState(false)
-        })
-    },
+    // save(propagate = false) {
+    //   if (!this.$refs.form.checkValidity()) {
+    //     this.$refs.form.reportValidity()
+    //     return
+    //   }
+    //   this.setActionButtonsDisabledState(true)
+    //   this.grid
+    //     .update(this.nav, propagate)
+    //     .then(() => {
+    //       this.nav = initialICMSNavData
+    //       this.$refs.jqxWindow.close()
+    //     })
+    //     .finally(() => {
+    //       this.setActionButtonsDisabledState(false)
+    //     })
+    // },
 
-    onInputKeypress(event: KeyboardEvent) {
-      if (event.key === 'Enter') {
-        this.save(false)
-      }
-    },
+    // onInputKeypress(event: KeyboardEvent) {
+    //   if (event.key === 'Enter') {
+    //     this.save(false)
+    //   }
+    // },
 
-    setActionButtonsDisabledState(disabled) {
-      $(this.$refs.buttonSaveChangesOnly.$el).jqxButton({ disabled })
-      $(this.$refs.buttonSavePropagateChanges.$el).jqxButton({ disabled })
-    },
+    // setActionButtonsDisabledState(disabled) {
+    //   $(this.$refs.buttonSaveChangesOnly.$el).jqxButton({ disabled })
+    //   $(this.$refs.buttonSavePropagateChanges.$el).jqxButton({ disabled })
+    // },
   },
 }
 </script>
