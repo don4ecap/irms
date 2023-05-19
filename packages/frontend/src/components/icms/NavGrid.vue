@@ -226,8 +226,6 @@ export default {
   }
 
   .jqx-grid-cell {
-    font-size: 8.5pt !important;
-
     & > div {
       margin-top: 0.35rem !important;
     }

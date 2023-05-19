@@ -1,28 +1,8 @@
-// .jqx-tabs-header {
-//   padding-left: 1rem;
-//   padding-right: 1rem;
-// }
+.jqx-grid-cell-office {
+  font-size: 8.5pt !important;
+}
 
-// .jqx-widget-office *,
-// Override grid cell
-// .jqx-widget-office .jqx-grid-cell-office {
-//   font-family: 'Open Sans', Roboto, system-ui, -apple-system, BlinkMacSystemFont,
-//     'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-// }
-
-// .jqx-widget-office {
-//   .jqx-grid-cell-office,
-//   .jqx-grid-column-header-office {
-//     border-color: #b1b1b1;
-//   }
-// }
-
-// .jqx-grid-table,
-// .jqx-grid-column-header {
-//   font-size: 12px;
-// }
-
-.jqx-grid-cell.wrap {
+.jqx-grid-cell-office.wrap {
   white-space: nowrap !important;
 }
 
