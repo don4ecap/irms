@@ -1,6 +1,8 @@
 import fastify, { FastifyServerOptions } from 'fastify'
 import routes from './routes'
 import cors from '@fastify/cors'
+import formBody from '@fastify/formbody'
+// import qs from 'qs'
 import db from './db'
 
 const createServer = (opts: FastifyServerOptions) => fastify(opts)
@@ -20,6 +22,10 @@ server.register(cors, {
   ],
 })
 
+server.register(formBody, {
+  bodyLimit: 10000000000,
+})
+
 // Add an "onSend" hook to the server, which is called just before the response is sent to the client
 server.addHook('onSend', (req, res, payload, next) => {
   // Add the X-IRMS-DB-HOST and X-IRMS-DB-PORT headers to the response
@@ -29,6 +35,24 @@ server.addHook('onSend', (req, res, payload, next) => {
   // Call the "next" callback to continue processing the request/response cycle
   next()
 })
+
+// server.addContentTypeParser(
+//   'application/x-www-form-urlencoded',
+//   { parseAs: 'buffer' },
+//   (req, body, done) => {
+//     if (body && body.length) {
+//       try {
+//         const parsedBody = qs.parse(body.toString())
+//         done(null, parsedBody)
+//       } catch (error) {
+//         // @ts-ignore
+//         done(error, undefined)
+//       }
+//     } else {
+//       done(null, {})
+//     }
+//   }
+// )
 
 // Set an error handler for the server, which is called when an unhandled error occurs during request processing
 server.setErrorHandler((error, req, res) => {

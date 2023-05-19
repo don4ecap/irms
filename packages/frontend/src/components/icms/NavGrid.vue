@@ -2,6 +2,7 @@
   <div class="icms-nav-grid-container w-full overflow-hidden">
     <div class="flex p-2 gap-2">
       <JqxButton theme="office" @click="getICMSNavData">Reload</JqxButton>
+      <JqxButton theme="office" @click="exportToXLS">Export as XLS</JqxButton>
     </div>
     <JqxGrid
       ref="ICMSNavGrid"
@@ -213,6 +214,19 @@ export default {
           console.error(errorMessage, error)
           return Promise.reject(error)
         })
+    },
+
+    exportToXLS() {
+      const date = moment(Date.now()).format('DD MMM YYYY')
+      $(this.$refs.ICMSNavGrid.$el).jqxGrid(
+        'exportdata',
+        'xls',
+        `iCMS NAV Data for ${this.account} - ${date}`,
+        true,
+        null,
+        true,
+        `${import.meta.env.VITE_IRMS_BACKEND_URL}/export_file`
+      )
     },
   },
 }

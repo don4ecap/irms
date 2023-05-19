@@ -11,7 +11,8 @@ import 'jqwidgets-framework/jqwidgets/jqxgrid.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.selection.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.columnsresize.js'
 import 'jqwidgets-framework/jqwidgets/jqxgrid.sort.js'
-
+import 'jqwidgets-framework/jqwidgets/jqxdata.export.js'
+import 'jqwidgets-framework/jqwidgets/jqxgrid.export.js'
 // Helpers, load it here so we can globally expose it
 import RMSOperations from './helpers/RMSOperations'
 import Formatters from './helpers/Formatters'

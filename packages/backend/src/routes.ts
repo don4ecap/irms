@@ -1261,6 +1261,24 @@ const routes: Array<RouteOptions> = [
     },
   },
 
+  {
+    method: 'POST',
+    url: `${config.IRMS_CONFIG.IRMS_API_BASE_PATH_PREFIX}/export_file`,
+    async handler(req, res) {
+      const body = req.body as any
+
+      res.header('Content-Type', 'application/xml')
+      // @ts-ignore
+      res.header(
+        'Content-Disposition',
+        `attachment; filename="${body?.filename || 'Data'}.${
+          body?.format || 'xls'
+        }"`
+      )
+      res.send(body.content)
+    },
+  },
+
   /* -------------------------- GET CONTRACTS -------------------------- */
   // {
   //   method: 'GET',

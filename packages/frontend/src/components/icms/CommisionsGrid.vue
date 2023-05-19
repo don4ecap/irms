@@ -7,7 +7,9 @@
         Insert Commodity Fees
       </JqxButton>
       <JqxButton theme="office" @click="getICMSCommissionsData">
-        Reload
+        Reload </JqxButton
+      ><JqxButton theme="office" @click="exportToXLS">
+        Export as XLS
       </JqxButton>
     </div>
     <JqxGrid
@@ -197,11 +199,25 @@ export default {
         this.getICMSCommissionsData
       )
     },
+
     openEditICMSCommissionWindow({ args }) {
       const AppVue = window.IRMS_APP.$children[0]
       AppVue?.openEditICMSCommissionsWindow(
         args.row.bounddata,
         this.getICMSCommissionsData
+      )
+    },
+
+    exportToXLS() {
+      const date = moment(Date.now()).format('DD MMM YYYY')
+      $(this.$refs.ICMSCommissionsGrid.$el).jqxGrid(
+        'exportdata',
+        'xls',
+        `iCMS Commission Data for ${this.account} - ${date}`,
+        true,
+        null,
+        true,
+        `${import.meta.env.VITE_IRMS_BACKEND_URL}/export_file`
       )
     },
   },
