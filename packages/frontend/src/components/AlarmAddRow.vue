@@ -92,8 +92,8 @@ export default {
     emitSubmitEvent(event) {
       event.preventDefault()
       const splitedContract = this.contractOnly.trim().split(' ')
-      const contract = splitedContract[0]
-      const extension = splitedContract[splitedContract.length - 1]
+      const contract = splitedContract.slice(0, -1).join(' ')
+      const extension = splitedContract.slice(-1).toString()
       this.$emit('add', {
         contract: contract || null,
         extension: extension || null,
