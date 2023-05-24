@@ -42,16 +42,18 @@
         <div class="col-2">
           <div class="flex flex-column" style="gap: 0.3rem">
             <JqxDateTimeInput
+              ref="selectTradeDate"
               v-model="bookDate"
               width="110"
               height="28"
               @input="updateTradeDate"
             />
             <JqxDropDownList
+              ref="sessionDropdown"
               theme="office"
               width="130"
               :source="sessions"
-              :selected-index="0"
+              :selected-index="selectedSessionIndex"
               title="iRMS book session"
               @change="onChangeSession"
             />
@@ -442,6 +444,8 @@ export default {
   },
 
   data() {
+    const sessions = ['MORNING', 'AFTERNOON', 'EVENING', 'EOD']
+
     return {
       bookDate: new Date(),
       ratioField: 'ratio',
@@ -450,7 +454,7 @@ export default {
         riskRate: 'Risk Rate',
         loadBooks: 'Load iRMS',
       },
-      sessions: ['EOD', 'MORNING', 'AFTERNOON', 'EVENING'],
+      sessions: sessions,
       panels: [
         { size: 103, min: 103, max: 103, collapsible: true },
         { size: '50%', min: '50%', collapsible: false },
@@ -464,10 +468,17 @@ export default {
       showNonNull: true,
       version: import.meta.env.VITE_IRMS_VERSION,
       gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
-      selectedSessionIndex: 0,
+      selectedSessionIndex: sessions.length - 1,
       bookIsError: false,
       bookErrorMsg: '',
       loadingBooks: false,
+
+      // Used to save user's request data before changed to the available ones
+      initialRequestData: {
+        tradeDate: '',
+        session: '',
+      },
+
       /** Current view index to indicate track which view is opened right now
        * 0 for iRMS book, 1 for iCMS NAV, and 2 for iCMS Commissions
        */
@@ -660,6 +671,9 @@ export default {
         return
       }
 
+      this.initialRequestData.tradeDate = this.tradeDate
+      this.initialRequestData.session = this.selectedSession
+
       this.showLoadingBooks()
       this.bookLoadedDate = moment().format('LLL')
 
@@ -715,7 +729,7 @@ export default {
       }
     },
 
-    async loadBooks() {
+    async loadBooks(tradeDate = this.tradeDate) {
       console.time(`Load ${this.account} books`)
       const accountVar = helpers.getAccountVar(this.account)
 
@@ -724,8 +738,35 @@ export default {
 
       try {
         const { data: books } = await http.irms.get(
-          `get_book/${this.account}/${this.tradeDate}?session=${this.selectedSession}`
+          `get_book/${this.account}/${tradeDate}?session=${this.selectedSession}`
         )
+
+        // If selected date and session has no books, load previous date and sessions
+        if (!books?.length) {
+          this.$refs.sessionDropdown.selectIndex(this.selectedSessionIndex - 1)
+          if (this.selectedSessionIndex === 0) {
+            this.$refs.sessionDropdown.selectIndex(this.sessions.length - 1)
+            const yesterday = moment(this.tradeDate)
+              .subtract(1, 'day')
+              .format('YYYY-MM-DD')
+
+            this.$refs.selectTradeDate.setDate(new Date(yesterday))
+            return this.loadBooks(yesterday)
+          } else {
+            return this.loadBooks()
+          }
+        }
+
+        if (
+          tradeDate !== this.initialRequestData.tradeDate ||
+          this.selectedSession !== this.initialRequestData.session
+        ) {
+          PageControls.success(
+            `Book with ${this.initialRequestData.tradeDate}/${this.initialRequestData.session} has no book. Book of ${tradeDate}/${this.selectedSession} is selected as the book closest to your selection`,
+            20000
+          )
+        }
+
         $(this.$refs.IRMSBookTreeGrid).jqxTreeGrid('clear')
         accountVar.books = books
         accountVar.bookIDMap = []

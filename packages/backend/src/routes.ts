@@ -74,7 +74,7 @@ const routes: Array<RouteOptions> = [
     handler(req, res) {
       db.pool
         .getConnection()
-        .then((connection) => {
+        .then(async (connection) => {
           const params: CommonRequestParams = req.params as CommonRequestParams
           const queries = (req.query as GetBookQueries) || { session: '' }
           queries.session = (queries.session || '').toLowerCase()
@@ -104,37 +104,26 @@ const routes: Array<RouteOptions> = [
           )
           res.header('X-IRMS-TIMESTAMP', helpers.getCurrentTimestamp())
 
-          connection
+          await connection
             .query(query.sql, query.params)
             .then((books: Array<any>) => {
-              if (books.length) {
-                books = books.map((book) => {
-                  return {
-                    ...book,
-                    first_notice_date: helpers.toDateISOString(
-                      book.first_notice_date
-                    ),
-                    last_trade_date: helpers.toDateISOString(
-                      book.last_trade_date
-                    ),
-                    expiry4E: helpers.toDateISOString(book.expiry4E),
-                    notice4E: helpers.toDateISOString(book.notice4E),
+              books = books.map((book) => {
+                return {
+                  ...book,
+                  first_notice_date: helpers.toDateISOString(
+                    book.first_notice_date
+                  ),
+                  last_trade_date: helpers.toDateISOString(
+                    book.last_trade_date
+                  ),
+                  expiry4E: helpers.toDateISOString(book.expiry4E),
+                  notice4E: helpers.toDateISOString(book.notice4E),
 
-                    last_nav: helpers.properRound(book.last_nav),
-                    live_nav: helpers.properRound(book.live_nav),
-                  }
-                })
-                return res.send(books)
-              } else {
-                if (queries.session === '') {
-                  queries.session = 'eod'
+                  last_nav: helpers.properRound(book.last_nav),
+                  live_nav: helpers.properRound(book.live_nav),
                 }
-                return res.status(404).send({
-                  message: `account ${
-                    params.account
-                  } with ${queries.session.toUpperCase()} session has no books`,
-                })
-              }
+              })
+              return res.send(books)
             })
             .catch(internalServerErrorHandler(res))
             .finally(connection.end)
