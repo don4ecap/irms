@@ -5,7 +5,7 @@
     :min-width="1200"
     :min-height="500"
     :auto-open="false"
-    @close="clearIntervals"
+    @close="close"
   >
     <h2 id="preview-single-window-header" style="margin: 0">Alarms</h2>
     <div class="preview-window-content single-order-preview">
@@ -64,6 +64,7 @@
                 @delete="deleteAlarm"
                 @update-enabled="updateEnabledAlarm"
                 @submit="updateAlarm"
+                @changed="updateAlarmsToUpdateBeforeClose"
               />
               <!-- v-if="contract" -->
               <AlarmAddRow
@@ -79,7 +80,7 @@
         </div>
       </div>
       <div>
-        <jqxButton theme="office" @click="close"> close </jqxButton>
+        <jqxButton theme="office" @click="() => close(true)"> close </jqxButton>
       </div>
     </div>
   </JqxWindow>
@@ -122,6 +123,7 @@ export default {
       countdown: 0,
       countdownInterval: null,
       endTime: 0,
+      alarmsToUpdateBeforeClose: [],
     }
   },
 
@@ -231,9 +233,9 @@ export default {
       )
     },
 
-    updateAlarm(alarm: Alarm) {
+    updateAlarm(index: number, alarm: Alarm) {
       const account = this.account
-      http.irms
+      return http.irms
         .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
@@ -248,10 +250,35 @@ export default {
       clearInterval(this.countdownInterval)
     },
 
-    close() {
+    updateAlarmsToUpdateBeforeClose(index: number, alarm: Alarm) {
+      this.alarmsToUpdateBeforeClose[index] = alarm
+    },
+
+    updateChangedAlarms() {
+      return Promise.race(
+        this.alarmsToUpdateBeforeClose.map((alarm, index) => {
+          if (alarm) {
+            return this.updateAlarm(index, alarm).then(() => {
+              this.alarmsToUpdateBeforeClose.splice(index, 1)
+              return Promise.resolve()
+            })
+          } else {
+            this.alarmsToUpdateBeforeClose.splice(index, 1)
+            return Promise.resolve()
+          }
+        })
+      )
+    },
+
+    async close() {
+      if (this.alarmsToUpdateBeforeClose?.length) {
+        await this.updateChangedAlarms()
+      }
       this.alarms = []
       this.clearIntervals()
-      this.$refs.currentWindow.close()
+      if (this.$refs.currentWindow.isOpen()) {
+        this.$refs.currentWindow.close()
+      }
     },
   },
 }

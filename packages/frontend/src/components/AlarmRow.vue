@@ -19,6 +19,7 @@
         type="number"
         step="any"
         placeholder="Click to edit"
+        @change="emitChanged"
       />
     </td>
     <td>{{ alarmData.currentValue }}</td>
@@ -29,6 +30,7 @@
         type="number"
         step="any"
         placeholder="Click to edit"
+        @change="emitChanged"
       />
     </td>
     <td class="enable">
@@ -110,7 +112,7 @@ export default {
   methods: {
     emitSubmitEvent(event) {
       event.preventDefault()
-      this.$emit('submit', this.alarmData)
+      this.$emit('submit', this.index, this.alarmData)
     },
 
     emitDeleteEvent() {
@@ -129,6 +131,10 @@ export default {
         this.alarmData.enabled = false
       }
       this.$emit('update-enabled', this.alarmData)
+    },
+
+    emitChanged() {
+      this.$emit('changed', this.index, this.alarmData)
     },
   },
 }

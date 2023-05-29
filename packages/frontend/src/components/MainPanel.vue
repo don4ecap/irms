@@ -334,7 +334,6 @@
           </JqxToggleButton>
           <label class="flex items-center">
             <input
-              id="liverisks"
               type="checkbox"
               value="liverisks"
               style="scale: 1.15"
