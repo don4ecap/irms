@@ -221,10 +221,14 @@ export default {
     },
 
     updateEnabledAlarm(alarm: Alarm) {
-      http.irms.put(`update_enabled_alert/${alarm.contract}/${alarm.field}`, {
-        enabled: alarm.enabled,
-        numTriggers: alarm.numTriggers,
-      })
+      const account = this.account
+      http.irms.put(
+        `update_enabled_alert/${account}/${alarm.contract}/${alarm.field}`,
+        {
+          enabled: alarm.enabled,
+          numTriggers: alarm.numTriggers,
+        }
+      )
     },
 
     updateAlarm(alarm: Alarm) {

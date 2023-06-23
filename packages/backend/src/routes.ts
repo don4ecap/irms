@@ -849,7 +849,7 @@ const routes: Array<RouteOptions> = [
           const _enabled = enabled ? 'TRUE' : 'FALSE'
 
           const query = {
-            sql: `UPDATE customRef.mktdata_marketdataalarms SET enabled="${_enabled}", numTriggers="${numTriggers}" WHERE account="${account}" contract="${contract}" AND field="${field}"`,
+            sql: `UPDATE customRef.mktdata_marketdataalarms SET enabled="${_enabled}", numTriggers="${numTriggers}" WHERE account="${account}" AND contract="${contract}" AND field="${field}"`,
           }
 
           res.header('X-IRMS-SQL-QUERY', query.sql)
