@@ -267,7 +267,7 @@ export default {
                   .filter((row) => row.contract_onedigit === backContract)
                   .map((row) => row.contract_twodigit)
 
-                contract_twodigit = `${frontContract2}-${backContract2}`
+                contract_twodigit = `${frontContract2[0]}-${backContract2[0]}`
               } else {
                 contract_twodigit = frontContract2
               }
