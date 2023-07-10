@@ -116,3 +116,13 @@ export interface IRMSBook {
   action?: string
   style?: string
 }
+
+export interface IRMSOrder {
+  qty: number
+  strategy: string
+  price: number
+  freetext: string
+
+  // Extended fields, added in frontend side
+  selected?: boolean // for checkbox selection
+}

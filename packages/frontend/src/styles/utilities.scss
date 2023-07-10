@@ -2,6 +2,10 @@
   overflow: hidden;
 }
 
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }
@@ -60,6 +64,10 @@
 
 .mb-2 {
   margin-bottom: 0.5rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .ml-auto {
@@ -203,6 +211,11 @@
 
 .not-visible {
   visibility: hidden;
+}
+
+.hr {
+  width: 100%;
+  background-color: transparent;
 }
 
 /* ------------------------------- ANIMATIONS ------------------------------- */

@@ -1,3 +1,9 @@
-import { Alarm, ICMSNavData, ICMSCommissionsData, IRMSBook } from './Data'
+import {
+  Alarm,
+  ICMSNavData,
+  ICMSCommissionsData,
+  IRMSBook,
+  IRMSOrder,
+} from './Data'
 
-export type { Alarm, ICMSNavData, ICMSCommissionsData, IRMSBook }
+export type { Alarm, ICMSNavData, ICMSCommissionsData, IRMSBook, IRMSOrder }
