@@ -25,6 +25,7 @@ export interface CommonAlertData {
   contract: string
   field: string
   account: string
+  comment: string
 }
 
 export interface UpdateAlertEnabledBody {

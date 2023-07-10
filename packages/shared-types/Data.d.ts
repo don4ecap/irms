@@ -46,6 +46,7 @@ export interface Alarm {
   numTriggers: number
   reached: boolean
   tablerownames: string
+  comment: string
 }
 
 export interface IRMSBook {

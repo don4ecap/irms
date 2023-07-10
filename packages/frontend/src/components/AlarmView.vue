@@ -11,23 +11,27 @@
         <h4>Showing all working alarms for {{ account }} account</h4>
         <table class="alarms-table w-full">
           <thead class="bold">
-            <td>Contract</td>
-            <td>Field</td>
+            <td style="width: 12rem">Contract</td>
+            <td style="width: 6rem">Field</td>
             <td
-              style="width: 10rem"
+              style="width: 6rem"
               :class="{ 'not-visible': !(alarms && alarms.length) }"
             >
               Down
             </td>
-            <td :class="{ 'not-visible': !(alarms && alarms.length) }">
+            <td
+              :class="{ 'not-visible': !(alarms && alarms.length) }"
+              style="width: 6rem"
+            >
               Current
             </td>
             <td
-              style="width: 10rem"
+              style="width: 6rem"
               :class="{ 'not-visible': !(alarms && alarms.length) }"
             >
               Up
             </td>
+            <td>Comment</td>
             <td
               class="w-0"
               :class="{ 'not-visible': !(alarms && alarms.length) }"

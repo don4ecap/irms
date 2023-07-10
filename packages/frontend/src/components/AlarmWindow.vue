@@ -30,23 +30,27 @@
               <h3 v-else class="text-left">Showing all working alarms</h3>
             </caption>
             <thead class="bold">
-              <td>Contract</td>
-              <td>Field</td>
+              <td style="width: 12rem">Contract</td>
+              <td style="width: 6rem">Field</td>
               <td
-                style="width: 10rem"
+                style="width: 6rem"
                 :class="{ 'not-visible': !(alarms && alarms.length) }"
               >
                 Down
               </td>
-              <td :class="{ 'not-visible': !(alarms && alarms.length) }">
+              <td
+                :class="{ 'not-visible': !(alarms && alarms.length) }"
+                style="width: 6rem"
+              >
                 Current
               </td>
               <td
-                style="width: 10rem"
+                style="width: 6rem"
                 :class="{ 'not-visible': !(alarms && alarms.length) }"
               >
                 Up
               </td>
+              <td>Comment</td>
               <td
                 class="w-0"
                 :class="{ 'not-visible': !(alarms && alarms.length) }"
@@ -66,7 +70,6 @@
                 @submit="updateAlarm"
                 @changed="updateAlarmsToUpdateBeforeClose"
               />
-              <!-- v-if="contract" -->
               <AlarmAddRow
                 ref="addAlarmRow"
                 :contract="contract"
@@ -181,8 +184,10 @@ export default {
       contractDetails = {
         ...contractDetails,
         contract: `${contractDetails.contract} ${contractDetails.extension}`,
+        comment: contractDetails.comment,
         account: this.account,
       }
+      debugger
       http.irms
         .post('/add_alert', contractDetails)
         .then(({ data: addedAlarm }) => {
@@ -239,6 +244,7 @@ export default {
         .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
+          comment: alarm.comment,
         })
         .then(() => {
           this.fetchAlarms(false)

@@ -739,7 +739,8 @@ const routes: Array<RouteOptions> = [
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { account, contract, field } = req.body as CommonAlertData
+          const { account, contract, field, comment } =
+            req.body as CommonAlertData
 
           // const contractSplited = contract.split(' ')
           // if (contractSplited.length < 2) {
@@ -767,8 +768,8 @@ const routes: Array<RouteOptions> = [
           }
 
           const query = {
-            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames, account, contract, field, alertLow, alertHigh, enabled, lowDirty, highDirty, numTriggers, currentValue) VALUES (1, ?, ?, ?, '', '', 'TRUE', 'FALSE', 'FALSE', 0, 0)`,
-            params: [account, contract.toUpperCase(), field],
+            sql: `INSERT INTO customRef.mktdata_marketdataalarms (tablerownames, account, contract, field, alertLow, alertHigh, enabled, lowDirty, highDirty, numTriggers, currentValue, comment) VALUES (1, ?, ?, ?, '', '', 'TRUE', 'FALSE', 'FALSE', 0, 0, ?)`,
+            params: [account, contract.toUpperCase(), field, comment],
           }
           res.header(
             'X-IRMS-SQL-QUERY',
@@ -875,7 +876,8 @@ const routes: Array<RouteOptions> = [
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { account, contract, field } = req.params as CommonAlertData
+          const { account, contract, field, comment } =
+            req.params as CommonAlertData
           let { alertLow, alertHigh } = req.body as UpdateAlertBody
 
           // @ts-ignore
@@ -894,8 +896,8 @@ const routes: Array<RouteOptions> = [
           }
 
           const query = {
-            sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=? WHERE account=? AND contract=? AND field=?',
-            params: [alertLow, alertHigh, account, contract, field],
+            sql: 'UPDATE customRef.mktdata_marketdataalarms SET alertLow=?, alertHigh=?, comment=? WHERE account=? AND contract=? AND field=?',
+            params: [alertLow, alertHigh, comment, account, contract, field],
           }
 
           res.header(

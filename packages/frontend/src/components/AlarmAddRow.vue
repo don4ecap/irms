@@ -3,7 +3,7 @@
     <form :id="formID" class="hidden" @submit="emitSubmitEvent">
       <button class="hidden" type="submit"></button>
     </form>
-    <td class="uppercase down">
+    <td class="uppercase field">
       <input
         ref="inputContract"
         v-model="contractOnly"
@@ -23,22 +23,16 @@
     </td>
     <td class="down"></td>
     <td></td>
-    <td class="up">
-      <!-- <input
-        v-model="alarm.alertHigh"
+    <td></td>
+    <td class="field">
+      <input
+        v-model="alarm.comment"
         :form="formID"
-        type="number"
-        placeholder="Click to edit"
-      /> -->
+        type="text"
+        placeholder="Comment"
+      />
     </td>
-    <td class="enable">
-      <!-- <input
-        v-model="alarm.enabled"
-        :form="formID"
-        class="enable-alarm-checkbox block mx-auto"
-        type="checkbox"
-      /> -->
-    </td>
+    <td></td>
     <td class="delete" style="background-color: #0075ff">
       <button
         :disabled="disable"
@@ -82,6 +76,7 @@ export default {
         extension: this.extension,
         contract: this.contract,
         field: 'Bid',
+        comment: '',
       },
       contractOnly: `${this.contract} ${this.extension}`.toUpperCase().trim(),
       formID: `form-add-alarm-${instanceCount++}`,
@@ -98,6 +93,7 @@ export default {
         contract: contract || null,
         extension: extension || null,
         field: this.alarm.field,
+        comment: this.alarm.comment,
       })
     },
 

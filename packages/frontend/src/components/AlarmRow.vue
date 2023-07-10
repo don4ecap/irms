@@ -4,15 +4,8 @@
       <button class="hidden" type="submit"></button>
     </form>
     <td>{{ alarmData.contract }}</td>
-    <td>
-      {{ alarmData.field }}
-      <!-- <select v-model="alarmData.field" :form="id">
-        <option value="Bid">Bid</option>
-        <option value="Ask">Ask</option>
-        <option value="Last">Last</option>
-      </select> -->
-    </td>
-    <td class="down">
+    <td>{{ alarmData.field }}</td>
+    <td class="field">
       <input
         v-model="alarmData.alertLow"
         :form="id"
@@ -23,7 +16,7 @@
       />
     </td>
     <td>{{ alarmData.currentValue }}</td>
-    <td class="up">
+    <td class="field">
       <input
         v-model="alarmData.alertHigh"
         :form="id"
@@ -33,14 +26,10 @@
         @change="emitChanged"
       />
     </td>
+    <td class="field">
+      <input v-model="alarmData.comment" type="text" placeholder="Comment" />
+    </td>
     <td class="enable">
-      <!-- <input
-        v-model="alarmData.enabled"
-        :form="id"
-        class="enable-alarm-checkbox block mx-auto"
-        title="Enable/disable alarm"
-        type="checkbox"
-      /> -->
       <button
         class="button-custom w-full flex justify-center items-center"
         :title="alarmStatus"

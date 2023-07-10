@@ -258,25 +258,26 @@
 
   & tbody td:is(.down, .up, .delete) {
     padding: 0;
-
-    & input {
-      margin: -1px;
-      appearance: none;
-      border: none;
-      display: block;
-      padding: 0.2rem 0.3rem;
-      width: 100%;
-      max-width: 95%;
-      height: 1.7rem;
-
-      &:focus {
-        outline: 1px solid #838181;
-      }
-    }
   }
 
   .enable-alarm-checkbox {
     transform: scale(1.2);
+  }
+}
+
+.field {
+  & input {
+    margin: -1px;
+    appearance: none;
+    border: none;
+    display: block;
+    padding: 0.2rem 0.3rem;
+    width: calc(100% - 0.5rem);
+    height: 2rem;
+
+    &:focus {
+      outline: 1px solid #838181;
+    }
   }
 }
 
@@ -344,5 +345,17 @@
     opacity: 1;
   }
 }
+
+.field-text-alarm {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid;
+
+  input {
+    height: 2rem;
+    border: none;
+  }
+}
+
 @import './risks.scss';
 @import './utilities.scss';
