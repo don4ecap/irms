@@ -27,7 +27,13 @@
       />
     </td>
     <td class="field">
-      <input v-model="alarmData.comment" type="text" placeholder="Comment" />
+      <input
+        v-model="alarmData.comment"
+        :form="id"
+        type="text"
+        placeholder="Comment"
+        @change="emitChanged"
+      />
     </td>
     <td class="enable">
       <button

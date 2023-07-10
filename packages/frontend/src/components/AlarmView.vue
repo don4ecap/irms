@@ -211,12 +211,13 @@ export default defineComponent({
       )
     },
 
-    updateAlarm(alarm: Alarm) {
+    updateAlarm(index: number, alarm: Alarm) {
       const account = this.account
       http.irms
         .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
+          comment: alarm.comment,
         })
         .then(() => {
           this.fetchAlarms(false)

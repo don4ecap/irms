@@ -36,6 +36,7 @@ export interface UpdateAlertEnabledBody {
 export interface UpdateAlertBody {
   alertLow: string
   alertHigh: string
+  comment: string
 }
 
 export interface SaveCellBody {

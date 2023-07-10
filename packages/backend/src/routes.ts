@@ -876,9 +876,9 @@ const routes: Array<RouteOptions> = [
       db.pool
         .getConnection()
         .then(async (connection) => {
-          const { account, contract, field, comment } =
-            req.params as CommonAlertData
+          const { account, contract, field } = req.params as CommonAlertData
           let { alertLow, alertHigh } = req.body as UpdateAlertBody
+          const { comment } = req.body as UpdateAlertBody
 
           // @ts-ignore
           // eslint-disable-next-line no-extra-boolean-cast
