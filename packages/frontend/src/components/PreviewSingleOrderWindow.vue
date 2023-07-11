@@ -74,11 +74,15 @@
                 placeholder="Strategy"
                 autocomplete="order_strategy"
               />
-              <input v-model="order.price" type="number" placeholder="Price" />
+              <input
+                v-model="order.price"
+                type="number"
+                placeholder="Price"
+                step="any"
+              />
               <input
                 v-model="order.freetext"
                 type="text"
-                step="any"
                 placeholder="Freetext"
               />
               <div class="flex" style="gap: 0.4rem">

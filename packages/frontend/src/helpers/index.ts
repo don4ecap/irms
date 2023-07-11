@@ -88,9 +88,9 @@ function parseOrder(quantity: string, strategy: string) {
     // }
 
     orders[j] = {
-      qty: parseInt(qty),
+      qty: parseFloat(qty),
       strategy: strat,
-      price: parseInt(qty),
+      price: parseFloat(price),
       freetext,
     }
     j++
