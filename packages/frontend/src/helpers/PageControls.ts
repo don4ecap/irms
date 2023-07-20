@@ -68,20 +68,28 @@ function small_success(text: string, timeout: number) {
 }
 
 /** Add new line to log query view */
-function logQuery(timestamp: string, query: string) {
+function logQuery(timestamp: string, query: string, url: string) {
   const logsEl = document.body.querySelector('#logs')
   const line = document.createElement('div')
   const timestampEl = document.createElement('div')
   const queryEl = document.createElement('div')
+  const urlEl = document.createElement('a')
 
   line.classList.add('flex')
-  timestampEl.style.marginRight = '0.9rem'
+  urlEl.classList.add('api-endpoint')
+  if (!window.showAPIEndpoint) {
+    urlEl.classList.add('hidden')
+  }
+  timestampEl.style.marginRight = queryEl.style.marginRight = '0.9rem'
 
   timestampEl.textContent = `[${timestamp}]`
   queryEl.textContent = query
+  urlEl.textContent = url
+  urlEl.href = url
 
   line.appendChild(timestampEl)
   line.appendChild(queryEl)
+  line.appendChild(urlEl)
   logsEl.prepend(line)
   //@ts-ignore
   if (IRMS_APP.$children[0].showQueryLog && window.autoScrollToFirstLine) {

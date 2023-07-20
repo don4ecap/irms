@@ -6,13 +6,9 @@ function postOrderContracts(
   extension: string
 ) {
   return http.irms
-    .post(`order_contracts`, {
-      contract1,
-      contract2,
-      extension,
-    })
+    .get(`orderContracts/${contract1}/${contract2}/${extension}`)
     .then(({ data }) => {
-      return Promise.resolve(data)
+      return Promise.resolve(data.data)
     })
     .catch((error) => {
       console.error('Error when post order contracts:\n', error)

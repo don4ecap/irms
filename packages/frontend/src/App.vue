@@ -36,8 +36,15 @@
         {{ showQueryLog ? 'hide' : 'show' }} query logs
       </button>
       <div class="flex items-center db-info">
-        <div class="bold" style="margin-left: 0.2rem">
-          DB SERVER: {{ dbInfo.host }}; DB PORT: {{ dbInfo.port }}
+        <div class="bold flex" style="margin-left: 0.2rem">
+          <div>
+            DB SERVER (READ): {{ dbInfo.read.host }}; DB PORT:
+            {{ dbInfo.read.port }}
+          </div>
+          <div style="margin-left: 1rem">
+            DB SERVER (WRITE): {{ dbInfo.write.host }}; DB PORT:
+            {{ dbInfo.write.port }}
+          </div>
         </div>
         <label
           class="ml-auto flex items-center"
@@ -51,6 +58,20 @@
           />
           <div style="margin: 0 0.3rem; font-size: 11.7px">
             auto scroll to first line
+          </div>
+        </label>
+        <label
+          class="flex items-center"
+          style="font-size: 0.76rem"
+          title="Show API endpoint URL in the log"
+        >
+          <input
+            v-model="showAPIEndpoint"
+            type="checkbox"
+            @change="updateShowAPIEndpoint"
+          />
+          <div style="margin: 0 0.3rem; font-size: 11.7px">
+            show API endpoint
           </div>
         </label>
       </div>
@@ -99,9 +120,16 @@ export default {
       currentAccount: 'EE02',
       showQueryLog: false,
       autoScrollToFirstLine: true,
+      showAPIEndpoint: false,
       dbInfo: {
-        host: '0.0.0.0',
-        port: 3306,
+        read: {
+          host: '0.0.0.0',
+          port: 3306,
+        },
+        write: {
+          host: '0.0.0.0',
+          port: 3306,
+        },
       },
     }
   },
@@ -113,6 +141,7 @@ export default {
     window.previewAllOrdersWindow = this.$refs.previewAllOrdersWindow
     window.previewSingleOrderWindow = this.$refs.previewSingleOrderWindow
     window.autoScrollToFirstLine = this.autoScrollToFirstLine
+    window.showAPIEndpoint = this.showAPIEndpoint
     window.alarmWindow = this.$refs.alarmWindow
 
     this.fetchDatabaseInfo()
@@ -121,6 +150,7 @@ export default {
   methods: {
     updateGlobal() {
       window.autoScrollToFirstLine = this.autoScrollToFirstLine
+      window.showAPIEndpoint = this.showAPIEndpoint
     },
 
     onTabClick() {
@@ -157,14 +187,26 @@ export default {
     /** Fetch database info from server and shot it under query logs */
     fetchDatabaseInfo() {
       http.irms
-        .get('get_db_info')
-        .then(({ data: databaseInfo }) => {
-          this.dbInfo.host = databaseInfo.DB_HOST
-          this.dbInfo.port = databaseInfo.DB_PORT
+        .get('getDBInfo')
+        .then(({ data }) => {
+          this.dbInfo = data.data
         })
         .catch((error) => {
           console.error('Error when trying to get database info', error)
         })
+    },
+
+    updateShowAPIEndpoint() {
+      if (this.showAPIEndpoint) {
+        document.body
+          .querySelectorAll('.api-endpoint')
+          ?.forEach((el) => el.classList.remove('hidden'))
+      } else {
+        document.body
+          .querySelectorAll('.api-endpoint')
+          ?.forEach((el) => el.classList.add('hidden'))
+      }
+      this.updateGlobal()
     },
   },
 }

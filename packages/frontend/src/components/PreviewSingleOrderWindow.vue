@@ -280,6 +280,8 @@ export default {
 
       const cellData = {
         id: book.id,
+        account: currentAccount,
+        tradeDate: accountVar.tradeDate,
         contract: book.contract,
         extension: book.extension || null,
         order_qty: this.quantities || null,
@@ -287,9 +289,9 @@ export default {
       }
 
       http.irms
-        .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
+        .post('updateIRMSOrder', cellData)
         .then(({ data }) => {
-          if (parseInt(data.id) == -1) {
+          if (parseInt(data.data.id) == -1) {
             // TODO: Notify failure
             console.error('Data is not saved')
             return

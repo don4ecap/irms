@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import PageControls from '../helpers/PageControls'
 
 interface IRMSHttpClientInstance extends AxiosInstance {
@@ -22,11 +22,12 @@ function createCommonHttpClient(baseURL: string) {
   })
 
   httpClient.interceptors.response.use(
-    function (res) {
+    function (res: AxiosResponse) {
       if (res?.headers['x-irms-sql-query']) {
         PageControls.logQuery(
           res.headers['x-irms-timestamp'],
-          res.headers['x-irms-sql-query']
+          res.headers['x-irms-sql-query'],
+          res.request.responseURL
         )
       }
       return Promise.resolve(res)
@@ -35,7 +36,8 @@ function createCommonHttpClient(baseURL: string) {
       if (error?.response.headers['x-irms-sql-query']) {
         PageControls.logQuery(
           error.response.headers['x-irms-timestamp'],
-          error.response.headers['x-irms-sql-query']
+          error.response.headers['x-irms-sql-query'],
+          error.response.request.responseURL
         )
       }
       return Promise.reject(error)
@@ -56,13 +58,13 @@ irms.postOrderContracts = function (
   extension: string
 ) {
   return irms
-    .post(`order_contracts`, {
+    .post(`orderContracts`, {
       contract1,
       contract2,
       extension,
     })
     .then(({ data }) => {
-      return Promise.resolve(data)
+      return Promise.resolve(data.data)
     })
     .catch((error) => {
       console.error('Error when post order contracts:\n', error)

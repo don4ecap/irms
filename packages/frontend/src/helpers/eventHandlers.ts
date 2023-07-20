@@ -114,9 +114,9 @@ function onRowEndEdit(event) {
 
   // Send request to server for save cell
   http.irms
-    .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
+    .post(`updateIRMSOrder/${currentAccount}/${accountVar.tradeDate}`, cellData)
     .then(({ data }) => {
-      if (parseInt(data.id) == -1) {
+      if (parseInt(data.data.id) == -1) {
         // TODO: Notify failure
         console.error('Data is not saved')
         return

@@ -162,8 +162,9 @@ export default {
       const contract = this.contract
       const account = this.account
       return http.irms
-        .get(`get_alarms/${account}/${contract}`)
-        .then(({ data: alarms }) => {
+        .get(`getAlarms/${account}/${contract}`)
+        .then(({ data }) => {
+          const alarms = data.data as Array<Alarm>
           this.alarms = alarms.map((alarm) => ({
             ...alarm,
             loading: {
@@ -187,9 +188,8 @@ export default {
         comment: contractDetails.comment,
         account: this.account,
       }
-      debugger
       http.irms
-        .post('/add_alert', contractDetails)
+        .post('addAlert', contractDetails)
         .then(({ data: addedAlarm }) => {
           addedAlarm = {
             ...addedAlarm,
@@ -217,7 +217,7 @@ export default {
       const account = this.account
       http.irms
         .delete(
-          `delete_alert/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
+          `deleteAlert/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
         )
         .then((/* { data } */) => {
           this.fetchAlarms(false)
@@ -230,7 +230,7 @@ export default {
     updateEnabledAlarm(alarm: Alarm) {
       const account = this.account
       http.irms.put(
-        `update_enabled_alert/${account}/${alarm.contract}/${alarm.field}`,
+        `updateEnabledAlarm/${account}/${alarm.contract}/${alarm.field}`,
         {
           enabled: alarm.enabled,
           numTriggers: alarm.numTriggers,
@@ -241,7 +241,7 @@ export default {
     updateAlarm(index: number, alarm: Alarm) {
       const account = this.account
       return http.irms
-        .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
+        .put(`updateAlarm/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
           comment: alarm.comment,

@@ -156,8 +156,9 @@ export default {
       this.$refs.ICMSNavGrid.showloadelement()
       this.$refs.ICMSNavGrid.removesort()
       return http.icms
-        .get(`get_navs/${this.account}`)
-        .then(({ data: iCMSNavData }) => {
+        .get(`getNavs/${this.account}`)
+        .then(({ data }) => {
+          const iCMSNavData = data.data
           this.$refs.ICMSNavGrid.source = {
             localdata: iCMSNavData,
             datatype: 'array',
@@ -201,7 +202,7 @@ export default {
       }
 
       return http.icms
-        .put(`update_nav/${updatedNav.account}/${tradeDate}`, navRequestBody)
+        .put(`updateNav/${updatedNav.account}/${tradeDate}`, navRequestBody)
         .then(({ data }) => {
           if ('message' in data && window.confirm(data.message)) {
             this.getICMSNavData()
@@ -225,7 +226,7 @@ export default {
         true,
         null,
         true,
-        `${import.meta.env.VITE_IRMS_BACKEND_URL}/export_file`
+        `${import.meta.env.VITE_IRMS_BACKEND_URL}/exportFile`
       )
     },
   },

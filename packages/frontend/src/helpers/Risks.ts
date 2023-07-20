@@ -199,8 +199,8 @@ function ComputeRisks() {
         if (book.orderP != null)
           if (book.orderP.indexOf('#') != -1) {
             console.log('Spread found on ' + book.contract)
-            const q = book.orderQ.split(';')
-            const p = book.orderP.split(';')
+            const q = book.orderQ.toString().split(';') || []
+            const p = book.orderP.toString().split(';') || []
             for (let i = 0; i < q.length; i++) {
               if (p[i].indexOf('#') != -1) {
                 let cont2 = p[i].split('#')[1]

@@ -111,26 +111,24 @@ contextMenu.on('itemclick', async function ({ args: menuITem }) {
     order_p: row.orderP || null,
   }
 
-  await http.irms
-    .post(`save_cell/${currentAccount}/${accountVar.tradeDate}`, cellData)
-    .then(({ data }) => {
-      if (parseInt(data.id) == -1) {
-        // TODO: Notify failure
-        console.error('Data is not saved')
-        return
-      }
-      const index = Risks.GetBookIndexByID(data.id)
-      const book = accountVar.books[index]
-      book.orderQ = row.orderQ
-      book.orderP = row.orderP
-      //ComputeRisksRow(index);
-      Risks.ComputeRisks()
-      $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
-      accountVar.editingRowID = -1
-      PageControls.success('Risks Updated')
-      //if(editingRowID!=-1)
-      //$("#treeGrid").jqxTreeGrid('beginRowEdit', editingRowID);
-    })
+  await http.irms.put(`updateIRMSOrder`, cellData).then(({ data }) => {
+    if (parseInt(data.data.id) == -1) {
+      // TODO: Notify failure
+      console.error('Data is not saved')
+      return
+    }
+    const index = Risks.GetBookIndexByID(data.data.id)
+    const book = accountVar.books[index]
+    book.orderQ = row.orderQ
+    book.orderP = row.orderP
+    //ComputeRisksRow(index);
+    Risks.ComputeRisks()
+    $(`#${accountVar.treeGridID}`).jqxTreeGrid('updateBoundData')
+    accountVar.editingRowID = -1
+    PageControls.success('Risks Updated')
+    //if(editingRowID!=-1)
+    //$("#treeGrid").jqxTreeGrid('beginRowEdit', editingRowID);
+  })
 })
 
 window.ignoreStrategies = ''
@@ -148,9 +146,9 @@ window.IRMS_APP = new Vue({
 }).$mount('#app')
 
 http.irms
-  .get('get_irms_config/ORDER_GENERATION_CODE')
+  .get('getOrderGenerationCode')
   .then(({ data }) => {
-    ORDER_GENERATION_CODE = data.content
+    ORDER_GENERATION_CODE = data.data
   })
   .catch((error) => {
     console.error('Failed to fetch ORDER_GENERATION_CODE config', error)

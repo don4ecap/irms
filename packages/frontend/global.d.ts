@@ -1,5 +1,6 @@
 import ExecuteR from './src/helpers/ExecuteR'
 import * as Vue from 'vue/types/umd'
+import type { IRMSBook } from 'irms-shared-types'
 
 /* eslint-disable no-var */
 
@@ -35,6 +36,8 @@ declare global {
 
   var autoScrollToFirstLine: boolean
 
+  var showAPIEndpoint: boolean
+
   var strategies: Array<string>
 
   var alarms: Array<Alarm>
@@ -46,7 +49,7 @@ declare global {
     bookIDMapRev: Array<number>
     books: Array<IRMSBook>
     calculateRisksLive: boolean
-    configTags: []
+    configTags: Array<string>
     editingRowID: number
     editingRowQty: any
     excecuteR: ExecuteR

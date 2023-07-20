@@ -172,8 +172,9 @@ export default {
       this.$refs.ICMSCommissionsGrid.showloadelement()
       this.$refs.ICMSCommissionsGrid.removesort()
       return http.icms
-        .get(`get_commissions/${this.account}`)
-        .then(({ data: ICMSCommissionsData }) => {
+        .get(`getCommissions/${this.account}`)
+        .then(({ data }) => {
+          const ICMSCommissionsData = data.data
           this.$refs.ICMSCommissionsGrid.source = {
             localdata: ICMSCommissionsData,
             datatype: 'array',
@@ -217,7 +218,7 @@ export default {
         true,
         null,
         true,
-        `${import.meta.env.VITE_IRMS_BACKEND_URL}/export_file`
+        `${import.meta.env.VITE_IRMS_BACKEND_URL}/exportFile`
       )
     },
   },

@@ -390,7 +390,7 @@ import helpers from '../helpers'
 import Formatters from '../helpers/Formatters'
 import EventHandlers from '../helpers/eventHandlers'
 import PageControls from '../helpers/PageControls'
-import type { Alarm } from 'irms-shared-types'
+import type { Alarm, IRMSBook } from 'irms-shared-types'
 
 import JqxSplitter from 'jqwidgets-framework/jqwidgets-vue/vue_jqxsplitter.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
@@ -676,40 +676,49 @@ export default {
       this.showLoadingBooks()
       this.bookLoadedDate = moment().format('LLL')
 
-      await this.loadCommoIndicatorLevel()
-      await this.loadStrategies()
-      await this.loadAlarms()
-      // this.loadContracts()
-      await this.loadConfigTags()
+      try {
+        await this.loadCommoIndicatorLevel()
+        await this.loadStrategies()
+        await this.loadAlarms()
+        // this.loadContracts()
+        await this.loadConfigTags()
 
-      await this.loadBooks()
-      await this.loadNav()
+        await this.loadBooks()
+        await this.loadNav()
 
-      const date = await this.getLastBookCalculation()
-      this.lastBookCalculation = moment(date).format('LLL')
-      // Attach last book calclulation scheduler, runs every one minute
-      this.updateLastBookCalculationScheduler()
-      if (!this.lastBookCalculationSchedulerInterval) {
-        console.debug('Check last book calculation scheduler has been attached')
-        this.lastBookCalculationSchedulerInterval = setInterval(
-          this.updateLastBookCalculationScheduler,
-          60000
-        )
+        const date = await this.getLastBookCalculation()
+        this.lastBookCalculation = moment(date).format('LLL')
+        // Attach last book calclulation scheduler, runs every one minute
+        this.updateLastBookCalculationScheduler()
+        if (!this.lastBookCalculationSchedulerInterval) {
+          console.debug(
+            'Check last book calculation scheduler has been attached'
+          )
+          this.lastBookCalculationSchedulerInterval = setInterval(
+            this.updateLastBookCalculationScheduler,
+            60000
+          )
+        }
+      } catch (error) {
+        //
+      } finally {
+        this.unshowLoadingBooks()
       }
-      return Promise.resolve()
     },
 
     async loadStrategies() {
-      const { data } = await http.irms.get('get_strategies')
-      data.unshift('CHECK')
-      strategies = data
+      const { data } = await http.irms.get('getStrategies')
+      const strategiesData = data.data as Array<string>
+      strategiesData.unshift('CHECK')
+      strategies = strategiesData
     },
 
     async loadConfigTags() {
       try {
-        const { data } = await http.irms.get(`get_configtags/${this.account}`)
+        const { data } = await http.irms.get(`getConfigTags/${this.account}`)
+        const configTags = data.data as Array<string>
         const accountVar = helpers.getAccountVar(this.account)
-        accountVar.configTags = data
+        accountVar.configTags = configTags
         PageControls.CreateGenerateButtons()
       } catch (error) {
         console.error('Failed to fetch config tags', error)
@@ -720,9 +729,9 @@ export default {
       console.time(`Load ${this.account} nav`)
       const accountVar = helpers.getAccountVar(this.account)
       const { data } = await http.irms.get(
-        `get_nav/${this.account}/${accountVar.tradeDate}`
+        `getNav/${this.account}/${accountVar.tradeDate}`
       )
-      this.nav = helpers.formatNavData(data, this.account)
+      this.nav = helpers.formatNavData(data.data, this.account)
       if (this.account !== 'EE04') {
         this.labels.riskRate = 'Risk Ratio'
       }
@@ -736,9 +745,10 @@ export default {
       this.loadingBooks = true
 
       try {
-        const { data: books } = await http.irms.get(
-          `get_book/${this.account}/${tradeDate}?session=${this.selectedSession}`
+        const { data } = await http.irms.get(
+          `getBook/${this.account}/${tradeDate}?session=${this.selectedSession}`
         )
+        const books = data.data as Array<IRMSBook>
 
         // If selected date and session has no books, load previous date and sessions
         if (!books?.length) {
@@ -870,9 +880,10 @@ export default {
     async loadPortfolio() {
       const tradeDate = helpers.getDateFromISO(this.bookDate.toISOString())
       try {
-        const { data: portfolio } = await http.irms.get(
-          `get_portfolio/${this.account}/${tradeDate}`
+        const { data } = await http.irms.get(
+          `getPortfolio/${this.account}/${tradeDate}`
         )
+        const portfolio = data.data
         const accountVar = helpers.getAccountVar(this.account)
         accountVar.portfolio = portfolio
         accountVar.portfolio.display = 'PORTFOLIO'
@@ -886,8 +897,8 @@ export default {
 
     async loadCommoIndicatorLevel() {
       const accountVar = helpers.getAccountVar(this.account)
-      const { data } = await http.irms.get('get_commo_indicator_level')
-      return (accountVar.indLevel = data)
+      const { data } = await http.irms.get('getCommoIndicatorLevels')
+      return (accountVar.indLevel = data.data)
     },
 
     buildGrid() {
@@ -943,9 +954,9 @@ export default {
     async getLastBookCalculation() {
       try {
         const { data } = await http.irms.get(
-          `check_last_calculated/${this.account}`
+          `getLastCalculated/${this.account}`
         )
-        return data.value
+        return data.data.value
       } catch (error) {
         console.error(
           `Failed to fetch last calculation date for ${this.account}`,
@@ -1017,10 +1028,11 @@ export default {
 
     async loadAlarms() {
       try {
-        const { data: alarms } = await http.irms.get(
-          `get_alarms?account=${this.account}`
+        const { data } = await http.irms.get(
+          `getAlarms?account=${this.account}`
         )
-        window.alarms = alarms as Array<Alarm>
+        // @ts-ignore
+        window.alarms = data.data as Array<Alarm>
       } catch (error) {
         console.error('Failed to load alarms', error)
       }

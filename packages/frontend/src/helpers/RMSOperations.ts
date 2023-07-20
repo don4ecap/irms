@@ -262,7 +262,7 @@ function DeleteSector(sector: string) {
   const accountVar = helpers.getAccountVar(account)
   return http.irms
     .delete(
-      `delete_all_orders/${account}/${accountVar.tradeDate}`,
+      `deleteAllOrders/${account}/${accountVar.tradeDate}`,
       //  @ts-ignore
       { sector }
     )
@@ -296,7 +296,7 @@ function DeleteCommodity(
   const accountVar = helpers.getAccountVar(account)
   http.irms
     .delete(
-      `delete_commodity/${account}/${accountVar.tradeDate}/${commodity}/${extension}`
+      `deleteCommodity/${account}/${accountVar.tradeDate}/${commodity}/${extension}`
     )
     .then((/* {data} */) => {
       for (let i = 0; i < accountVar.books.length; i++) {
@@ -327,7 +327,7 @@ function DeleteSingle(contract: string, extension: string, id: string) {
   const accountVar = helpers.getAccountVar(account)
   http.irms
     .delete(
-      `delete_single/${account}/${accountVar.tradeDate}/${contract}/${extension}`
+      `deleteOrder/${account}/${accountVar.tradeDate}/${contract}/${extension}`
     )
     .then((/* { data } */) => {
       const index = Risks.GetBookIndexByID(id)
@@ -490,13 +490,14 @@ function SoftReload(account: string) {
   const accountVar = helpers.getAccountVar(account)
 
   http.irms
-    .get(`get_book/${account}/${accountVar.tradeDate}`)
-    .then(async ({ data: books }) => {
+    .get(`getBook/${account}/${accountVar.tradeDate}`)
+    .then(async ({ data }) => {
+      const books = data.data
       accountVar.books = books
 
       accountVar.portfolio = await http.irms
-        .get(`get_portfolio/${account}/${accountVar.tradeDate}`)
-        .then(({ data }) => data)
+        .get(`getPortfolio/${account}/${accountVar.tradeDate}`)
+        .then(({ data }) => data.data)
         .catch((error) => console.error('Failed to get portfolio:', error))
 
       accountVar.portfolio.display = 'PORTFOLIO'

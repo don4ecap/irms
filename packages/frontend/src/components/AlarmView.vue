@@ -131,10 +131,11 @@ export default defineComponent({
       this.endTime = Date.now() + this.fetchIntervalTime
       this.alarms = []
       // if (showLoading) this.loading.load = true
-      const url = `get_alarms?account=${this.account}`
+      const url = `getAlarms?account=${this.account}`
       return http.irms
         .get(url)
-        .then(({ data: alarms }) => {
+        .then(({ data }) => {
+          const alarms = data.data as Array<Alarm>
           this.alarms = alarms.map((alarm) => ({
             ...alarm,
             loading: {
@@ -162,10 +163,10 @@ export default defineComponent({
         account: this.account,
       }
       http.irms
-        .post('/add_alert', contractDetails)
-        .then(({ data: addedAlarm }) => {
-          addedAlarm = {
-            ...addedAlarm,
+        .post('/addAlarm', contractDetails)
+        .then(({ data }) => {
+          const addedAlarm = {
+            ...data.data,
             loading: {
               delete: false,
             },
@@ -190,7 +191,7 @@ export default defineComponent({
       const account = this.account
       http.irms
         .delete(
-          `delete_alert/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
+          `deleteAlarm/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
         )
         .then((/* { data } */) => {
           this.fetchAlarms(false)
@@ -203,7 +204,7 @@ export default defineComponent({
     updateEnabledAlarm(alarm: Alarm) {
       const account = this.account
       http.irms.put(
-        `update_enabled_alert/${account}/${alarm.contract}/${alarm.field}`,
+        `updateEnabledAlarm/${account}/${alarm.contract}/${alarm.field}`,
         {
           enabled: alarm.enabled,
           numTriggers: alarm.numTriggers,
@@ -214,7 +215,7 @@ export default defineComponent({
     updateAlarm(index: number, alarm: Alarm) {
       const account = this.account
       http.irms
-        .put(`update_alert/${account}/${alarm.contract}/${alarm.field}`, {
+        .put(`updateAlarm/${account}/${alarm.contract}/${alarm.field}`, {
           alertHigh: alarm.alertHigh,
           alertLow: alarm.alertLow,
           comment: alarm.comment,

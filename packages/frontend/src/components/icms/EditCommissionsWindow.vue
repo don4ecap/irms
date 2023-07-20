@@ -287,7 +287,7 @@ export default {
       this.setActionButtonsDisabledState(true)
       const feesData = JSON.parse(JSON.stringify(this.commission))
       return http.icms
-        .put('update_fees', feesData)
+        .put('updateCommission', feesData)
         .then(({ data }) => {
           this.commissions = initialICMSCommissionsData
           if ('message' in data) {

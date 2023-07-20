@@ -61,9 +61,9 @@ export default {
       if (!accountVar.books.length) return
       this.loading.get = true
       http.irms
-        .get(`get_working/${currentAccount}/${accountVar.tradeDate}`)
+        .get(`getWorkingOrders/${currentAccount}/${accountVar.tradeDate}`)
         .then(async ({ data }) => {
-          const orders = await this.buildPreview(this.sector || '', data)
+          const orders = await this.buildPreview(this.sector || '', data.data)
 
           this.$refs.currentWindow.open()
 
@@ -342,13 +342,15 @@ export default {
         const index = selected[i]
         const dataToSend = {
           index,
+          account,
+          tradeDate: accountVar.tradeDate,
           ...rows[index],
         }
         http.irms
-          .post(`send_to_itrade/${account}/${accountVar.tradeDate}`, dataToSend)
+          .post(`sendToItrade/${account}/${accountVar.tradeDate}`, dataToSend)
           .then(({ data }) => {
-            $('#preview-orders-grid').jqxGrid('unselectrow', data.result)
-            $('#preview-orders-grid').jqxGrid('deleterow', data.result)
+            $('#preview-orders-grid').jqxGrid('unselectrow', data.data.result)
+            $('#preview-orders-grid').jqxGrid('deleterow', data.data.result)
           })
           .catch((error) => {
             console.error('Failed to send order to itrade', rows[index], error)
