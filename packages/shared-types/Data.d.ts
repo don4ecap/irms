@@ -72,7 +72,7 @@ export interface IRMSBook {
   gamma: number
   gl_factor: number
   hedge_ratio: number
-  id: string
+  id: number
   instrument: string
   last_fx: number
   last_nav: number

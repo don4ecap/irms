@@ -210,7 +210,7 @@ export default {
   },
 
   methods: {
-    open(rowID: number) {
+    open(rowID: string) {
       this.$refs.currentWindow.open()
       this.rowID = rowID
       const accountVar = helpers.getAccountVar(currentAccount)
@@ -218,7 +218,7 @@ export default {
       if (!accountVar.books.length) return
 
       const currentBook = accountVar.books.find(
-        (book) => book.id === rowID.toString()
+        (book) => book.id === parseInt(rowID)
       )
 
       this.origin.quantity = currentBook.orderQ
