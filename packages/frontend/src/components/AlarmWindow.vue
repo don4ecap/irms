@@ -182,22 +182,24 @@ export default {
 
     addAlarm(contractDetails) {
       this.loading.addAlarm = true
-      contractDetails = {
-        ...contractDetails,
-        contract: `${contractDetails.contract} ${contractDetails.extension}`,
-        comment: contractDetails.comment,
+      const contract = contractDetails.contract || ''
+      const extension = contractDetails.extension || ''
+      const alarmData = {
         account: this.account,
+        contract: `${contract} ${extension}`.trim(),
+        field: contractDetails.field,
+        comment: contractDetails.comment,
       }
       http.irms
-        .post('addAlert', contractDetails)
-        .then(({ data: addedAlarm }) => {
-          addedAlarm = {
-            ...addedAlarm,
+        .post('addAlarm', alarmData)
+        .then(({ data }) => {
+          contractDetails = {
+            ...data.data,
             loading: {
               delete: false,
             },
           }
-          this.alarms.push(addedAlarm)
+          this.alarms.push(contractDetails)
         })
         .catch((error) => {
           console.error('Failed when add alarm', contractDetails, error)
@@ -217,7 +219,7 @@ export default {
       const account = this.account
       http.irms
         .delete(
-          `deleteAlert/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
+          `deleteAlarm/${account}/${alarmToDelete.contract}/${alarmToDelete.field}`
         )
         .then((/* { data } */) => {
           this.fetchAlarms(false)

@@ -157,21 +157,24 @@ export default defineComponent({
 
     addAlarm(contractDetails) {
       this.loading.addAlarm = true
-      contractDetails = {
-        ...contractDetails,
-        contract: `${contractDetails.contract} ${contractDetails.extension}`,
+      const contract = contractDetails.contract || ''
+      const extension = contractDetails.extension || ''
+      const alarmData = {
         account: this.account,
+        contract: `${contract} ${extension}`.trim(),
+        field: contractDetails.field,
+        comment: contractDetails.comment,
       }
       http.irms
-        .post('/addAlarm', contractDetails)
+        .post('addAlarm', alarmData)
         .then(({ data }) => {
-          const addedAlarm = {
+          contractDetails = {
             ...data.data,
             loading: {
               delete: false,
             },
           }
-          this.alarms.push(addedAlarm)
+          this.alarms.push(contractDetails)
         })
         .catch((error) => {
           console.error('Failed when add alarm', contractDetails, error)
