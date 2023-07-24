@@ -284,18 +284,18 @@ export default {
         tradeDate: accountVar.tradeDate,
         contract: book.contract,
         extension: book.extension || null,
-        order_qty: this.quantities || null,
-        order_p: this.strategies || null,
+        orderQty: this.quantities || null,
+        orderP: this.strategies || null,
       }
 
       http.irms
-        .post('updateIRMSOrder', cellData)
-        .then(({ data }) => {
-          if (parseInt(data.data.id) == -1) {
-            // TODO: Notify failure
-            console.error('Data is not saved')
-            return
-          }
+        .put('updateIRMSOrder', cellData)
+        .then((/* { data } */) => {
+          // if (parseInt(data.data.id) == -1) {
+          // TODO: Notify failure
+          //   console.error('Data is not saved')
+          //   return
+          // }
           book.orderQ = this.quantities
           book.orderP = this.strategies
           //ComputeRisksRow(bookIndex);

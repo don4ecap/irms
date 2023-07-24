@@ -45,12 +45,17 @@ function parseOrder(quantity: string, strategy: string) {
     return
   }
 
+  if (typeof quantity === 'number') {
+    // @ts-ignore
+    quantity = quantity.toString()
+  }
+
   let quantities = []
   const orders = []
 
   let j = 0
-  quantities = quantity.split(';')
-  strategies = strategy.split(';')
+  quantities = quantity?.split(';')
+  strategies = strategy?.split(';')
 
   // if (quantities.length > strategies.length) {
   //   alert('You have more quantities than strategies')
