@@ -28,7 +28,6 @@
 
 <script lang="ts">
 import http from '../services/http'
-import API from '../services/api'
 import helpers from '../helpers'
 
 import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
@@ -255,10 +254,8 @@ export default {
                 extension
               )
               if (ordered.length < 2) {
-                PageControls.error(
-                  `Post order contract of ${frontContract} failed, the data should have 2 rows but got ${ordered.length}`
-                )
-                continue
+                const errorMessage = `Post order contract of ${frontContract} failed, the data should have 2 rows but got ${ordered.length}`
+                console.warn(errorMessage)
               }
               contract = `${frontContract}-${backContract}`
 
