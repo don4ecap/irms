@@ -191,6 +191,10 @@ export default {
           continue
         }
 
+        if (typeof sectorRow.orderQ === 'number') {
+          sectorRow.orderQ = sectorRow.orderQ.toString()
+        }
+
         const quantities = sectorRow.orderQ.split(';')
         const strategies = sectorRow.orderP.split(';')
 

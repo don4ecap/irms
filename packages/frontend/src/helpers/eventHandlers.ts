@@ -106,21 +106,23 @@ function onRowEndEdit(event) {
 
   const cellData = {
     id: row.id,
+    account: currentAccount,
+    tradeDate: accountVar.tradeDate,
     contract: row.contract,
     extension: row.extension || null,
-    order_qty: row.orderQ || null,
-    order_p: row.orderP || null,
+    orderQty: row.orderQ || null,
+    orderP: row.orderP || null,
   }
 
   // Send request to server for save cell
   http.irms
-    .post(`updateIRMSOrder/${currentAccount}/${accountVar.tradeDate}`, cellData)
-    .then(({ data }) => {
-      if (parseInt(data.data.id) == -1) {
-        // TODO: Notify failure
-        console.error('Data is not saved')
-        return
-      }
+    .put('updateIRMSOrder', cellData)
+    .then((/* { data } */) => {
+      // if (parseInt(data.data.id) == -1) {
+      // TODO: Notify failure
+      // console.error('Data is not saved')
+      // return
+      // }
       bookToUpdate.orderQ = row.orderQ
       bookToUpdate.orderP = row.orderP
       //ComputeRisksRow(index);
