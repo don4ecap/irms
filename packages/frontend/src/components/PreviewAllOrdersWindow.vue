@@ -34,6 +34,7 @@ import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import PageControls from '../helpers/PageControls'
+import { IRMSBook } from 'irms-shared-types'
 
 export default {
   name: 'PreviewAllOrdersWindow',
@@ -54,15 +55,18 @@ export default {
   },
 
   methods: {
-    initialize() {
+    initialize(skipOrderedCountInfo = false) {
       const accountVar = helpers.getAccountVar(currentAccount)
 
-      if (!accountVar.books.length) return
       this.loading.get = true
       http.irms
         .get(`getWorkingOrders/${currentAccount}/${accountVar.tradeDate}`)
         .then(async ({ data }) => {
-          const orders = await this.buildPreview(this.sector || '', data.data)
+          const orders = await this.buildPreview(
+            this.sector || '',
+            data.data,
+            skipOrderedCountInfo
+          )
 
           this.$refs.currentWindow.open()
 
@@ -166,15 +170,29 @@ export default {
         })
     },
 
-    async buildPreview(sector: string, existingOrders: Array<any>) {
-      let sectorRows
+    async buildPreview(
+      sector: string,
+      existingOrders: Array<any>,
+      skipOrderedCountInfo = false
+    ) {
+      let sectorRows = [] as Array<IRMSBook>
       const accountVar = helpers.getAccountVar(currentAccount)
 
-      if (sector === '') {
-        sectorRows = accountVar.books
-      } else {
-        sectorRows = accountVar.books.filter((book) => book.sector === sector)
+      let books = accountVar.books
+
+      if (!books || books?.length < 1) {
+        const getBookResp = await http.irms.get(
+          `getBook/${currentAccount}/${accountVar.tradeDate}`
+        )
+        books = getBookResp.data?.data as Array<IRMSBook>
       }
+
+      if (!books)
+        if (sector === '') {
+          sectorRows = books
+        } else {
+          sectorRows = books.filter((book) => book.sector === sector)
+        }
 
       let ignoreStrategies = 'CHECK'
       let excluded = 0
@@ -318,7 +336,7 @@ export default {
         }
       }
 
-      if (excluded > 0) {
+      if (excluded > 0 && !skipOrderedCountInfo) {
         PageControls.log(
           `${excluded} orders have been excluded as they are already in iTrade`,
           6500
@@ -332,31 +350,72 @@ export default {
       $('#preview-orders-grid').jqxGrid('selectallrows')
     },
 
-    sendToItrade() {
+    async sendToItrade() {
       const account = currentAccount
       const accountVar = accountsVar[account]
       const selected = $('#preview-orders-grid').jqxGrid(
         'getselectedrowindexes'
-      )
+      ) as Array<number>
       const rows = $('#preview-orders-grid').jqxGrid('getrows')
-      for (let i = 0; i < selected.length; i++) {
-        const index = selected[i]
+      let sentOrdersCount = 0
+      let unsetOrdersCount = 0
+
+      const sendOrderPromises = selected.map((selectedIndex) => {
+        const order = rows[selectedIndex] as IRMSBook
         const dataToSend = {
-          index,
-          account,
+          account: order.account,
           tradeDate: accountVar.tradeDate,
-          ...rows[index],
+          commo: order.commo,
+          contract: order.contract,
+          contract_twodigit: order.contract_twodigit,
+          extension: order.extension,
+          freetext: order.freetext,
+          instrument: order.instrument,
+          price: order.price,
+          qty: order.qty,
+          strategy: order.strategy,
         }
-        http.irms
-          .post(`sendToItrade/${account}/${accountVar.tradeDate}`, dataToSend)
-          .then(({ data }) => {
-            $('#preview-orders-grid').jqxGrid('unselectrow', data.data.result)
-            $('#preview-orders-grid').jqxGrid('deleterow', data.data.result)
+
+        // if (selectedIndex == 2) {
+        //   dataToSend.account = 'xxx'
+        // }
+
+        return http.irms
+          .post('sendToItrade', dataToSend)
+          .then(() => {
+            $('#preview-orders-grid').jqxGrid('unselectrow', selectedIndex)
+            sentOrdersCount++
           })
           .catch((error) => {
-            console.error('Failed to send order to itrade', rows[index], error)
+            unsetOrdersCount++
+            console.error(
+              'Failed to send order to itrade',
+              rows[selectedIndex],
+              error
+            )
           })
-      }
+      })
+
+      Promise.all(sendOrderPromises).finally(() => {
+        let plural: string
+
+        if (sentOrdersCount > 0) {
+          plural = sentOrdersCount > 1 ? 'orders' : 'order'
+          PageControls.log(
+            `Successfuly sent ${sentOrdersCount} ${plural} to iTrade`,
+            60000
+          )
+        }
+
+        if (unsetOrdersCount > 0) {
+          plural = unsetOrdersCount > 1 ? 'orders' : 'order'
+          PageControls.error(
+            `Failed to send ${unsetOrdersCount} ${plural} to iTrade`
+          )
+        }
+
+        this.initialize(true)
+      })
     },
 
     open(sector: string) {

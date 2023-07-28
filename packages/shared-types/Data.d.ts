@@ -69,6 +69,7 @@ export interface IRMSBook {
   expiry4E: string
   extension: string
   first_notice_date: string
+  freetext: string
   gamma: number
   gl_factor: number
   hedge_ratio: number
@@ -91,11 +92,13 @@ export interface IRMSBook {
   positions_pct_current: number
   positions_pct_target_notional: number
   positions_pct_target: number
+  price: number
   qty: number
   rowType: 'sector' | 'contract' | 'commodity'
   sector: string
   settlement_available: string
   settlement: number
+  strategy: string
   target_allocation_delta: number
   target_allocation_lots: number
   target_allocation_pct_notional: number

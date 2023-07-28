@@ -789,7 +789,7 @@ export default {
           book.expanded = true
           book.order_size = null
           book.action = ''
-          accountVar.bookIDMap[i] = parseInt(book.id)
+          accountVar.bookIDMap[i] = book.id
           accountVar.bookIDMapRev[book.id] = i
           book.style = 'background-color:red'
         }
