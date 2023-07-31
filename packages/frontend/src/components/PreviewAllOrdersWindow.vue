@@ -187,12 +187,11 @@ export default {
         books = getBookResp.data?.data as Array<IRMSBook>
       }
 
-      if (!books)
-        if (sector === '') {
-          sectorRows = books
-        } else {
-          sectorRows = books.filter((book) => book.sector === sector)
-        }
+      if (sector === '') {
+        sectorRows = books
+      } else {
+        sectorRows = books.filter((book) => book.sector === sector)
+      }
 
       let ignoreStrategies = 'CHECK'
       let excluded = 0
