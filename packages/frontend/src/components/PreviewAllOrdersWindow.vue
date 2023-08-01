@@ -208,7 +208,7 @@ export default {
         }
 
         if (typeof sectorRow.orderQ === 'number') {
-          sectorRow.orderQ = sectorRow.orderQ.toString()
+          sectorRow.orderQ = (sectorRow.orderQ as number).toString()
         }
 
         const quantities = sectorRow.orderQ.split(';')
@@ -273,6 +273,7 @@ export default {
               if (ordered.length < 2) {
                 const errorMessage = `Post order contract of ${frontContract} failed, the data should have 2 rows but got ${ordered.length}`
                 console.warn(errorMessage)
+                continue
               }
               contract = `${frontContract}-${backContract}`
 
@@ -297,11 +298,11 @@ export default {
 
           let flag = false
           for (let l = 0; l < existingOrders.length; l++) {
-            const existingOrder = existingOrders[l]
+            const existingOrder = existingOrders[l] as IRMSBook
             if (
               existingOrder.contract == contract &&
               existingOrder.extension == extension &&
-              existingOrder.price == price &&
+              existingOrder.price.toString() == price &&
               existingOrder.strategy == strategy
             ) {
               flag = true
