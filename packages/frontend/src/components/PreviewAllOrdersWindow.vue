@@ -1,29 +1,39 @@
 <template>
-  <div id="dynacontainer">
-    <JqxWindow
-      ref="currentWindow"
-      theme="office"
-      :min-width="1200"
-      :min-height="500"
-      :auto-open="false"
-    >
-      <h2 id="preview-window-header" style="margin: 0">
-        Preview Orders
-        <span id="tag1"></span>
-      </h2>
-      <div class="preview-window-content">
-        <div class="flex" style="padding: 5px; gap: 0.3rem">
-          <JqxButton theme="office" @click="selectAllRows">
-            Select All
-          </JqxButton>
-          <JqxButton theme="office" @click="sendToItrade">
-            Send to iTrade
-          </JqxButton>
-        </div>
-        <div id="preview-orders-grid"></div>
+  <JqxWindow
+    ref="currentWindow"
+    :auto-open="false"
+    :is-modal="true"
+    :min-width="1200"
+    :min-height="500"
+    theme="office"
+  >
+    <h3 id="preview-window-header" style="margin: 0">
+      Preview All Orders - <span id="preview-window-account"></span>
+      <span id="tag1"></span>
+    </h3>
+    <div class="preview-window-content">
+      <div class="flex" style="padding: 5px; gap: 0.3rem">
+        <JqxButton ref="btnSelectAl" theme="office" @click="selectAllRows">
+          Select All
+        </JqxButton>
+        <JqxButton ref="btnSendToItrade" theme="office" @click="sendToItrade">
+          Send to iTrade
+        </JqxButton>
       </div>
-    </JqxWindow>
-  </div>
+      <JqxGrid
+        ref="previewOrdersGrid"
+        :altrows="true"
+        :columns="columns"
+        :columnsheight="25"
+        height="100%"
+        :rowsheight="24"
+        selectionmode="multiplerowsextended"
+        :source="adapter"
+        theme="office"
+        width="100%"
+      />
+    </div>
+  </JqxWindow>
 </template>
 
 <script lang="ts">
@@ -34,7 +44,7 @@ import JqxWindow from 'jqwidgets-framework/jqwidgets-vue/vue_jqxwindow.vue'
 import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import PageControls from '../helpers/PageControls'
-import { IRMSBook } from 'irms-shared-types'
+import type { IRMSBook } from 'irms-shared-types'
 
 export default {
   name: 'PreviewAllOrdersWindow',
@@ -48,17 +58,101 @@ export default {
 
   data() {
     return {
-      loading: {
-        get: false,
-      },
+      // @ts-ignore
+      // eslint-disable-next-line no-undef
+      adapter: new jqx.dataAdapter(this.source),
+      columns: [
+        {
+          text: 'Contract',
+          datafield: 'contract',
+        },
+        {
+          text: 'Extension',
+          datafield: 'extension',
+        },
+        {
+          text: 'Quantity',
+          datafield: 'qty',
+        },
+        {
+          text: 'Strategy',
+          datafield: 'strategy',
+          cellsalign: 'center',
+          width: 200,
+        },
+        {
+          text: 'Price',
+          datafield: 'price',
+        },
+        {
+          text: 'FreeText',
+          datafield: 'freetext',
+          width: 150,
+        },
+        {
+          text: 'Account',
+          datafield: 'account',
+          width: 150,
+        },
+      ],
+    }
+  },
+
+  beforeCreate() {
+    // @ts-ignore
+    this.source = {
+      localdata: [],
+      datatype: 'array',
+      datafields: [
+        {
+          name: 'contract',
+          type: 'number',
+        },
+        {
+          name: 'extension',
+          type: 'string',
+        },
+        {
+          name: 'qty',
+          type: 'string',
+        },
+        {
+          name: 'strategy',
+          type: 'string',
+        },
+        {
+          name: 'price',
+          type: 'number',
+        },
+        {
+          name: 'account',
+          type: 'number',
+        },
+        {
+          name: 'freetext',
+          type: 'number',
+        },
+        {
+          name: 'contract_twodigit',
+          type: 'number',
+        },
+        {
+          name: 'commo',
+          type: 'string',
+        },
+        {
+          name: 'instrument',
+          type: 'string',
+        },
+      ],
     }
   },
 
   methods: {
     initialize(skipOrderedCountInfo = false) {
       const accountVar = helpers.getAccountVar(currentAccount)
-
-      this.loading.get = true
+      this.$refs.previewOrdersGrid.showloadelement()
+      this.disableComponents()
       http.irms
         .get(`getWorkingOrders/${currentAccount}/${accountVar.tradeDate}`)
         .then(async ({ data }) => {
@@ -67,106 +161,15 @@ export default {
             data.data,
             skipOrderedCountInfo
           )
-
-          this.$refs.currentWindow.open()
-
-          const sourcePreview = {
+          this.$refs.previewOrdersGrid.source = {
             localdata: orders,
-            datafields: [
-              {
-                name: 'contract',
-                type: 'number',
-              },
-              {
-                name: 'extension',
-                type: 'string',
-              },
-              {
-                name: 'qty',
-                type: 'string',
-              },
-              {
-                name: 'strategy',
-                type: 'string',
-              },
-              {
-                name: 'price',
-                type: 'number',
-              },
-              {
-                name: 'account',
-                type: 'number',
-              },
-              {
-                name: 'freetext',
-                type: 'number',
-              },
-              {
-                name: 'contract_twodigit',
-                type: 'number',
-              },
-              {
-                name: 'commo',
-                type: 'string',
-              },
-              {
-                name: 'instrument',
-                type: 'string',
-              },
-            ],
             datatype: 'array',
           }
-
-          const dataAdapter = new $.jqx.dataAdapter(sourcePreview)
-          $('#preview-orders-grid').jqxGrid({
-            // width: 1150,
-            autowidth: true,
-            height: 1000,
-            theme: 'office',
-            source: dataAdapter,
-            columns: [
-              {
-                text: 'Contract',
-                datafield: 'contract',
-              },
-              {
-                text: 'Extension',
-                datafield: 'extension',
-              },
-              {
-                text: 'Quantity',
-                datafield: 'qty',
-              },
-              {
-                text: 'Strategy',
-                datafield: 'strategy',
-                cellsalign: 'center',
-                width: 200,
-              },
-              {
-                text: 'Price',
-                datafield: 'price',
-              },
-              {
-                text: 'FreeText',
-                datafield: 'freetext',
-                width: 150,
-              },
-              {
-                text: 'Account',
-                datafield: 'account',
-                width: 150,
-              },
-            ],
-            selectionmode: 'multiplerowsextended',
-          })
-
-          $('#jqxwindow').on('close', (/* event */) => {
-            $('#preview-orders-grid').jqxGrid('destroy')
-          })
+          this.$refs.previewOrdersGrid.updatebounddata('data')
         })
         .finally(() => {
-          this.loading.get = false
+          this.$refs.previewOrdersGrid.hideloadelement()
+          this.enableComponents()
         })
     },
 
@@ -347,23 +350,26 @@ export default {
     },
 
     selectAllRows() {
-      $('#preview-orders-grid').jqxGrid('selectallrows')
+      this.$refs.previewOrdersGrid.selectallrows()
     },
 
     async sendToItrade() {
       const account = currentAccount
       const accountVar = accountsVar[account]
-      const selected = $('#preview-orders-grid').jqxGrid(
-        'getselectedrowindexes'
-      ) as Array<number>
-      const rows = $('#preview-orders-grid').jqxGrid('getrows')
-      let sentOrdersCount = 0
-      let unsetOrdersCount = 0
+      const selected =
+        this.$refs.previewOrdersGrid.getselectedrowindexes() as Array<number>
+      const rows = this.$refs.previewOrdersGrid.getrows() as Array<any>
 
+      let sentOrdersCount = 0
+      let unsentOrdersCount = 0
+      // const indexesToRemove = []
+
+      this.disableComponents()
       const sendOrderPromises = selected.map((selectedIndex) => {
         const order = rows[selectedIndex] as IRMSBook
         const dataToSend = {
-          account: order.account,
+          // index: selectedIndex,
+          account: currentAccount,
           tradeDate: accountVar.tradeDate,
           commo: order.commo,
           contract: order.contract,
@@ -376,23 +382,14 @@ export default {
           strategy: order.strategy,
         }
 
-        // if (selectedIndex == 2) {
-        //   dataToSend.account = 'xxx'
-        // }
-
         return http.irms
           .post('sendToItrade', dataToSend)
           .then(() => {
-            $('#preview-orders-grid').jqxGrid('unselectrow', selectedIndex)
             sentOrdersCount++
           })
           .catch((error) => {
-            unsetOrdersCount++
-            console.error(
-              'Failed to send order to itrade',
-              rows[selectedIndex],
-              error
-            )
+            unsentOrdersCount++
+            console.error('Failed to send order to itrade', error)
           })
       })
 
@@ -407,26 +404,48 @@ export default {
           )
         }
 
-        if (unsetOrdersCount > 0) {
-          plural = unsetOrdersCount > 1 ? 'orders' : 'order'
+        if (unsentOrdersCount > 0) {
+          plural = unsentOrdersCount > 1 ? 'orders' : 'order'
           PageControls.error(
-            `Failed to send ${unsetOrdersCount} ${plural} to iTrade`
+            `Failed to send ${unsentOrdersCount} ${plural} to iTrade`
           )
         }
 
+        this.enableComponents()
+        this.$refs.previewOrdersGrid.clearselection()
         this.initialize(true)
       })
     },
 
+    disableComponents() {
+      this.$refs.btnSelectAl.disabled = true
+      this.$refs.btnSendToItrade.disabled = true
+      this.$refs.previewOrdersGrid.disabled = true
+    },
+
+    enableComponents() {
+      this.$refs.btnSelectAl.disabled = false
+      this.$refs.btnSendToItrade.disabled = false
+      this.$refs.previewOrdersGrid.disabled = false
+    },
+
     open(sector: string) {
       this.sector = sector
-      this.initialize()
       const sectorNameEl = this.$refs.currentWindow.$el.querySelector('#tag1')
       if (this.sector?.length) {
-        sectorNameEl.textContent = `- ${this.sector}`
+        sectorNameEl.textContent = ` - ${this.sector}`
       } else {
         sectorNameEl.textContent = ''
       }
+      const previewWindowAccountEl = this.$refs.currentWindow.$el.querySelector(
+        '#preview-window-account'
+      )
+      if (previewWindowAccountEl) {
+        previewWindowAccountEl.textContent = currentAccount
+      }
+      this.$refs.previewOrdersGrid.clearselection()
+      this.$refs.currentWindow.open()
+      this.initialize()
     },
 
     close() {
