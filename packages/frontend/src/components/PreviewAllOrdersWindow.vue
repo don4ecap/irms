@@ -5,6 +5,7 @@
     :is-modal="true"
     :min-width="1200"
     :min-height="500"
+    @close="onWindowClosed"
     theme="office"
   >
     <h3 id="preview-window-header" style="margin: 0">
@@ -45,6 +46,8 @@ import JqxGrid from 'jqwidgets-framework/jqwidgets-vue/vue_jqxgrid.vue'
 import JqxButton from 'jqwidgets-framework/jqwidgets-vue/vue_jqxbuttons.vue'
 import PageControls from '../helpers/PageControls'
 import type { IRMSBook } from 'irms-shared-types'
+
+let previousSector = ''
 
 export default {
   name: 'PreviewAllOrdersWindow',
@@ -443,14 +446,17 @@ export default {
       if (previewWindowAccountEl) {
         previewWindowAccountEl.textContent = currentAccount
       }
-      this.$refs.previewOrdersGrid.clearselection()
       this.$refs.currentWindow.open()
       this.initialize()
     },
 
-    close() {
-      this.$refs.currentWindow.close()
+    onWindowClosed() {
+      this.$refs.previewOrdersGrid.clearselection()
     },
+
+    // close() {
+    //   this.$refs.currentWindow.close()
+    // },
   },
 }
 </script>
