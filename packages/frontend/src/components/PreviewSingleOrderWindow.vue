@@ -1,151 +1,156 @@
 <template>
-  <div id="dynacontainer">
-    <JqxWindow
-      ref="currentWindow"
-      theme="office"
-      :min-width="1200"
-      :min-height="500"
-      :auto-open="false"
-    >
-      <h2 id="preview-single-window-header" style="margin: 0">Order Details</h2>
-      <div class="preview-window-content single-order-preview">
-        <div class="orders-container flex-grow overflow-hidden">
-          <form ref="formAddOrder" class="item" @submit.prevent="add">
-            <input type="checkbox" disabled />
+  <JqxWindow
+    ref="currentWindow"
+    theme="office"
+    :min-width="1200"
+    :min-height="500"
+    :auto-open="false"
+    :is-modal="true"
+  >
+    <h3 id="preview-single-window-header" style="margin: 0">
+      Order Details - <span id="preview-single-order-contract-name"></span>
+    </h3>
+    <div class="preview-window-content single-order-preview">
+      <div class="orders-container flex-grow overflow-hidden">
+        <form ref="formAddOrder" class="item" @submit.prevent="add">
+          <!-- <input type="checkbox" disabled /> -->
+          <input
+            ref="addOrderQuantityField"
+            v-model="newOrder.qty"
+            type="number"
+            step="any"
+            placeholder="Quantity"
+            required
+          />
+          <input
+            v-model="newOrder.strategy"
+            type="text"
+            placeholder="Strategy"
+            name="order_strategy"
+            required
+          />
+          <input
+            v-model="newOrder.price"
+            type="number"
+            step="any"
+            placeholder="Price"
+          />
+          <input
+            v-model="newOrder.freetext"
+            type="text"
+            placeholder="Freetext"
+          />
+          <input
+            type="submit"
+            hidden
+            aria-hidden="true"
+            style="display: none"
+            value=""
+          />
+          <div>
+            <div style="min-width: 800px"></div>
+            <jqxButton
+              type="submit"
+              class="btn-add"
+              theme="office"
+              @click="add"
+            >
+              ADD
+            </jqxButton>
+          </div>
+        </form>
+        <hr class="hr" />
+
+        <div class="orders-container orders-list">
+          <div v-for="(order, index) in orders" :key="index" class="item">
+            <!-- <input v-model="order.selected" type="checkbox" /> -->
             <input
-              ref="addOrderQuantityField"
-              v-model="newOrder.qty"
+              v-model="order.qty"
               type="number"
               step="any"
               placeholder="Quantity"
-              required
             />
             <input
-              v-model="newOrder.strategy"
+              v-model="order.strategy"
               type="text"
               placeholder="Strategy"
-              name="order_strategy"
-              required
+              autocomplete="order_strategy"
             />
             <input
-              v-model="newOrder.price"
+              v-model="order.price"
               type="number"
-              step="any"
               placeholder="Price"
+              step="any"
             />
             <input
-              v-model="newOrder.freetext"
+              v-model="order.freetext"
               type="text"
               placeholder="Freetext"
             />
-            <input
-              type="submit"
-              hidden
-              aria-hidden="true"
-              style="display: none"
-              value=""
-            />
-            <div>
-              <div style="min-width: 800px"></div>
+            <div class="flex" style="gap: 0.4rem">
               <jqxButton
-                type="submit"
-                class="btn-add"
+                class="btn-split w-full"
                 theme="office"
-                @click="add"
+                @click="split(order)"
               >
-                ADD
+                SPLIT
+              </jqxButton>
+              <jqxButton
+                class="btn-duplicate w-full"
+                theme="office"
+                @click="duplicate(order)"
+              >
+                DUPLICATE
+              </jqxButton>
+              <jqxButton
+                class="btn-delete w-full"
+                theme="office"
+                @click="remove(index)"
+              >
+                DELETE
               </jqxButton>
             </div>
-          </form>
-          <hr class="hr" />
-
-          <div class="orders-container orders-list">
-            <div v-for="(order, index) in orders" :key="index" class="item">
-              <input v-model="order.selected" type="checkbox" />
-              <input
-                v-model="order.qty"
-                type="number"
-                step="any"
-                placeholder="Quantity"
-              />
-              <input
-                v-model="order.strategy"
-                type="text"
-                placeholder="Strategy"
-                autocomplete="order_strategy"
-              />
-              <input
-                v-model="order.price"
-                type="number"
-                placeholder="Price"
-                step="any"
-              />
-              <input
-                v-model="order.freetext"
-                type="text"
-                placeholder="Freetext"
-              />
-              <div class="flex" style="gap: 0.4rem">
-                <jqxButton
-                  class="btn-split w-full"
-                  theme="office"
-                  @click="split(order)"
-                >
-                  SPLIT
-                </jqxButton>
-                <jqxButton
-                  class="btn-duplicate w-full"
-                  theme="office"
-                  @click="duplicate(order)"
-                >
-                  DUPLICATE
-                </jqxButton>
-                <jqxButton
-                  class="btn-delete w-full"
-                  theme="office"
-                  @click="remove(index)"
-                >
-                  DELETE
-                </jqxButton>
-              </div>
-            </div>
-          </div>
-
-          <hr class="hr" />
-
-          <div class="order-details mt-auto">
-            <input
-              type="text"
-              :value="quantities"
-              disabled
-              placeholder="Quantities"
-              title="Quantities"
-            />
-            <input
-              type="text"
-              :value="strategies"
-              disabled
-              placeholder="Strategies"
-              title="Strategies"
-            />
           </div>
         </div>
 
-        <div class="orders-buttons-container flex">
+        <hr class="hr" />
+
+        <div class="order-details mt-auto">
+          <input
+            type="text"
+            :value="quantities"
+            disabled
+            placeholder="Quantities"
+            title="Quantities"
+          />
+          <input
+            type="text"
+            :value="strategies"
+            disabled
+            placeholder="Strategies"
+            title="Strategies"
+          />
+        </div>
+      </div>
+
+      <div class="orders-buttons-container flex">
+        <div class="flex ml-auto">
           <jqxButton
+            ref="btnReset"
             theme="office"
             title="Reset the orders to the original one"
+            width="150px"
             @click="reset"
           >
             RESET
           </jqxButton>
-          <jqxButton theme="office" @click="save">
+          <jqxButton ref="btnUpdate" theme="office" width="150px" @click="save">
             {{ loading.update ? 'UPDATING...' : 'UPDATE' }}
           </jqxButton>
         </div>
       </div>
-    </JqxWindow>
-  </div>
+    </div>
+  </JqxWindow>
 </template>
 
 <script lang="ts">
@@ -167,7 +172,7 @@ const initialNewOrder: IRMSOrder = {
 function formatOrder(order: IRMSOrder): IRMSOrder {
   return {
     ...order,
-    selected: false,
+    // selected: false,
   }
 }
 
@@ -220,6 +225,11 @@ export default {
       const currentBook = accountVar.books.find(
         (book) => book.id === parseInt(rowID)
       )
+
+      const contractNameEl = this.$el.querySelector(
+        '#preview-single-order-contract-name'
+      ) as HTMLElement
+      contractNameEl.textContent = currentBook.contract
 
       this.origin.quantity = currentBook.orderQ
       this.origin.strategy = currentBook.orderP
@@ -274,6 +284,7 @@ export default {
 
     save() {
       this.loading.update = true
+      this.disableComponents()
       const accountVar = helpers.getAccountVar(currentAccount)
       const bookIndex = Risks.GetBookIndexByID(this.rowID)
       const book = accountVar.books[bookIndex]
@@ -311,7 +322,18 @@ export default {
         })
         .finally(() => {
           this.loading.update = false
+          this.enableComponents()
         })
+    },
+
+    disableComponents() {
+      this.$refs.btnUpdate.disabled = true
+      this.$refs.btnReset.disabled = true
+    },
+
+    enableComponents() {
+      this.$refs.btnUpdate.disabled = false
+      this.$refs.btnReset.disabled = false
     },
 
     remove(index: number) {
