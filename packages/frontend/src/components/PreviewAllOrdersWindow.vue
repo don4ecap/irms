@@ -361,6 +361,11 @@ export default {
       const accountVar = accountsVar[account]
       const selected =
         this.$refs.previewOrdersGrid.getselectedrowindexes() as Array<number>
+
+      if (selected.length < 1) {
+        return
+      }
+
       const rows = this.$refs.previewOrdersGrid.getrows() as Array<any>
 
       let sentOrdersCount = 0
