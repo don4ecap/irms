@@ -5,30 +5,27 @@
     :min-width="1200"
     :min-height="500"
     :auto-open="false"
+    :is-modal="true"
     @close="close"
   >
-    <h2 id="preview-single-window-header" style="margin: 0">Alarms</h2>
-    <div class="preview-window-content single-order-preview">
-      <div class="orders-container flex-grow">
+    <h3 id="alarm-window-header" style="margin: 0">
+      Alarms - <span id="alarm-window-contract-name"></span>
+    </h3>
+    <div class="preview-window-content" style="padding: 0.5rem">
+      <div class="window-content-container flex-grow">
         <SkeletonLoader
           v-if="loading.load"
           caption="Loading alarms..."
           style="min-height: 200px; padding-top: 0.1rem"
         />
         <div v-else>
-          <div class="text-right relative">
+          <div class="text-right relative mb-2">
             <span :class="{ timer: countdown <= 5 && countdown > 0 }">{{
               countdown
             }}</span>
             seconds to auto-refresh
           </div>
           <table class="alarms-table w-full">
-            <caption>
-              <h3 v-if="contract" class="text-left">
-                Set alarm for contract {{ contract }}
-              </h3>
-              <h3 v-else class="text-left">Showing all working alarms</h3>
-            </caption>
             <thead class="bold">
               <td style="width: 12rem">Contract</td>
               <td style="width: 6rem">Field</td>
@@ -133,9 +130,16 @@ export default {
   methods: {
     async open(contract: string, extension: string, account: string) {
       this.$refs.currentWindow.open()
+
       this.contract = contract
       this.extension = extension
       this.account = account
+
+      const alarmContractNameEl = this.$el.querySelector(
+        '#alarm-window-contract-name'
+      ) as HTMLSpanElement
+      alarmContractNameEl.textContent = contract
+
       this.countdown = this.fetchIntervalTime / 1000
       await this.fetchAlarms()
       this.fetchInterval = setInterval(
@@ -143,6 +147,7 @@ export default {
         this.fetchIntervalTime
       )
       this.countdownInterval = setInterval(this.updateRemainingTime, 1000)
+
       this.$refs.addAlarmRow.focus()
     },
 
