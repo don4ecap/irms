@@ -236,19 +236,47 @@
         <div
           v-show="currentViewIndex === 0"
           ref="IRMSBookTreeGridContainer"
-          class="irms-book-tree-grid-container flex w-full"
+          class="irms-book-tree-grid-container relative flex w-full"
         >
           <div
-            v-show="!bookIsError"
             :id="IRMSBookTreeGridID"
             ref="IRMSBookTreeGrid"
             class="irms-book-tree-grid"
           />
           <div
-            v-show="bookIsError && !loadingBooks"
-            class="book-error-msg flex flex-column flex-grow items-center justify-center"
+            v-show="loadingBooks"
+            class="book-loading flex flex-column flex-grow items-center justify-center"
           >
-            {{ bookErrorMsg }}
+            <div style="max-width: 100px">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                style="
+                  margin: auto;
+                  background: transparent;
+                  display: block;
+                  shape-rendering: auto;
+                "
+                width="64px"
+                height="64px"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid"
+              >
+                <circle cx="50" cy="23" r="13" fill="#a49d9d">
+                  <animate
+                    attributeName="cy"
+                    dur="0.85s"
+                    repeatCount="indefinite"
+                    calcMode="spline"
+                    keySplines="0.45 0 0.9 0.55;0 0.45 0.55 0.9"
+                    keyTimes="0;0.5;1"
+                    values="23;77;23"
+                  ></animate>
+                </circle>
+              </svg>
+            </div>
+            <div class="animate-pulse">Loading iRMS books...</div>
+            <!-- {{ bookErrorMsg }} -->
           </div>
         </div>
 
@@ -352,7 +380,7 @@
 
         <!-- DATES -->
         <div
-          v-show="!bookIsError"
+          v-show="!loadingBooks"
           class="ml-auto flex wrap items-center"
           style="gap: 1rem; margin-right: 0.3rem"
         >
@@ -368,7 +396,7 @@
               {{ lastBookCalculationScheduler }}
             </span>
           </div>
-          <div v-show="bookLoadedDate?.length && !bookIsError">
+          <div v-show="bookLoadedDate?.length && !loadingBooks">
             Book Loaded: <span>{{ bookLoadedDate }}</span>
           </div>
           <div class="permission bold text-center self-center cursor-default">
@@ -468,7 +496,7 @@ export default {
       version: import.meta.env.VITE_IRMS_VERSION,
       gitBranchLink: import.meta.env.VITE_IRMS_GIT_BRANCH_LINK,
       selectedSessionIndex: sessions.length - 1,
-      bookIsError: false,
+      // bookIsError: false,
       bookErrorMsg: '',
       loadingBooks: false,
 
@@ -674,6 +702,7 @@ export default {
       this.initialRequestData.session = this.selectedSession
 
       this.showLoadingBooks()
+      this.loadingBooks = true
       this.bookLoadedDate = moment().format('LLL')
 
       try {
@@ -742,7 +771,6 @@ export default {
       const accountVar = helpers.getAccountVar(this.account)
 
       this.showLoadingBooks()
-      this.loadingBooks = true
 
       try {
         const { data } = await http.irms.get(
@@ -854,18 +882,18 @@ export default {
         accountVar.editingRowID = -1
         return await Promise.resolve()
       } catch (error) {
-        if (error.response.status !== 404) {
-          console.error('Failed to fetch books', this.account, error)
-        }
-        this.bookIsError = true
-        if (!error?.response?.data?.message) {
-          this.bookErrorMsg = `Failed to fetch books of ${
-            this.account
-          } account with ${this.sessions[this.selectedSessionIndex]} session`
-        } else {
-          console.error(error.response.data.message)
-          this.bookErrorMsg = error.response.data.message
-        }
+        // if (error.response.status !== 404) {
+        //   console.error('Failed to fetch books', this.account, error)
+        // }
+        // this.bookIsError = true
+        // if (!error?.response?.data?.message) {
+        //   this.bookErrorMsg = `Failed to fetch books of ${
+        //     this.account
+        //   } account with ${this.sessions[this.selectedSessionIndex]} session`
+        // } else {
+        //   console.error(error.response.data.message)
+        //   this.bookErrorMsg = error.response.data.message
+        // }
         clearInterval(this.lastBookCalculationSchedulerInterval)
         this.resetNavData()
         this.resetConfigTagsButton()

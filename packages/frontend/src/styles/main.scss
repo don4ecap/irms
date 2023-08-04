@@ -185,20 +185,29 @@
   transform: scale(1.1);
 }
 
-.book-error-msg {
-  padding: 1rem;
+.book-loading {
+  background-color: #fff;
   font-size: 1rem;
-  color: #ff0000;
+  height: calc(100% - 2rem);
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  padding: 1rem;
+  position: absolute;
+  width: calc(100% - 2rem);
+  z-index: 9999999;
 }
 
 .query-log {
   background-color: #fff;
   border: 1px solid #d4d4d4;
   height: 30vh;
+  position: relative;
   transform: translateY(8px);
   transition: transform 0.27s ease;
   margin-right: -2px;
   box-sizing: border-box;
+  z-index: 9999999;
 
   &.active {
     transform: translateY(-30vh);
