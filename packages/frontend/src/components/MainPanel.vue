@@ -223,11 +223,13 @@
           ></div>
         </div>
         <div
-          class="col-5 flex flex-column ml-auto"
-          style="gap: 0.3rem; margin-right: 1em"
+          class="col-5flex flex-column ml-auto bold"
+          style="padding: 0.2rem; margin-right: 1em; font-size: 0.8rem"
         >
           <div>
-            <a :href="gitBranchLink" target="_blank">{{ version }}</a>
+            <a class="no-decoration" :href="gitBranchLink" target="_blank"
+              >iRMS {{ version }}</a
+            >
           </div>
         </div>
       </div>
