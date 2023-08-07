@@ -135,7 +135,7 @@ export default defineComponent({
       return http.irms
         .get(url)
         .then(({ data }) => {
-          const alarms = data.data as Array<Alarm>
+          const alarms = (data.data || []) as Array<Alarm>
           this.alarms = alarms.map((alarm) => ({
             ...alarm,
             loading: {
