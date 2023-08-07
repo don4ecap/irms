@@ -14,9 +14,10 @@
       <form ref="form" class="flex flex-column h-full" @submit.prevent="save">
         <table class="w-full flex-grow">
           <tr>
-            <td><label for="adminfees" class="block">Admin Fees</label></td>
+            <td><label for="nav-adminfees" class="block">Admin Fees</label></td>
             <td>
               <input
+                id="nav-adminfees"
                 v-model="nav.fee1"
                 type="number"
                 step="any"
@@ -26,10 +27,13 @@
               <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
-              <label for="managementfees" class="block">Management Fees</label>
+              <label for="nav-managementfees" class="block">
+                Management Fees
+              </label>
             </td>
             <td>
               <input
+                id="nav-managementfees"
                 v-model="nav.fee2"
                 type="number"
                 step="any"
@@ -39,10 +43,13 @@
               <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
-              <label for="incentivefees" class="block">Incentive Fees</label>
+              <label for="nav-incentivefees" class="block">
+                Incentive Fees
+              </label>
             </td>
             <td>
               <input
+                id="nav-incentivefees"
                 v-model="nav.fee3"
                 type="number"
                 step="any"
@@ -54,10 +61,11 @@
           </tr>
           <tr>
             <td>
-              <label for="fxadjustment" class="block">Fx Adjustment</label>
+              <label for="nav-fxadjustment" class="block">Fx Adjustment</label>
             </td>
             <td>
               <input
+                id="nav-fxadjustment"
                 v-model="nav.fxAdj"
                 type="number"
                 step="any"
@@ -67,12 +75,13 @@
               <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
-              <label for="brokercommissions" class="block">
+              <label for="nav-brokercommissions" class="block">
                 Broker Commissions
               </label>
             </td>
             <td>
               <input
+                id="nav-brokercommissions"
                 v-model="nav.brokerCommissions"
                 type="number"
                 step="any"
@@ -81,9 +90,10 @@
               />
               <!-- @keypress="onInputKeypress" -->
             </td>
-            <td><label for="misc" class="block">Miscellaneous</label></td>
+            <td><label for="nav-misc" class="block">Miscellaneous</label></td>
             <td>
               <input
+                id="nav-misc"
                 v-model="nav.misc"
                 type="number"
                 step="any"
@@ -94,9 +104,10 @@
             </td>
           </tr>
           <tr>
-            <td><label for="pnl" class="block">PNL</label></td>
+            <td><label for="nav-pnl" class="block">PNL</label></td>
             <td>
               <input
+                id="nav-pnl"
                 v-model="nav.pnl"
                 type="number"
                 step="any"
@@ -105,9 +116,10 @@
               />
               <!-- @keypress="onInputKeypress" -->
             </td>
-            <td><label for="subred" class="block">Sub/Red</label></td>
+            <td><label for="nav-subred" class="block">Sub/Red</label></td>
             <td>
               <input
+                id="nav-subred"
                 v-model="nav.subred"
                 type="number"
                 step="any"
@@ -118,9 +130,12 @@
             </td>
           </tr>
           <tr>
-            <td><label for="fourecapnav" class="block">4ECAP NAV</label></td>
+            <td>
+              <label for="nav-fourecapnav" class="block">4ECAP NAV</label>
+            </td>
             <td>
               <input
+                id="nav-fourecapnav"
                 v-model="nav.nav"
                 type="number"
                 step="any"
@@ -130,12 +145,13 @@
               <!-- @keypress="onInputKeypress" -->
             </td>
             <td>
-              <label for="administratornav" class="block">
+              <label for="nav-administratornav" class="block">
                 Administrator NAV
               </label>
             </td>
             <td>
               <input
+                id="nav-administratornav"
                 v-model="nav.chNav"
                 type="number"
                 step="any"
@@ -146,9 +162,15 @@
             </td>
           </tr>
           <tr>
-            <td><label for="comments" class="block">Comments</label></td>
+            <td><label for="nav-comments" class="block">Comments</label></td>
             <td colspan="6">
-              <input type="text" style="width: 97%" size="100" disabled />
+              <input
+                id="nav-comments"
+                type="text"
+                style="width: 97%"
+                size="100"
+                disabled
+              />
             </td>
           </tr>
         </table>
