@@ -702,7 +702,6 @@ export default {
       this.initialRequestData.session = this.selectedSession
 
       this.showLoadingBooks()
-      this.loadingBooks = true
       this.bookLoadedDate = moment().format('LLL')
 
       try {
@@ -899,7 +898,6 @@ export default {
         this.resetConfigTagsButton()
         return await Promise.reject()
       } finally {
-        this.loadingBooks = false
         this.unshowLoadingBooks()
         console.timeEnd(`Load ${this.account} books`)
       }
@@ -1030,12 +1028,21 @@ export default {
     },
 
     showLoadingBooks() {
+      this.loadingBooks = true
+      const mainContainer = this.$refs.mainContainer as HTMLDivElement
+      mainContainer.scrollTop = 0
+      mainContainer.style.overflow = 'hidden'
+
       this.labels.loadBooks = 'Loading...'
       $(this.$refs.loadButton.$el).jqxButton({ disabled: true })
       $(this.$refs.btnPreview.$el).jqxButton({ disabled: true })
     },
 
     unshowLoadingBooks() {
+      this.loadingBooks = false
+      const mainContainer = this.$refs.mainContainer as HTMLDivElement
+      mainContainer.style.overflow = null
+
       this.labels.loadBooks = 'Load iRMS'
       $(this.$refs.loadButton.$el).jqxButton({ disabled: false })
       $(this.$refs.btnPreview.$el).jqxButton({ disabled: false })
