@@ -3,12 +3,17 @@
     class="icms-commissions-grid-container w-full flex flex-column overflow-hidden"
   >
     <div class="flex p-2 gap-2">
-      <JqxButton theme="office" @click="openAddICMSCommissionWindow">
+      <JqxButton
+        ref="btnInsert"
+        theme="office"
+        @click="openAddICMSCommissionWindow"
+      >
         Insert Commodity Fees
       </JqxButton>
-      <JqxButton theme="office" @click="getICMSCommissionsData">
-        Reload </JqxButton
-      ><JqxButton theme="office" @click="exportToXLS">
+      <JqxButton ref="btnReload" theme="office" @click="getICMSCommissionsData">
+        Reload
+      </JqxButton>
+      <JqxButton ref="btnExport" theme="office" @click="exportToXLS">
         Export as XLS
       </JqxButton>
     </div>
@@ -170,6 +175,7 @@ export default {
   methods: {
     getICMSCommissionsData() {
       this.$refs.ICMSCommissionsGrid.showloadelement()
+      this.disableComponents()
       this.$refs.ICMSCommissionsGrid.removesort()
       return http.icms
         .get(`getCommissions/${this.account}`)
@@ -190,6 +196,7 @@ export default {
         })
         .finally(() => {
           this.$refs.ICMSCommissionsGrid.hideloadelement()
+          this.enableComponents()
         })
     },
 
@@ -220,6 +227,20 @@ export default {
         true,
         `${import.meta.env.VITE_IRMS_BACKEND_URL}/exportFile`
       )
+    },
+
+    enableComponents() {
+      this.$refs.btnInsert.disabled = false
+      this.$refs.btnReload.disabled = false
+      this.$refs.btnExport.disabled = false
+      this.$refs.ICMSCommissionsGrid.disabled = false
+    },
+
+    disableComponents() {
+      this.$refs.btnInsert.disabled = true
+      this.$refs.btnReload.disabled = true
+      this.$refs.btnExport.disabled = true
+      this.$refs.ICMSCommissionsGrid.disabled = true
     },
   },
 }

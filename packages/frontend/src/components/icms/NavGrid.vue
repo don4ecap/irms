@@ -1,8 +1,12 @@
 <template>
   <div class="icms-nav-grid-container w-full overflow-hidden">
     <div class="flex p-2 gap-2">
-      <JqxButton theme="office" @click="getICMSNavData">Reload</JqxButton>
-      <JqxButton theme="office" @click="exportToXLS">Export as XLS</JqxButton>
+      <JqxButton ref="btnReload" theme="office" @click="getICMSNavData"
+        >Reload</JqxButton
+      >
+      <JqxButton ref="btnExport" theme="office" @click="exportToXLS"
+        >Export as XLS</JqxButton
+      >
     </div>
     <JqxGrid
       ref="ICMSNavGrid"
@@ -154,6 +158,7 @@ export default {
   methods: {
     getICMSNavData() {
       this.$refs.ICMSNavGrid.showloadelement()
+      this.disableComponents()
       this.$refs.ICMSNavGrid.removesort()
       return http.icms
         .get(`getNavs/${this.account}`)
@@ -174,6 +179,7 @@ export default {
         })
         .finally(() => {
           this.$refs.ICMSNavGrid.hideloadelement()
+          this.enableComponents()
         })
     },
 
@@ -228,6 +234,18 @@ export default {
         true,
         `${import.meta.env.VITE_IRMS_BACKEND_URL}/exportFile`
       )
+    },
+
+    enableComponents() {
+      this.$refs.btnReload.disabled = false
+      this.$refs.btnExport.disabled = false
+      this.$refs.ICMSNavGrid.disabled = false
+    },
+
+    disableComponents() {
+      this.$refs.btnReload.disabled = true
+      this.$refs.btnExport.disabled = true
+      this.$refs.ICMSNavGrid.disabled = true
     },
   },
 }
