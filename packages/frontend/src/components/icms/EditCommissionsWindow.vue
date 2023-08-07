@@ -6,6 +6,7 @@
     :height="415"
     :resizable="false"
     theme="office"
+    :is-modal="true"
   >
     <div>
       <b>Edit Commodity Fees</b>
