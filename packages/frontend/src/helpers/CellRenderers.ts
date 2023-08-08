@@ -355,7 +355,8 @@ const aRenderer: RendererCallback = function (
       'onclick',
       `DeleteSector('${rowData.sector}')`
     )
-    deleteSectorButton.textContent = 'X'
+    deleteSectorButton.title = 'Delete sector'
+    deleteSectorButton.textContent = '✘'
     return deleteSectorButton.outerHTML
   }
 
@@ -367,7 +368,8 @@ const aRenderer: RendererCallback = function (
       'onclick',
       `DeleteCommodity('${rowData.commo}', '${rowData.extension}', '${rowData.instrument}')`
     )
-    deleteCommodityButton.textContent = 'X'
+    deleteCommodityButton.title = 'Delete commodity'
+    deleteCommodityButton.textContent = '✘'
     return deleteCommodityButton.outerHTML
   }
 
@@ -528,46 +530,49 @@ const colorType: RendererCallback = function (
 ) {
   const accountVar = helpers.getAccountVar(currentAccount)
 
-  if (dataField == 'target_allocation_delta') {
-    if (rowData.rowType == 'contract') return 'commo'
-  }
-  if (rowData.rowType == 'sector') {
-    if (rowData.display == 'PORTFOLIO') return 'portfolio'
-    else return 'sector'
+  if (
+    rowData.rowType === 'contract' &&
+    dataField === 'target_allocation_delta'
+  ) {
+    return 'commo'
   }
 
-  if (rowData.rowType == 'commodity') {
-    if (dataField.indexOf('current_allocation_delta') != -1) {
+  if (rowData.rowType === 'sector') {
+    return rowData.display === 'PORTFOLIO' ? 'portfolio' : 'sector'
+  }
+
+  if (rowData.rowType === 'commodity') {
+    if (dataField.includes('current_allocation_delta')) {
       return getDeltaColor(Math.abs(parseFloat(cellText)))
     }
-    if (dataField.indexOf('display') != -1) {
+    if (dataField.includes('display')) {
       const key = accountVar.bookIDMapRev[rowData.id]
       const row = accountVar.books[key]
-      if (row.marketStatus == 'FALSE') return 'marketclosed'
+      if (row.marketStatus === 'FALSE') {
+        return 'marketclosed'
+      }
     }
     return 'commo'
   }
 
-  if (rowData.rowType == 'contract') {
-    // let nonnull = ''
+  if (rowData.rowType === 'contract') {
     let commo = ''
 
-    if (dataField == 'display') {
+    if (dataField === 'display') {
       const level = accountVar.indLevel.find(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        (item) => item.contract == rowData.contract
+        (item) => item.contract === rowData.contract
       )
-      // @ts-ignore
-      if (level != null) return 'level_' + level.maxLevel
+      if (level != null) {
+        return 'level_' + level.maxLevel
+      }
     }
-    if (dataField.indexOf('pct') != -1) {
+    if (dataField.includes('pct')) {
       commo = 'commo'
     }
-    if (dataField == 'orderQ' || dataField == 'orderP') {
+    if (dataField === 'orderQ' || dataField === 'orderP') {
       commo = 'editable wrap'
     }
-    if (dataField.indexOf('delta') != -1) {
+    if (dataField.includes('delta')) {
       commo = 'white'
     }
     return commo

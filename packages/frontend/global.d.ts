@@ -19,6 +19,11 @@ interface Alarm {
   tablerownames: string
 }
 
+interface IndicatorLevel {
+  contract: string
+  maxLevel: number
+}
+
 // interface Contract {
 //   some: string
 // }
@@ -55,7 +60,7 @@ declare global {
     excecuteR: ExecuteR
     fixings: []
     forceRenderedOnce: boolean
-    indLevel: []
+    indLevel: Array<IndicatorLevel>
     inputEl: HTMLInputElement
     isEdited: boolean
     pnlUSD: any
